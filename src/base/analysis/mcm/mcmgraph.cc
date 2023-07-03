@@ -730,7 +730,7 @@ CDouble MCMgraph::calculateMaximumCycleMeanKarpDouble(const MCMnode **criticalNo
 }
 
 CDouble MCMgraph::calculateMaximumCycleRatioAndCriticalCycleYoungTarjanOrlin(
-        std::shared_ptr<std::vector<const MCMedge *>> *cycle) {
+        std::vector<const MCMedge *> *cycle) {
     return maxCycleRatioAndCriticalCycleYoungTarjanOrlin(*this, cycle);
 }
 

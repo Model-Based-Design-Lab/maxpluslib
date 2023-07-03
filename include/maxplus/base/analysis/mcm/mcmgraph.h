@@ -211,7 +211,7 @@ public:
     calculateMaximumCycleMeanKarpDouble(const MCMnode **criticalNode = nullptr);
 
     [[nodiscard]] CDouble calculateMaximumCycleRatioAndCriticalCycleYoungTarjanOrlin(
-            std::shared_ptr<std::vector<const MCMedge*>> *cycle = nullptr);
+            std::vector<const MCMedge*> *cycle = nullptr);
 
     [[nodiscard]] std::shared_ptr<MCMgraph> normalize(CDouble mu) const;
     [[nodiscard]] std::shared_ptr<MCMgraph> normalize(const std::map<CId, CDouble> &mu) const;

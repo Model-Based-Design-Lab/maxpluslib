@@ -116,7 +116,7 @@ CDouble maxCycleMeanYoungTarjanOrlin(MCMgraph& mcmGraph);
 /// @param cycle Pointer to the critical cycle
 /// @return the MCM and a critical cycle
 CDouble
-maxCycleMeanAndCriticalCycleYoungTarjanOrlin(MCMgraph& mcmGraph, std::shared_ptr<std::vector<const MCMedge*>> *cycle);
+maxCycleMeanAndCriticalCycleYoungTarjanOrlin(MCMgraph& mcmGraph, std::vector<const MCMedge*> *cycle);
 
 
 /**
@@ -135,7 +135,7 @@ CDouble maxCycleRatioYoungTarjanOrlin(MCMgraph& mcmGraph);
  * to an array of *MCMEdges of the critical cycle/
  */
 CDouble
-maxCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph& mcmGraph, std::shared_ptr<std::vector<const MCMedge*>> *cycle);
+maxCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph& mcmGraph, std::vector<const MCMedge*> *cycle);
 
 /**
  * minCycleRatioYoungTarjanOrlin ()
@@ -153,7 +153,7 @@ CDouble minCycleRatioYoungTarjanOrlin(MCMgraph& mcmGraph);
  * to an array of *MCMEdges of the critical cycle.
  */
 CDouble
-minCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph& mcmGraph, std::shared_ptr<std::vector<const MCMedge*>> *cycle);
+minCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph& mcmGraph, std::vector<const MCMedge*> *cycle);
 
 /**
  * getDelay ()
@@ -186,7 +186,7 @@ void convertMCMgraphToYTOgraph(MCMgraph& g,
  * edges, alternatively called "length" or "weight".
  */
 
-void mmcycle(graph& gr, CDouble *lambda, std::shared_ptr<std::vector<const arc*>> *cycle);
+void mmcycle(graph& gr, CDouble *lambda, std::vector<const arc*> *cycle);
 
 } // namespace Graphs
 

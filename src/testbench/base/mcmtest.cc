@@ -193,11 +193,11 @@ void MCMTest::test_yto() {
     CDouble result = maxCycleMeanYoungTarjanOrlin(g1);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
 
-    std::shared_ptr<std::vector<const MCMedge *>> cycle;
+    std::vector<const MCMedge *> cycle;
     result = maxCycleMeanAndCriticalCycleYoungTarjanOrlin(g1, &cycle);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
-    ASSERT_THROW(cycle->size() == 4);
-    int eid = cycle->at(0)->id;
+    ASSERT_THROW(cycle.size() == 4);
+    int eid = cycle.at(0)->id;
     ASSERT_THROW(eid == 0 || eid == 1 || eid == 2 || eid == 3);
 
     result = maxCycleRatioYoungTarjanOrlin(g1);
@@ -205,7 +205,7 @@ void MCMTest::test_yto() {
 
     result = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(g1, &cycle);
     ASSERT_APPROX_EQUAL(10.0 / 3.0, result, 1e-5);
-    eid = cycle->at(0)->id;
+    eid = cycle.at(0)->id;
     ASSERT_THROW(eid == 4);
 
     result = minCycleRatioYoungTarjanOrlin(g1);
@@ -213,7 +213,7 @@ void MCMTest::test_yto() {
 
     result = minCycleRatioAndCriticalCycleYoungTarjanOrlin(g1, &cycle);
     ASSERT_APPROX_EQUAL(1.0, result, 1e-5);
-    eid = cycle->at(0)->id;
+    eid = cycle.at(0)->id;
     ASSERT_THROW(eid == 6);
 
     // TODO: check of the cycle ratio are identical to old SDF3
