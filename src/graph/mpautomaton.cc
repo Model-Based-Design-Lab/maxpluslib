@@ -29,7 +29,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCR(){
         }
     }
 
-    std::shared_ptr<std::vector<const MCMedge*>> cycle;
+    std::vector<const MCMedge*> cycle;
     CDouble mcr = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(g, &cycle);
 
     return mcr;
@@ -57,11 +57,11 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(std::shared_ptr<std::v
         }
     }
 
-    std::shared_ptr<std::vector<const MCMedge*>> mcmCycle;
+    std::vector<const MCMedge*> mcmCycle;
     CDouble mcr = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(g, &mcmCycle);
     if (cycle != nullptr) {
         *cycle = std::make_shared<std::vector<const MPAREdge*>>();
-        for (const auto *e: *mcmCycle) {
+        for (const auto *e: mcmCycle) {
             (*cycle)->push_back(edgeMap[e]);
         }
     }
