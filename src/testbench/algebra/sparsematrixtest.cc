@@ -4,7 +4,6 @@
 #include "sparsematrixtest.h"
 #include "testing.h"
 
-
 #define ASSERT_EPSILON 0.001
 
 using namespace MaxPlus;

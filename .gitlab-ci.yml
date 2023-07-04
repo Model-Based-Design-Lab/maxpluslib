@@ -2,7 +2,7 @@ before_script:
     - apt-get update
     - apt-get install --force-yes -y python lcov
     - apt remove --purge --auto-remove cmake
-    - apt install -y software-properties-common lsb-release cmake
+    - apt install -y software-properties-common lsb-release cmake clang-format
 
 build:
     tags:
@@ -12,6 +12,17 @@ build:
         - make
         - ctest --output-on-failure
         - make maxpluslibcoverage
+    artifacts:
+      expire_in: 14d
+      when: always
+      paths:
+      - ./build/coverage/
+
+format:
+    tags:
+        - Ubuntu2004-64bit
+    script:
+        - clang-format --dry-run --Werror `find ./ -type f -name "*.h" -o -name "*.cc" -o -name "*.cpp"`
     artifacts:
       expire_in: 14d
       when: always

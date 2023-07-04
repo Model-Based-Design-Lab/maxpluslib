@@ -34,7 +34,8 @@ int MatrixTest::test_SetMPTimeInMatrix() {
             if (row == 0 && column == 0) {
                 ASSERT_EQUAL(static_cast<CDouble>(newVal), static_cast<CDouble>(m.get(0, 0)));
             } else {
-                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(row, column)));
+                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY),
+                             static_cast<CDouble>(m.get(row, column)));
             }
         }
     }
@@ -103,8 +104,10 @@ int MatrixTest::test_Addition() {
                 ASSERT_EQUAL(3.0, static_cast<CDouble>(mResult.get(row, column)));
                 ASSERT_EQUAL(3.0, static_cast<CDouble>(mResult2.get(row, column)));
             } else {
-                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(mResult.get(row, column)));
-                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(mResult2.get(row, column)));
+                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY),
+                             static_cast<CDouble>(mResult.get(row, column)));
+                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY),
+                             static_cast<CDouble>(mResult2.get(row, column)));
             }
         }
     }

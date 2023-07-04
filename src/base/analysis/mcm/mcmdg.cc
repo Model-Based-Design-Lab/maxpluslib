@@ -119,8 +119,7 @@ CDouble mcmDG_SCC(MCMgraph &mcmGraph) {
 
     return l;
 }
-    
-    
+
 /**
  * mcmDG ()
  * The function computes the maximum cycle mean of an MCM graph using

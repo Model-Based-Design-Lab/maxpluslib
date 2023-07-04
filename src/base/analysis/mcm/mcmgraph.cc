@@ -600,19 +600,19 @@ void stronglyConnectedMCMgraph(MCMgraph &g,
  */
 void relabelMCMgraph(MCMgraph &g) {
 
-    std::set<MCMedge*> edgesToRemove;
-    std::set<MCMnode*> nodesToRemove;
-    
+    std::set<MCMedge *> edgesToRemove;
+    std::set<MCMnode *> nodesToRemove;
+
     // find nodes to remove
     for (auto &n : g.getNodes()) {
-        if (! n.visible) {
+        if (!n.visible) {
             nodesToRemove.insert(&n);
         }
     }
 
     // find edges to remove
     for (auto &e : g.getEdges()) {
-        if (! e.visible) {
+        if (!e.visible) {
             edgesToRemove.insert(&e);
         }
     }
@@ -644,7 +644,6 @@ void relabelMCMgraph(MCMgraph &g) {
             edgeId++;
         }
     }
-
 }
 
 // Prune the edges in the MCMgraph to maintain only Pareto maximal combinations

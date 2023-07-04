@@ -383,7 +383,7 @@ public:
      *
      * 9) goto (6);
      */
-    void mmcycle(graph &gr, CDouble *lambda, std::shared_ptr<std::vector<const arc*>> *cycle) {
+    void mmcycle(graph &gr, CDouble *lambda, std::shared_ptr<std::vector<const arc *>> *cycle) {
 
         // set up initial tree
         node *s_ptr = gr.vs;
@@ -628,7 +628,7 @@ public:
         }
 
         if (cycle != nullptr) {
-            *cycle = std::make_shared<std::vector<const arc*>>();
+            *cycle = std::make_shared<std::vector<const arc *>>();
             if (min_a_ptr != NILA) {
                 (*cycle)->push_back(min_a_ptr);
                 a_ptr = min_a_ptr->tail->parent_in;
@@ -658,7 +658,7 @@ public:
      * TODO: see if the algorithms can be unified to remove duplicate code
      **/
 
-    void mmcycle_robust(graph &gr, CDouble *lambda, std::vector<const arc*> *cycle) {
+    void mmcycle_robust(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle) {
         const CDouble MCR_EPSILON_RATIO = 1.0e-8L;
 
         // set up initial tree
@@ -731,7 +731,7 @@ public:
         }
 
         // d-heap used for maintenance of vertex keys
-        //d_heap h;
+        // d_heap h;
         AllocHeap(gr.n_nodes);
 
         // compute initial vertex keys
@@ -914,12 +914,12 @@ public:
         }
 
         if (cycle != nullptr) {
-            *cycle = std::vector<const arc*>();
+            *cycle = std::vector<const arc *>();
             if (min_a_ptr != NILA) {
-                cycle -> push_back(min_a_ptr);
+                cycle->push_back(min_a_ptr);
                 a_ptr = min_a_ptr->tail->parent_in;
                 while (a_ptr->head != min_a_ptr->head) {
-                    cycle -> push_back(a_ptr);
+                    cycle->push_back(a_ptr);
                     a_ptr = a_ptr->tail->parent_in;
                 }
             }
@@ -934,11 +934,10 @@ public:
  * It assumes that the id's of the nodes are 0 <= id < number of nodes
  */
 
-
 void convertMCMgraphToYTOgraph(MCMgraph &g,
                                graph &gr,
-                               CDouble (*costFunction)(const MCMedge& e),
-                               CDouble (*transit_timeFunction)(const MCMedge& e)) {
+                               CDouble (*costFunction)(const MCMedge &e),
+                               CDouble (*transit_timeFunction)(const MCMedge &e)) {
 
     gr.n_nodes = static_cast<int>(g.nrVisibleNodes());
     gr.n_arcs = static_cast<int>(g.nrVisibleEdges());
@@ -948,11 +947,11 @@ void convertMCMgraphToYTOgraph(MCMgraph &g,
 
     // create nodes
     // keep an index of node id's
-    std::map<CId,CId> nodeIndex;
+    std::map<CId, CId> nodeIndex;
     uint ind = 0;
     for (const auto &n : g.getNodes()) {
         nodeIndex[n.id] = ind;
-        node& x = (gr.nodes)[ind];
+        node &x = (gr.nodes)[ind];
         x.id = static_cast<int>(n.id + 1);
         x.first_arc_out = nullptr;
         x.first_arc_in = nullptr;
@@ -964,8 +963,8 @@ void convertMCMgraphToYTOgraph(MCMgraph &g,
     // create arcs
     int aidx = 0;
     for (const auto &e : g.getEdges()) {
-        MCMnode* u = e.src;
-        MCMnode* v = e.dst;
+        MCMnode *u = e.src;
+        MCMnode *v = e.dst;
 
         arc &a = gr.arcs[aidx];
 
@@ -1049,19 +1048,19 @@ void convertMCMgraphToYTOgraph(MCMgraph &g,
  * constOne ()
  * The function returns the unit cost associated with an edge.
  */
-CDouble constOne(const MCMedge& /*e*/) { return 1.0; }
+CDouble constOne(const MCMedge & /*e*/) { return 1.0; }
 
 /**
  * getWeight ()
  * The function returns the weight associated with an edge.
  */
-CDouble getWeight(const MCMedge& e) { return e.w; }
+CDouble getWeight(const MCMedge &e) { return e.w; }
 
 /**
  * getDelay ()
  * The function returns the delay associated with an edge.
  */
-CDouble getDelay(const MCMedge& e) { return e.d; }
+CDouble getDelay(const MCMedge &e) { return e.d; }
 
 /**
  * maxCycleMeanAndCriticalCycleYoungTarjanOrlin ()
@@ -1076,9 +1075,8 @@ CDouble getDelay(const MCMedge& e) { return e.d; }
  * 2. it is assumed that the node have id's ranging from 0 up to the number of nodes.
  * 3. it is assumed that cycles have a weight > 0 !
  */
-CDouble
-maxCycleMeanAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
-                                             std::vector<const MCMedge *> *cycle) {
+CDouble maxCycleMeanAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
+                                                     std::vector<const MCMedge *> *cycle) {
     graph ytoGraph;
 
     // Convert the graph to an input graph for the YTO algorithm
@@ -1088,7 +1086,7 @@ maxCycleMeanAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
 
     CDouble min_cr = 0;
     if (cycle != nullptr) {
-        std::vector<const arc*> ytoCycle;
+        std::vector<const arc *> ytoCycle;
 
         // Find maximum cycle mean
         std::int32_t ytoCycLen = 0;
@@ -1096,7 +1094,7 @@ maxCycleMeanAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
 
         size_t len = ytoCycle.size();
 
-        *cycle = std::vector<const MCMedge*>(len);
+        *cycle = std::vector<const MCMedge *>(len);
         for (uint i = 0; i < len; i++) {
             (*cycle).at(i) = ytoCycle.at(i)->mcmEdge;
         }
@@ -1131,7 +1129,7 @@ CDouble maxCycleMeanYoungTarjanOrlin(MCMgraph &mcmGraph) {
  */
 
 CDouble maxCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
-                                                      std::vector<const MCMedge*> *cycle) {
+                                                      std::vector<const MCMedge *> *cycle) {
     graph ytoGraph;
 
     // catch special case when the graph has no edges
@@ -1147,7 +1145,7 @@ CDouble maxCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
     CDouble min_cr = 0;
     if (cycle != nullptr) {
 
-        std::vector<const arc*> ytoCycle;
+        std::vector<const arc *> ytoCycle;
 
         // Find maximum cycle ratio
         std::int32_t ytoCycLen = 0;
@@ -1190,7 +1188,7 @@ CDouble maxCycleRatioYoungTarjanOrlin(MCMgraph &mcmGraph) {
  */
 
 CDouble minCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
-                                                      std::vector<const MCMedge*> *cycle) {
+                                                      std::vector<const MCMedge *> *cycle) {
     graph ytoGraph;
 
     // Convert the graph to an input graph for the YTO algorithm
@@ -1201,15 +1199,14 @@ CDouble minCycleRatioAndCriticalCycleYoungTarjanOrlin(MCMgraph &mcmGraph,
     CDouble min_cr = 0;
     if (cycle != nullptr) {
 
-        std::vector<const arc*> ytoCycle;
+        std::vector<const arc *> ytoCycle;
 
         // Find minimum cycle ratio
         std::int32_t ytoCycLen = 0;
         alg.mmcycle_robust(ytoGraph, &min_cr, &ytoCycle);
 
         size_t len = ytoCycle.size();
-        *cycle = std::vector<const MCMedge*>(len);
-
+        *cycle = std::vector<const MCMedge *>(len);
 
         for (uint i = 0; i < len; i++) {
             cycle->at(i) = ytoCycle[i]->mcmEdge;

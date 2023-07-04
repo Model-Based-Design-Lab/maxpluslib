@@ -120,12 +120,11 @@ public:
 
     // Split
     [[nodiscard]] CStrings split(char delim) const;
-    static CString join(const CStrings& strl, char delim);
-    static CString join(const CStrings& strl, const CString& delim);
+    static CString join(const CStrings &strl, char delim);
+    static CString join(const CStrings &strl, const CString &delim);
 
     // Replacement
-    CString &
-    replace(const CString &s1, const CString &s2, size_type sPos = 0, uint n = 0);
+    CString &replace(const CString &s1, const CString &s2, size_type sPos = 0, uint n = 0);
 
     // Case
     CString &toLower();

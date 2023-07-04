@@ -59,9 +59,7 @@ public:
     MCMnode *dst;
     CDouble w;
     CDouble d;
-    bool operator==(const MCMedge& e) const {
-        return this->id == e.id;
-    }
+    bool operator==(const MCMedge &e) const { return this->id == e.id; }
 };
 
 using MCMedges = std::list<MCMedge>;
@@ -75,14 +73,11 @@ public:
     bool visible;
     MCMedgeRefs in;
     MCMedgeRefs out;
-    bool operator==(const MCMnode& n) const {
-        return this->id == n.id;
-    }
+    bool operator==(const MCMnode &n) const { return this->id == n.id; }
 };
 
 struct MCMNodeLess {
-    bool operator()(const MCMnode* const &lhs,
-                    const MCMnode* const &rhs) const {
+    bool operator()(const MCMnode *const &lhs, const MCMnode *const &rhs) const {
         return lhs->id < rhs->id;
     };
 };
@@ -105,7 +100,9 @@ public:
     MCMgraph &operator=(MCMgraph &&) = delete;
     MCMgraph &operator=(const MCMgraph &other) = delete;
 
-    [[nodiscard]] unsigned int numberOfNodes() { return static_cast<unsigned int>(this->nodes.size()); };
+    [[nodiscard]] unsigned int numberOfNodes() {
+        return static_cast<unsigned int>(this->nodes.size());
+    };
     [[nodiscard]] MCMnodes &getNodes() { return nodes; };
     [[nodiscard]] MCMnodeRefs getNodeRefs();
     [[nodiscard]] MCMedgeRefs getEdgeRefs();
@@ -128,7 +125,9 @@ public:
         return nullptr;
     };
 
-    [[nodiscard]] unsigned int numberOfEdges() { return static_cast<unsigned int>(this->edges.size()); };
+    [[nodiscard]] unsigned int numberOfEdges() {
+        return static_cast<unsigned int>(this->edges.size());
+    };
     [[nodiscard]] MCMedges &getEdges() { return edges; };
 
     MCMedge *getEdge(CId id) {
@@ -183,8 +182,9 @@ public:
     }
 
     // Add an edge to the MCMgraph.
-    MCMedge *addEdge(CId id, MCMnode &src, MCMnode &dst, CDouble w, CDouble d, bool visible = true) {
-        MCMedge& e = this->edges.emplace_back(id, src, dst, w, d, visible);
+    MCMedge *
+    addEdge(CId id, MCMnode &src, MCMnode &dst, CDouble w, CDouble d, bool visible = true) {
+        MCMedge &e = this->edges.emplace_back(id, src, dst, w, d, visible);
         src.out.push_back(&e);
         dst.in.push_back(&e);
         return &e;
@@ -195,7 +195,8 @@ public:
     void removeEdge(MCMedge &e) {
         e.src->out.remove(&e);
         e.dst->in.remove(&e);
-        this->edges.remove(e);    }
+        this->edges.remove(e);
+    }
 
     void relabelNodeIds(std::map<CId, CId> *nodeIdMap = nullptr);
 
@@ -211,7 +212,7 @@ public:
     calculateMaximumCycleMeanKarpDouble(const MCMnode **criticalNode = nullptr);
 
     [[nodiscard]] CDouble calculateMaximumCycleRatioAndCriticalCycleYoungTarjanOrlin(
-            std::vector<const MCMedge*> *cycle = nullptr);
+            std::vector<const MCMedge *> *cycle = nullptr);
 
     [[nodiscard]] std::shared_ptr<MCMgraph> normalize(CDouble mu) const;
     [[nodiscard]] std::shared_ptr<MCMgraph> normalize(const std::map<CId, CDouble> &mu) const;
@@ -251,7 +252,7 @@ void stronglyConnectedMCMgraph(MCMgraph &g,
  * The function removes all hidden nodes and edges from the graph. All visible
  * edges are assigned a new id starting in the range [0,nrNodes()).
  */
-void relabelMCMgraph(MCMgraph& g);
+void relabelMCMgraph(MCMgraph &g);
 
 /**
  * addLongestDelayEdgesToMCMgraph ()
@@ -260,7 +261,7 @@ void relabelMCMgraph(MCMgraph& g);
  * with no delay are removed and edges with more than one delay element
  * are converted into a sequence of edges with one delay element.
  */
-void addLongestDelayEdgesToMCMgraph(MCMgraph& g);
+void addLongestDelayEdgesToMCMgraph(MCMgraph &g);
 
 } // namespace Graphs
 #endif

@@ -60,7 +60,9 @@ namespace Graphs {
  * The function converts a weighted directed graph used in the MCM algorithms
  * to a sparse matrix input for Howard's algorithm.
  */
-void convertMCMgraphToMatrix(MCMgraph& g, std::shared_ptr<std::vector<int>> *ij, std::shared_ptr<std::vector<CDouble>> *A);
+void convertMCMgraphToMatrix(MCMgraph &g,
+                             std::shared_ptr<std::vector<int>> *ij,
+                             std::shared_ptr<std::vector<CDouble>> *A);
 
 /**
  * Howard ()
@@ -122,7 +124,6 @@ CDouble maximumCycleMeanHoward(MCMgraph &g, MCMnode **criticalNode);
  *
  */
 CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode);
-
 
 } // namespace Graphs
 #endif

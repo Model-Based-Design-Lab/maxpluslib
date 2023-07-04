@@ -7,7 +7,6 @@
 
 #include "graph/mpautomaton.h"
 
-
 class MPAutomatonTest : public ::testing::Test {
 
 public:

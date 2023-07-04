@@ -2,10 +2,8 @@
 #include "game/mpgameautomaton.h"
 #include <algorithm>
 
-
 #include "strategyvectortest.h"
 #include "testing.h"
-
 
 using namespace MaxPlus;
 
