@@ -23,8 +23,4 @@ format:
         - Ubuntu2004-64bit
     script:
         - clang-format --dry-run --Werror `find ./ -type f -name "*.h" -o -name "*.cc" -o -name "*.cpp"`
-    artifacts:
-      expire_in: 14d
-      when: always
-      paths:
-      - ./build/coverage/
+        
