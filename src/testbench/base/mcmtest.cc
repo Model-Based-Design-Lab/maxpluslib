@@ -9,6 +9,7 @@
 #include "mcmtest.h"
 #include "testing.h"
 #include <random>
+#include <array>
 #include <type_traits>
 
 
