@@ -5,7 +5,6 @@
 #include "game/strategyvector.h"
 #include <algorithm>
 
-
 #include "testing.h"
 
 using namespace MaxPlus;

@@ -46,7 +46,6 @@
 #include "maxplus/graph/mpautomaton.h"
 #include "ratiogame.h"
 
-
 namespace MaxPlus {
 
 /**
@@ -59,9 +58,10 @@ class MaxPlusGameAutomatonWithRewards : public MaxPlusAutomatonWithRewards,
 public:
     MaxPlusGameAutomatonWithRewards() = default;
 
-     ~MaxPlusGameAutomatonWithRewards() override= default;;
+    ~MaxPlusGameAutomatonWithRewards() override = default;
+    ;
 
-    std::set<MPARState *>& getV0() override { return this->setV0; }
+    std::set<MPARState *> &getV0() override { return this->setV0; }
 
     std::set<MPARState *> &getV1() override { return this->setV1; }
 

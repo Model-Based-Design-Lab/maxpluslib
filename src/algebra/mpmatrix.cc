@@ -33,9 +33,9 @@
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 
 #include "algebra/mpmatrix.h"
@@ -342,7 +342,8 @@ Matrix::Matrix(unsigned int nr_rows, unsigned int nr_cols, unsigned int nr_el) :
 Matrix::~Matrix() = default;
 
 /**
- * Increases the number of rows of the matrix by n and fills the new elements with -\infty.
+ * Increases the number of rows of the matrix by n and fills the new elements
+ * with -\infty.
  */
 void Matrix::addRows(uint n) {
     this->szRows = this->szRows + n;
@@ -373,7 +374,8 @@ MPTime Matrix::get(unsigned int row, unsigned int column) const {
 }
 
 /**
- * Get a row from the matrix as a vector. Row index must be between 0 and row size-1
+ * Get a row from the matrix as a vector. Row index must be between 0 and row
+ * size-1
  */
 Vector Matrix::getRowVector(unsigned int row) const {
     unsigned int sz = this->getCols();
@@ -542,7 +544,7 @@ Matrix Matrix::mp_power(const unsigned int p) const {
     if ((p % 2) == 1) {
         Matrix m_pow = this->mp_power(p - 1);
         return this->mp_multiply(m_pow);
-    } 
+    }
     //  p is even
     Matrix m_pow = this->mp_power(p / 2);
     return m_pow.mp_multiply(m_pow);
@@ -582,7 +584,7 @@ Matrix Matrix::getSubMatrix(const std::list<unsigned int> &rowIndices,
 }
 
 std::shared_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &rowIndices,
-                                    const std::list<unsigned int> &colIndices) const {
+                                                const std::list<unsigned int> &colIndices) const {
     auto NR = static_cast<unsigned int>(rowIndices.size());
     auto NC = static_cast<unsigned int>(colIndices.size());
     auto newMatrix = std::make_shared<Matrix>(NR, NC);
@@ -599,7 +601,6 @@ std::shared_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &r
     return newMatrix;
 }
 
-
 /**
  * Make sub matrix with indices in list from square matrix
  */
@@ -613,10 +614,9 @@ std::shared_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &i
     return this->getSubMatrixPtr(indices, indices);
 }
 
-
 /**
- * Make sub matrix with indices in list for non-square matrix. The new matrix only keeps the columns
- * of the original matrix with the selected indices.
+ * Make sub matrix with indices in list for non-square matrix. The new matrix
+ * only keeps the columns of the original matrix with the selected indices.
  */
 Matrix Matrix::getSubMatrixNonSquare(const std::list<unsigned int> &colIndices) const {
     auto NC = static_cast<unsigned int>(colIndices.size());
@@ -861,7 +861,8 @@ Matrix Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold, bool implyZero
 
 /**
  * Matrix all pair longest path. Returns true if there is a positive cycle.
- * TODO: unify with the method above to have only one longest path implementation
+ * TODO: unify with the method above to have only one longest path
+ * implementation
  */
 bool Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold,
                                       bool implyZeroSelfEdges,
@@ -932,7 +933,8 @@ void VectorList::toString(CString &outString, CDouble scale) const {
 
 //  /**
 //   * VectorList::findSimilar
-//   * test if list contains a vector which differs to vecX by less than threshold
+//   * test if list contains a vector which differs to vecX by less than
+//   threshold
 //* implementation incomplete!
 //   */
 //  bool VectorList::findSimilar(const Vector &vecX, CDouble threshold) const
@@ -1100,7 +1102,8 @@ Matrix::mp_generalized_eigenvectors() const {
     // map from nodes of precGraph to the cycle mean of its SCC
     std::map<MCMnode *, MPTime> cycleMeansMap;
 
-    // vector such that element k is a node from precGraph in the critical path of SCC k
+    // vector such that element k is a node from precGraph in the critical path of
+    // SCC k
     std::vector<MCMnode *> criticalNodes;
 
     // vector such that element k is the maximum cycle mean of SCC k
@@ -1145,12 +1148,13 @@ Matrix::mp_generalized_eigenvectors() const {
     for (size_t k = 0; k < sccs.size(); k++) {
         // there is one for each SCC with a cycle mean larger than -inf
         if (!cycleMeans[k].isMinusInfinity()) {
-            // eigenvector is formed by normalized longest paths from critical node to all other
-            // nodes compute transitive cycle means such that all nodes in SCC k and downstream SCCs
-            // get a cycle mean that is the maximum if all (reflexive) upstream SCCs
+            // eigenvector is formed by normalized longest paths from critical node to
+            // all other nodes compute transitive cycle means such that all nodes in
+            // SCC k and downstream SCCs get a cycle mean that is the maximum if all
+            // (reflexive) upstream SCCs
             std::map<CId, MPTime> trCycleMeans;
-            // initialize all nodes to undefined (represented by -DBL_MAX), except the root node
-            // which is initialized with its own cycle mean
+            // initialize all nodes to undefined (represented by -DBL_MAX), except the
+            // root node which is initialized with its own cycle mean
             for (unsigned int n = 0; n != precGraph.getNodes().size(); n++) {
                 trCycleMeans[n] = (n == criticalNodes[k]->id) ? (cycleMeans[k]) : MP_MINUSINFINITY;
             }

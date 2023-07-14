@@ -45,7 +45,6 @@
 #include <cassert>
 #include <cfloat>
 
-
 /* STL functionality */
 #include <algorithm>
 #include <fstream>
@@ -55,7 +54,6 @@
 #include <queue>
 #include <set>
 #include <vector>
-
 
 /* basic types */
 using uint = unsigned int;

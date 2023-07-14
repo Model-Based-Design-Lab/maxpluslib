@@ -60,7 +60,8 @@ using namespace ::FSM::Labeled;
  */
 template <typename SL, typename EL> class StrategyVector {
 public:
-    StrategyVector()= default;;
+    StrategyVector() = default;
+    ;
 
     explicit StrategyVector(StrategyVector *vec) {
         std::map<const State<SL, EL> *, const State<SL, EL> *> copy(vec->strategyVector);
@@ -74,16 +75,17 @@ public:
      *
      * @param graph game graph on which a random strategy is initialized
      */
-    void initializeRandomStrategy(RatioGame<SL, EL>& graph) {
-        for (auto &it: graph.getStates()) {
-            auto& si = *(it.second);
+    void initializeRandomStrategy(RatioGame<SL, EL> &graph) {
+        for (auto &it : graph.getStates()) {
+            auto &si = *(it.second);
             // Source vertex.
-            auto& src = dynamic_cast<State<SL, EL>&>(si);
-            const auto& es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs&>(src.getOutgoingEdges());
+            auto &src = dynamic_cast<State<SL, EL> &>(si);
+            const auto &es =
+                    dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(src.getOutgoingEdges());
 
             // Find the first outgoing edge, and get the target.
             auto *e = dynamic_cast<Edge<SL, EL> *>(*es.begin());
-            auto& dest = dynamic_cast<const State<SL, EL>&>(e->getDestination());
+            auto &dest = dynamic_cast<const State<SL, EL> &>(e->getDestination());
 
             strategyVector[&src] = &dest;
         }
@@ -95,7 +97,9 @@ public:
      * @param v         vertex of which a new successor is set
      * @param successor successor of the given vertex in the strategy
      */
-    void setSuccessor(const State<SL, EL> *v, const State<SL, EL> *successor) { strategyVector[v] = successor; }
+    void setSuccessor(const State<SL, EL> *v, const State<SL, EL> *successor) {
+        strategyVector[v] = successor;
+    }
 
     /**
      * Return the unique successor given the current strategy.
@@ -103,7 +107,9 @@ public:
      * @param v vertex of which the unique successor is returned.
      * @return the successor of {@code v} given the current strategy.
      */
-    const State<SL, EL> *getSuccessor(const State<SL, EL> *v) { return strategyVector.find(v)->second; }
+    const State<SL, EL> *getSuccessor(const State<SL, EL> *v) {
+        return strategyVector.find(v)->second;
+    }
 
     /**
      * Return the current strategy.

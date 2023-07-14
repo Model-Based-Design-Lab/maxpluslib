@@ -86,7 +86,7 @@ public:
      * @param game game graph
      * @return
      */
-    PolicyIterationResult solve(RatioGame<SL, EL>& graph) { return solve(graph, EPSILON); }
+    PolicyIterationResult solve(RatioGame<SL, EL> &graph) { return solve(graph, EPSILON); }
 
     /**
      * Find the values of the vertices and an optimal strategy for the given
@@ -98,7 +98,7 @@ public:
      * @param epsilon maximum absolute error between two values when they are considered equal
      * @return
      */
-    PolicyIterationResult solve(RatioGame<SL, EL>& game, CDouble epsilon) {
+    PolicyIterationResult solve(RatioGame<SL, EL> &game, CDouble epsilon) {
         if (!checkEachStateHasSuccessor(game)) {
             throw std::runtime_error(
                     "Input game graph is not valid. Some states have no successor.");
@@ -115,7 +115,7 @@ private:
     /**
      * Policy iteration algorithm to find the value of each state and the strategy.
      */
-    PolicyIterationResult policyIteration(RatioGame<SL, EL>& game,
+    PolicyIterationResult policyIteration(RatioGame<SL, EL> &game,
                                           std::shared_ptr<StrategyVector<SL, EL>> initialStrategy,
                                           CDouble epsilon) {
         SetOfStates<SL, EL> &states = game.getStates();
@@ -224,8 +224,8 @@ private:
      * @return new distance and ratio vectors, and a new strategy vector with an
      * updated strategy for player 1
      */
-    Player1Result improveStrategyPlayer1(RatioGame<SL, EL>& game,
-                                         StrategyVector<SL, EL>& currentStrategy,
+    Player1Result improveStrategyPlayer1(RatioGame<SL, EL> &game,
+                                         StrategyVector<SL, EL> &currentStrategy,
                                          std::map<const State<SL, EL> *, CDouble> &d_prev,
                                          std::map<const State<SL, EL> *, CDouble> &r_prev,
                                          std::map<const State<SL, EL> *, CDouble> &dw2_prev,
@@ -237,7 +237,8 @@ private:
         std::map<const State<SL, EL> *, CDouble> d_i_t(d_prev);
         std::map<const State<SL, EL> *, CDouble> r_i_t(r_prev);
         std::map<const State<SL, EL> *, CDouble> dw2_i_t(dw2_prev);
-        std::shared_ptr<StrategyVector<SL, EL>> s_i_t = std::make_shared<StrategyVector<SL, EL>>(currentStrategy);
+        std::shared_ptr<StrategyVector<SL, EL>> s_i_t =
+                std::make_shared<StrategyVector<SL, EL>>(currentStrategy);
 
         while (improvement) {
             improvement = false;
@@ -317,7 +318,7 @@ private:
      * @param stateIds        map with unique id for each state
      * @return the new distance and ratio vectors
      */
-    StrategyEvaluation evaluateStrategy(RatioGame<SL, EL>& game,
+    StrategyEvaluation evaluateStrategy(RatioGame<SL, EL> &game,
                                         std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
                                         std::map<const State<SL, EL> *, CDouble> &distanceVector,
                                         std::map<const State<SL, EL> *, CDouble> &ratioVector,
@@ -362,7 +363,7 @@ private:
      * @param stateIds        map with unique id for each state
      * @return
      */
-    CycleResult findCyclesInRestrictedGraph(RatioGame<SL, EL>& game,
+    CycleResult findCyclesInRestrictedGraph(RatioGame<SL, EL> &game,
                                             std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
                                             std::map<const State<SL, EL> *, CDouble> &stateIds) {
         SetOfStates<SL, EL> &states = game.getStates();
@@ -445,14 +446,15 @@ private:
      * @param epsilon         epsilon value for equality on real numbers
      * @return
      */
-    DistanceResult computeDistances(RatioGame<SL, EL>& game,
-                                    std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
-                                    const std::shared_ptr<FSM::Abstract::SetOfStateRefs>& selectedStates,
-                                    std::map<const State<SL, EL> *, CDouble> &r_i_t,
-                                    std::map<const State<SL, EL> *, CDouble> &d_prev,
-                                    std::map<const State<SL, EL> *, CDouble> &r_prev,
-                                    std::map<const State<SL, EL> *, CDouble> &dw2_prev,
-                                    CDouble epsilon) {
+    DistanceResult
+    computeDistances(RatioGame<SL, EL> &game,
+                     std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
+                     const std::shared_ptr<FSM::Abstract::SetOfStateRefs> &selectedStates,
+                     std::map<const State<SL, EL> *, CDouble> &r_i_t,
+                     std::map<const State<SL, EL> *, CDouble> &d_prev,
+                     std::map<const State<SL, EL> *, CDouble> &r_prev,
+                     std::map<const State<SL, EL> *, CDouble> &dw2_prev,
+                     CDouble epsilon) {
         SetOfStates<SL, EL> &states = game.getStates();
 
         std::stack<const State<SL, EL> *> stack;

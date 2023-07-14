@@ -19,7 +19,7 @@ void MPAutomatonTest::SetUp() {}
 void MPAutomatonTest::TearDown() {}
 
 void MPAutomatonTest::Run() {
-    testCreateFSM(); 
+    testCreateFSM();
     testDeterminizeFSM();
     testMinimizeFSM();
 }
@@ -39,8 +39,7 @@ void MPAutomatonTest::testCreateFSM() {
     mpa.addEdge(*s2, makeRewardEdgeLabel(MPTime(1.0), CString("A"), 1.0), *s1);
     mpa.addEdge(*s3, makeRewardEdgeLabel(MPTime(7.0), CString("A"), 1.0), *s1);
 
-    auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(
-            s1->getOutgoingEdges());
+    auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(s1->getOutgoingEdges());
     for (const auto &i : es) {
         auto *e = dynamic_cast<Edge<MPAStateLabel, MPAREdgeLabel> *>(i);
 
@@ -52,7 +51,9 @@ void MPAutomatonTest::testCreateFSM() {
     auto s = mpa.checkStateLabeled(makeMPAStateLabel(0, 1));
     ASSERT_THROW(s != nullptr);
 
-    auto e = mpa.findEdge(makeMPAStateLabel(0, 0), makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), makeMPAStateLabel(0, 1));
+    auto e = mpa.findEdge(makeMPAStateLabel(0, 0),
+                          makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0),
+                          makeMPAStateLabel(0, 1));
     ASSERT_THROW(e != nullptr);
 
     ASSERT_EQUAL_NOPRINT(s1, &(mpa.getInitialState()));
@@ -68,18 +69,16 @@ void MPAutomatonTest::testDeterminizeFSM() {
     MPARState *s2 = mpa.addState(makeMPAStateLabel(0, 1));
     MPARState *s3 = mpa.addState(makeMPAStateLabel(0, 2));
 
-    // s1 -- (3,A,1) -> s2 
+    // s1 -- (3,A,1) -> s2
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s2);
-    // s1 -- (3,A,1) -> s3 
+    // s1 -- (3,A,1) -> s3
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s3);
     // s2 -- (1,B,1) -> s1
     mpa.addEdge(*s2, makeRewardEdgeLabel(MPTime(1.0), CString("B"), 1.0), *s1);
-    // s3 -- (7,A,1) -> s1 
+    // s3 -- (7,A,1) -> s1
     mpa.addEdge(*s3, makeRewardEdgeLabel(MPTime(7.0), CString("A"), 1.0), *s1);
 
-
-    auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(
-            s1->getOutgoingEdges());
+    auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(s1->getOutgoingEdges());
     for (const auto &i : es) {
         auto *e = dynamic_cast<Edge<MPAStateLabel, MPAREdgeLabel> *>(i);
 
@@ -88,25 +87,25 @@ void MPAutomatonTest::testDeterminizeFSM() {
 
     mpa.setInitialState(*s1);
 
-    std::shared_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized = std::dynamic_pointer_cast<MaxPlusAutomatonWithRewards>(mpa.determinizeEdgeLabels());
+    std::shared_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized =
+            std::dynamic_pointer_cast<MaxPlusAutomatonWithRewards>(mpa.determinizeEdgeLabels());
 
     ASSERT_THROW(mpaDeterminized->getStates().size() == 2);
-    ASSERT_THROW(mpaDeterminized->getEdges().size()==3);
+    ASSERT_THROW(mpaDeterminized->getEdges().size() == 3);
 
     CDouble mcr = mpa.calculateMCR();
-    std::shared_ptr<std::vector<const MPAREdge*>> cycle;
+    std::shared_ptr<std::vector<const MPAREdge *>> cycle;
     CDouble mcr1 = mpaDeterminized->calculateMCRAndCycle(&cycle);
-    
+
     ASSERT_APPROX_EQUAL(mcr, mcr1, ASSERT_EPSILON);
     ASSERT_EQUAL(cycle->size(), 2);
-    
 }
 
 void MPAutomatonTest::testMinimizeFSM() {
 
     std::cout << "Running test: MinimizeFSM" << std::endl;
 
-    FSM::Labeled::FiniteStateMachine<int,int> fsa;
+    FSM::Labeled::FiniteStateMachine<int, int> fsa;
 
     auto s0 = fsa.addState(3);
     auto s1 = fsa.addState(5);
@@ -118,12 +117,13 @@ void MPAutomatonTest::testMinimizeFSM() {
 
     fsa.setInitialState(*s0);
 
-    std::shared_ptr<FSM::Labeled::FiniteStateMachine<int,int>> fsaMin = std::dynamic_pointer_cast<FSM::Labeled::FiniteStateMachine<int,int>>(fsa.minimizeEdgeLabels());
+    std::shared_ptr<FSM::Labeled::FiniteStateMachine<int, int>> fsaMin =
+            std::dynamic_pointer_cast<FSM::Labeled::FiniteStateMachine<int, int>>(
+                    fsa.minimizeEdgeLabels());
 
     std::cout << "Nr states: " << fsaMin->getStates().size() << std::endl;
     std::cout << "Nr edges: " << fsaMin->getEdges().size() << std::endl;
 
     ASSERT_EQUAL(fsaMin->getStates().size(), 2);
     ASSERT_EQUAL(fsaMin->getEdges().size(), 2);
-
 }

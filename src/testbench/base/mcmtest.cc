@@ -4,13 +4,12 @@
 #include "base/analysis/mcm/mcm.h"
 #include "base/analysis/mcm/mcmdg.h"
 #include "base/analysis/mcm/mcmgraph.h"
-#include <base/analysis/mcm/mcmhoward.h>
-#include <base/analysis/mcm/mcmyto.h>
 #include "mcmtest.h"
 #include "testing.h"
+#include <base/analysis/mcm/mcmhoward.h>
+#include <base/analysis/mcm/mcmyto.h>
 #include <random>
 #include <type_traits>
-
 
 using namespace MaxPlus;
 using namespace Graphs;
@@ -48,11 +47,12 @@ MCMgraph makeGraph2() {
     MCMnode &n0 = *g.addNode(0);
     MCMnode &n1 = *g.addNode(1);
     g.addEdge(0, n0, n1, 1.0, 1.0);
-    //g.addEdge(1, n1, n1, 1.0, 1.0);
+    // g.addEdge(1, n1, n1, 1.0, 1.0);
     return g;
 }
 
-MCMgraph makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned int seed) {
+MCMgraph
+makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned int seed) {
     MCMgraph g;
 
     std::mt19937 rng(seed);
@@ -78,7 +78,7 @@ MCMgraph makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges,
         do {
             src = rng() % actualNumberOfNodes;
             dst = rng() % actualNumberOfNodes;
-        } while (existingEdges.find(std::make_pair(src, dst))!=existingEdges.end());
+        } while (existingEdges.find(std::make_pair(src, dst)) != existingEdges.end());
         existingEdges.insert(std::make_pair(src, dst));
         CDouble w = static_cast<CDouble>(rng() % 100000) / 1000.0;
         CDouble d = static_cast<CDouble>(rng() % 100000) / 1000.0;
@@ -98,14 +98,12 @@ MCMgraph makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges,
     return g;
 }
 
-
-
 // Test mcmdg.
 void MCMTest::test_dg() {
     std::cout << "Running test: MCM-dg" << std::endl;
 
     MCMgraph g1 = makeGraph1();
-    CDouble result =  mcmDG(g1);
+    CDouble result = mcmDG(g1);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
 
     MCMgraph g2 = makeGraph2();
@@ -117,7 +115,7 @@ void MCMTest::test_dg() {
 void MCMTest::test_howard() {
     std::cout << "Running test: MCM-Howard" << std::endl;
     MCMgraph g1 = makeGraph1();
-    
+
     std::shared_ptr<std::vector<int>> ij = nullptr;
     std::shared_ptr<std::vector<CDouble>> A = nullptr;
     std::shared_ptr<std::vector<CDouble>> chi = nullptr;
@@ -125,10 +123,10 @@ void MCMTest::test_howard() {
     std::shared_ptr<std::vector<int>> policy = nullptr;
     int nr_iterations = 0;
     int nr_components = 0;
-    
+
     convertMCMgraphToMatrix(g1, &ij, &A);
 
-   Howard(*ij,
+    Howard(*ij,
            *A,
            static_cast<int>(g1.getNodes().size()),
            static_cast<int>(g1.getEdges().size()),
@@ -137,7 +135,6 @@ void MCMTest::test_howard() {
            &policy,
            &nr_iterations,
            &nr_components);
-    
 
     ASSERT_APPROX_EQUAL(2.5, chi->at(0), 1e-5);
     ASSERT_APPROX_EQUAL(2.5, chi->at(1), 1e-5);
@@ -180,10 +177,7 @@ void MCMTest::test_karp() {
 
     result = maximumCycleMeanKarpDoubleGeneral(g2);
     ASSERT_EQUAL(-INFINITY, result);
-
 }
-
-
 
 /// Test MCM YTO.
 void MCMTest::test_yto() {
@@ -217,7 +211,7 @@ void MCMTest::test_yto() {
     ASSERT_THROW(eid == 6);
 
     // TODO: check of the cycle ratio are identical to old SDF3
-    std::array<CDouble,250> expectedMinCycleRatios = {
+    std::array<CDouble, 250> expectedMinCycleRatios = {
             0.526141,  0.124523,  0.0389826, 0.289127,   0.11451,    0.723313,   1.07027,
             0.956067,  0.570066,  0.746341,  0.33622,    0.475978,   0.902663,   1.02951,
             0.088711,  0.269878,  0.213763,  0.468927,   2.13632,    0.564086,   0.656227,
@@ -256,11 +250,11 @@ void MCMTest::test_yto() {
             0.136082,  0.194365,  0.425315,  0.471688,   0.923484};
 
     // go through a bunch of (deterministic) small pseudo-random graphs
-    for (int k = 0; k < 250; k++){
+    for (int k = 0; k < 250; k++) {
         MCMgraph gr = makeRandomGraph(10, 10, k);
         result = minCycleRatioAndCriticalCycleYoungTarjanOrlin(gr, &cycle);
         ASSERT_APPROX_EQUAL(expectedMinCycleRatios[k], result, 1e-4);
-        //std::cout << "MCM: " << result << "cycle length: " << cycle->size() << std::endl;
+        // std::cout << "MCM: " << result << "cycle length: " << cycle->size() << std::endl;
     }
 
     std::array<CDouble, 25> expectedMaxCycleRatios = {
@@ -272,21 +266,18 @@ void MCMTest::test_yto() {
         MCMgraph gr = makeRandomGraph(1000, 100000, k);
         result = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(gr, &cycle);
         ASSERT_APPROX_EQUAL(expectedMaxCycleRatios[k], result, 1e-2);
-        //std::cout << "MCM: " << result << "cycle length: " << cycle->size() << std::endl;
+        // std::cout << "MCM: " << result << "cycle length: " << cycle->size() << std::endl;
     }
-
-
 }
 
 void MCMTest::test_prune() {
 
     MCMgraph mcmGraph;
-    auto& n36 = *mcmGraph.addNode(36);
-    auto& n37 = *mcmGraph.addNode(37);
-    auto& n38 = *mcmGraph.addNode(38);
-    auto& n39 = *mcmGraph.addNode(39);
-    auto& n40 = *mcmGraph.addNode(40);
-
+    auto &n36 = *mcmGraph.addNode(36);
+    auto &n37 = *mcmGraph.addNode(37);
+    auto &n38 = *mcmGraph.addNode(38);
+    auto &n39 = *mcmGraph.addNode(39);
+    auto &n40 = *mcmGraph.addNode(40);
 
     mcmGraph.addEdge(0, n36, n36, 5.83e+06, 1);
     mcmGraph.addEdge(1, n36, n37, 1.52647e+07, 1);
@@ -364,14 +355,12 @@ void MCMTest::test_prune() {
     mcmGraph.addEdge(73, n38, n40, 5.1029e+06, 1);
     mcmGraph.addEdge(74, n40, n40, 4.54732e+06, 1);
 
-    std::shared_ptr<MCMgraph> result =  mcmGraph.pruneEdges(); 
-
+    std::shared_ptr<MCMgraph> result = mcmGraph.pruneEdges();
 
     CDouble mcr1 = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(mcmGraph, nullptr);
     ASSERT_APPROX_EQUAL(mcr1, 5.83e+06, 1e3);
 
-    CDouble mcr2 = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(*result, nullptr);   
+    CDouble mcr2 = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(*result, nullptr);
 
     ASSERT_APPROX_EQUAL(mcr1, mcr2, 1e3);
-
 }

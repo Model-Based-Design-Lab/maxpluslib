@@ -4,7 +4,6 @@
 #include "testing.h"
 #include "valuetest.h"
 
-
 using namespace MaxPlus;
 
 void ValueTest::Run() {
@@ -28,24 +27,33 @@ void ValueTest::test_Max() {
     CDouble b = 3.14;
     CDouble max_ab = 5;
 
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(max_ab)), static_cast<CDouble>(MP_MAX(MPTime(a), MPTime(b))));
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(max_ab)), static_cast<CDouble>(MP_MAX(MPTime(b), MPTime(a))));
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(b)), static_cast<CDouble>(MP_MAX(MPTime(-a), MPTime(b))));
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(a)), static_cast<CDouble>(MP_MAX(MPTime(-b), MPTime(a))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(max_ab)),
+                 static_cast<CDouble>(MP_MAX(MPTime(a), MPTime(b))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(max_ab)),
+                 static_cast<CDouble>(MP_MAX(MPTime(b), MPTime(a))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(b)),
+                 static_cast<CDouble>(MP_MAX(MPTime(-a), MPTime(b))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(a)),
+                 static_cast<CDouble>(MP_MAX(MPTime(-b), MPTime(a))));
 
     // -Infinity case.
     ASSERT_THROW((MP_MAX(MP_MINUSINFINITY, MP_MINUSINFINITY)).isMinusInfinity());
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)), static_cast<CDouble>(MP_MAX(MPTime(3.14), MP_MINUSINFINITY)));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)),
+                 static_cast<CDouble>(MP_MAX(MPTime(3.14), MP_MINUSINFINITY)));
 }
 
 /// Test min operator.
 void ValueTest::test_Min() {
     std::cout << "Running test: Min" << std::endl;
     // Test normal CDouble values.
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)), static_cast<CDouble>(MP_MIN(MPTime(5.0), MPTime(3.14))));
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)), static_cast<CDouble>(MP_MIN(MPTime(3.14), MPTime(5.0))));
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(-5.0)), static_cast<CDouble>(MP_MIN(MPTime(-5.0), MPTime(3.14))));
-    ASSERT_EQUAL(static_cast<CDouble>(MPTime(-3.14)), static_cast<CDouble>(MP_MIN(MPTime(-3.14), MPTime(5.0))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)),
+                 static_cast<CDouble>(MP_MIN(MPTime(5.0), MPTime(3.14))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)),
+                 static_cast<CDouble>(MP_MIN(MPTime(3.14), MPTime(5.0))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(-5.0)),
+                 static_cast<CDouble>(MP_MIN(MPTime(-5.0), MPTime(3.14))));
+    ASSERT_EQUAL(static_cast<CDouble>(MPTime(-3.14)),
+                 static_cast<CDouble>(MP_MIN(MPTime(-3.14), MPTime(5.0))));
 
     // -Infinity case.
     ASSERT_THROW(MP_MIN(MP_MINUSINFINITY, MP_MINUSINFINITY).isMinusInfinity());

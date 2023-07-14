@@ -87,7 +87,9 @@ using MPDelay = MPTime;
 // MP_MAX()
 //==============================
 
-inline MPTime MP_MAX(MPTime a, MPTime b) { return (static_cast<CDouble>(a)) > (static_cast<CDouble>(b)) ? (a) : (b); }
+inline MPTime MP_MAX(MPTime a, MPTime b) {
+    return (static_cast<CDouble>(a)) > (static_cast<CDouble>(b)) ? (a) : (b);
+}
 
 inline MPTime MP_MAX(CDouble a, MPTime b) { return MP_MAX(MPTime(a), b); }
 
@@ -99,7 +101,9 @@ inline CDouble MP_MAX(CDouble a, CDouble b) { return CDouble(MP_MAX(MPTime(a), M
 // MP_MIN()
 //==============================
 
-inline MPTime MP_MIN(MPTime a, MPTime b) { return (static_cast<CDouble>(a)) < (static_cast<CDouble>(b)) ? (a) : (b); }
+inline MPTime MP_MIN(MPTime a, MPTime b) {
+    return (static_cast<CDouble>(a)) < (static_cast<CDouble>(b)) ? (a) : (b);
+}
 
 inline MPTime MP_MIN(CDouble a, MPTime b) { return MP_MIN(MPTime(a), b); }
 
@@ -119,17 +123,14 @@ inline bool MP_ISMINUSINFINITY(CDouble a) { return a <= MPTIME_MIN_INF_VALPTHR; 
 inline bool MP_ISMINUSINFINITY(MPTime a) { return a <= MP_MINUSINFINITY_THR; }
 
 inline MPTime MP_PLUS(CDouble a, CDouble b) {
-    return (MP_ISMINUSINFINITY(a) || MP_ISMINUSINFINITY(b)) ? MP_MINUSINFINITY
-                                                                    : MPTime(static_cast<CDouble>(a) + static_cast<CDouble>(b));
+    return (MP_ISMINUSINFINITY(a) || MP_ISMINUSINFINITY(b))
+                   ? MP_MINUSINFINITY
+                   : MPTime(static_cast<CDouble>(a) + static_cast<CDouble>(b));
 }
 
-inline MPTime MP_PLUS(MPTime a, CDouble b) {
-    return MP_PLUS(static_cast<CDouble>(a), b);
-}
+inline MPTime MP_PLUS(MPTime a, CDouble b) { return MP_PLUS(static_cast<CDouble>(a), b); }
 
-inline MPTime MP_PLUS(CDouble a, MPTime b) {
-    return MP_PLUS(a, static_cast<CDouble>(b));
-}
+inline MPTime MP_PLUS(CDouble a, MPTime b) { return MP_PLUS(a, static_cast<CDouble>(b)); }
 
 inline MPTime MP_PLUS(MPTime a, MPTime b) {
     return MP_PLUS(static_cast<CDouble>(a), static_cast<CDouble>(b));
@@ -185,37 +186,21 @@ inline MPTime &MPTime::operator-=(MPTime a) {
     return *this;
 }
 
-inline bool MPTime::operator==(MPTime a) const {
-    return this->myVal == a.myVal;
-}
+inline bool MPTime::operator==(MPTime a) const { return this->myVal == a.myVal; }
 
-inline bool MPTime::operator!=(MPTime a) const {
-    return this->myVal != a.myVal;
-}
+inline bool MPTime::operator!=(MPTime a) const { return this->myVal != a.myVal; }
 
-inline bool MPTime::operator<(MPTime a) const {
-    return this->myVal < a.myVal;
-}
+inline bool MPTime::operator<(MPTime a) const { return this->myVal < a.myVal; }
 
-inline bool MPTime::operator>(MPTime a) const {
-    return this->myVal > a.myVal;
-}
+inline bool MPTime::operator>(MPTime a) const { return this->myVal > a.myVal; }
 
-inline bool MPTime::operator<=(MPTime a) const {
-    return this->myVal <= a.myVal;
-}
+inline bool MPTime::operator<=(MPTime a) const { return this->myVal <= a.myVal; }
 
-inline bool MPTime::operator>=(MPTime a) const {
-    return this->myVal >= a.myVal;
-}
+inline bool MPTime::operator>=(MPTime a) const { return this->myVal >= a.myVal; }
 
-inline bool MPTime::isMinusInfinity() const {
-    return MP_ISMINUSINFINITY(this->myVal);
-}
+inline bool MPTime::isMinusInfinity() const { return MP_ISMINUSINFINITY(this->myVal); }
 
-inline MPTime MPTime::fabs() const {
-    return MPTime(std::fabs(this->myVal));
-}
+inline MPTime MPTime::fabs() const { return MPTime(std::fabs(this->myVal)); }
 
 //==============================
 // toString
@@ -225,7 +210,7 @@ inline CString timeToString(MPTime val) {
     // We intentionally dont use isMinusInfinity() here,
     // so that we can expose the unwanted "impure" infinities here.
     //
-    if (static_cast<CDouble>(val)==MPTIME_MIN_INF_VAL) {
+    if (static_cast<CDouble>(val) == MPTIME_MIN_INF_VAL) {
         return CString("-mp_inf");
     }
     return CString(static_cast<CDouble>(val));

@@ -10,9 +10,9 @@ class StrategyVectorTest : public ::testing::Test {
 public:
     StrategyVectorTest();
 
-     void Run() override;
-     void SetUp() override;
-     void TearDown() override;
+    void Run() override;
+    void SetUp() override;
+    void TearDown() override;
 
     void testSimpleTest();
 };

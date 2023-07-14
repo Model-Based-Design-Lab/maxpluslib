@@ -8,7 +8,7 @@
 
 using namespace MaxPlus;
 
-PolicyIterationTest::PolicyIterationTest()= default;
+PolicyIterationTest::PolicyIterationTest() = default;
 
 void PolicyIterationTest::Run() {
     testPlayer1CycleTest();
@@ -184,7 +184,7 @@ void PolicyIterationTest::testInvalidInputGraphTest() {
                 new PolicyIteration<MPAStateLabel, MPAREdgeLabel>();
         PolicyIteration<MPAStateLabel, MPAREdgeLabel>::PolicyIterationResult result =
                 pi->solve(mpa);
-    } catch (const std::runtime_error&) {
+    } catch (const std::runtime_error &) {
         // test passes
         // SUCCEED();
     }

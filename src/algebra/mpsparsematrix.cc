@@ -33,9 +33,9 @@
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
  */
 
 #include "algebra/mpsparsematrix.h"
@@ -222,8 +222,8 @@ SparseVector SparseVector::combine(const SparseVector &vecB, MPTime f(MPTime a, 
     unsigned int m1 = 0;
     unsigned int m2 = 0;
 
-    // invariant m1 elements if this->table[k1] have been covered and m2 elements of vecB.table[k2]
-    // m1 < this->table[k1].first && m2 < vecB.table[k1].first
+    // invariant m1 elements if this->table[k1] have been covered and m2 elements
+    // of vecB.table[k2] m1 < this->table[k1].first && m2 < vecB.table[k1].first
     if (k1 < this->table.size()) {
         m1 = this->table[k1].first;
     }
@@ -259,8 +259,8 @@ bool SparseVector::forall(const SparseVector &vecB, bool f(MPTime a, MPTime b)) 
     unsigned int m1 = 0;
     unsigned int m2 = 0;
 
-    // invariant m1 elements if this->table[k1] have been covered and m2 elements of vecB.table[k2]
-    // m1 < this->table[k1].first && m2 < vecB.table[k1].first
+    // invariant m1 elements if this->table[k1] have been covered and m2 elements
+    // of vecB.table[k2] m1 < this->table[k1].first && m2 < vecB.table[k1].first
     if (k1 < this->table.size()) {
         m1 = this->table[k1].first;
     }
@@ -500,8 +500,8 @@ MPTime SparseVector::innerProduct(const SparseVector &v) const {
     unsigned int m1 = 0;
     unsigned int m2 = 0;
 
-    // invariant m1 elements if this->table[k1] have been covered and m2 elements of vecB.table[k2]
-    // m1 < this->table[k1].first && m2 < vecB.table[k1].first
+    // invariant m1 elements if this->table[k1] have been covered and m2 elements
+    // of vecB.table[k2] m1 < this->table[k1].first && m2 < vecB.table[k1].first
     if (k1 < this->table.size()) {
         m1 = this->table[k1].first;
     }
@@ -742,7 +742,8 @@ void SparseMatrix::putAll(unsigned int startRow,
     if (ec - sc > 0) {
         unsigned int remaining = ec - sc;
         unsigned int j = 0;
-        // insert all new rows here as copies of the old ones with putAll, efficient as possible...
+        // insert all new rows here as copies of the old ones with putAll, efficient
+        // as possible...
         while (remaining > 0) {
             unsigned int num = v[j].first;
             if (remaining < num) {
@@ -804,8 +805,8 @@ void SparseMatrix::insertMatrix(unsigned int startRow,
     if (ec - sc > 0) {
         unsigned int remaining = ec - sc;
         unsigned int j = 0;
-        // insert all new rows here as copies of the old ones with inserted data, efficient as
-        // possible...
+        // insert all new rows here as copies of the old ones with inserted data,
+        // efficient as possible...
         unsigned int m = 0;
         unsigned int n = 0;
         while (remaining > 0) {
@@ -944,9 +945,9 @@ Matrix SparseMatrix::reduceRows() {
 }
 
 /**********
- * return a matrix according to the coarsest partitioning of the rows and columns
- * such that the corresponding blocks contain the same value and the new matrix has
- * a single element for each such block.
+ * return a matrix according to the coarsest partitioning of the rows and
+ *columns such that the corresponding blocks contain the same value and the new
+ *matrix has a single element for each such block.
  **********/
 std::pair<Matrix, Sizes> SparseMatrix::reduceRowsAndColumns() {
     // ensure that we are in transposed form
@@ -967,8 +968,8 @@ std::pair<Matrix, Sizes> SparseMatrix::reduceRowsAndColumns() {
     // determine a refinement of columns and all rows
     Sizes fs = rs.refineWith(cs);
 
-    // create a new non-sparse matrix with an element for each of the blocks with the value of that
-    // block
+    // create a new non-sparse matrix with an element for each of the blocks with
+    // the value of that block
     auto N = static_cast<unsigned int>(fs.size());
     Matrix M(N, N);
 
@@ -999,7 +1000,8 @@ std::pair<Matrix, Sizes> SparseMatrix::reduceRowsAndColumns() {
     return std::make_pair(M, fs);
 }
 
-// identical rows can be eliminated any eigenvector must have identical values for those rows.
+// identical rows can be eliminated any eigenvector must have identical values
+// for those rows.
 MPTime SparseMatrix::mpEigenvalue() {
     Matrix M = this->reduceRows();
     auto lambda = MPTime(M.mp_eigenvalue());
@@ -1106,7 +1108,6 @@ SparseMatrix SparseMatrix::starClosure() {
     SparseMatrix result = SparseMatrix::expand(MS, szs, szs);
 
     return result.maximum(SparseMatrix::IdentityMatrix(this->getRowSize()));
-
 }
 
 SparseMatrix SparseMatrix::expand(const Matrix &M, const Sizes &rszs, const Sizes &cszs) {

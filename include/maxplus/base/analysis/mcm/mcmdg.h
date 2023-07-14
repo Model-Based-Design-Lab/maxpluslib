@@ -60,7 +60,7 @@ namespace Graphs {
  * The function computes the maximum cycle mean of an MCM graph using
  * Dasdan-Gupta's algorithm.
  * Note: this algorithm assumes that edge weights are integer valued !
- * 
+ *
  * @todo
  * check if algorithm can be generalized to float edge weights
  */

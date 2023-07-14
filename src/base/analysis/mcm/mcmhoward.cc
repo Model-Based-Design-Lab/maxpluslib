@@ -127,7 +127,8 @@ private:
     int *NIterations;
     int *NComponents;
 
-    std::shared_ptr<std::vector<int>> new_pi = std::make_shared<std::vector<int>>(); /*  new policy */
+    std::shared_ptr<std::vector<int>> new_pi =
+            std::make_shared<std::vector<int>>(); /*  new policy */
     /* The inverse policy is coded by a linearly chained list.
      * pi_inv_idx[i]= pointer to the chain of inverses of node i.
      */
@@ -498,9 +499,9 @@ void convertMCMgraphToMatrix(MCMgraph &g,
     }
 
     *ij = std::make_shared<std::vector<int>>(2 * g.getEdges().size());
-    auto& ijr = *(*ij);
+    auto &ijr = *(*ij);
     *A = std::make_shared<std::vector<CDouble>>(g.getEdges().size());
-    auto& Ar = *(*A);
+    auto &Ar = *(*A);
 
     // Create an entry in the matrices for each edge
     int k = 0;
@@ -517,7 +518,7 @@ void convertMCMgraphToMatrix(MCMgraph &g,
     }
 }
 
-CDouble maximumCycleMeanHoward(MCMgraph& g, MCMnode* *criticalNode) {
+CDouble maximumCycleMeanHoward(MCMgraph &g, MCMnode **criticalNode) {
 
     if (g.numberOfNodes() == 0) {
         if (criticalNode != nullptr) {
@@ -547,7 +548,7 @@ CDouble maximumCycleMeanHoward(MCMgraph& g, MCMnode* *criticalNode) {
            &nr_components);
 
     // find maximum cycle mean in chi vector
-    MCMnodes& nodes = g.getNodes();
+    MCMnodes &nodes = g.getNodes();
     auto n = nodes.begin();
     CDouble mcm = chi->at(0);
     MCMnode *critNode = &(*n);
@@ -590,6 +591,5 @@ CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode) {
 
     return mcm;
 }
-
 
 } // namespace Graphs

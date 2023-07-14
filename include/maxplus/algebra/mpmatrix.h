@@ -88,13 +88,13 @@ public:
 
     [[nodiscard]] Vector add(MPTime increase) const;
 
-    void add(MPTime increase, Vector& result) const;
+    void add(MPTime increase, Vector &result) const;
 
-    void maximum(const Vector& vecB, Vector& result) const;
+    void maximum(const Vector &vecB, Vector &result) const;
 
-    [[nodiscard]] Vector add(const Vector& vecB) const;
+    [[nodiscard]] Vector add(const Vector &vecB) const;
 
-    void add(const Vector& vecB, Vector& res) const;
+    void add(const Vector &vecB, Vector &res) const;
 
     Vector &operator+=(MPTime increase) {
         this->add(increase, *this);
@@ -109,7 +109,7 @@ public:
 
     [[nodiscard]] bool compare(const Vector &v) const;
 
-    Vector &incrementalMaximum(const Vector& vec) {
+    Vector &incrementalMaximum(const Vector &vec) {
         this->maximum(vec, *this);
         return *this;
     }
@@ -149,7 +149,7 @@ public:
 
     Matrix(Matrix &&) = default;
     Matrix &operator=(Matrix &&) = default;
-    Matrix(const Matrix &)=default;
+    Matrix(const Matrix &) = default;
 
     Matrix &operator=(const Matrix &);
 
@@ -175,14 +175,16 @@ public:
     [[nodiscard]] Matrix transpose() const;
 
     [[nodiscard]] virtual Matrix getSubMatrix(const std::list<unsigned int> &rowIndices,
-                                               const std::list<unsigned int> &colIndices) const;
+                                              const std::list<unsigned int> &colIndices) const;
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix> getSubMatrixPtr(const std::list<unsigned int> &rowIndices,
-                                               const std::list<unsigned int> &colIndices) const;
+    [[nodiscard]] virtual std::shared_ptr<Matrix>
+    getSubMatrixPtr(const std::list<unsigned int> &rowIndices,
+                    const std::list<unsigned int> &colIndices) const;
 
     [[nodiscard]] Matrix getSubMatrix(const std::list<unsigned int> &indices) const;
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix> getSubMatrixPtr(const std::list<unsigned int> &indices) const;
+    [[nodiscard]] virtual std::shared_ptr<Matrix>
+    getSubMatrixPtr(const std::list<unsigned int> &indices) const;
 
     [[nodiscard]] Matrix getSubMatrixNonSquare(const std::list<unsigned int> &indices) const;
 
@@ -198,13 +200,13 @@ public:
     // Algebraic operations.
     [[nodiscard]] Matrix add(MPTime increase) const;
 
-    void add(MPTime increase, Matrix& result) const;
+    void add(MPTime increase, Matrix &result) const;
 
     [[nodiscard]] Matrix mp_sub(const Matrix &m) const;
 
     [[nodiscard]] Matrix mp_maximum(const Matrix &m) const;
 
-    void maximum(const Matrix& matB, Matrix& result) const;
+    void maximum(const Matrix &matB, Matrix &result) const;
 
     [[nodiscard]] Vector mp_multiply(const Vector &v) const;
 
@@ -231,9 +233,7 @@ public:
         return *this;
     }
 
-    void incrementalMaximum(const Matrix& matrix) {
-        this->maximum(matrix, *this);
-    }
+    void incrementalMaximum(const Matrix &matrix) { this->maximum(matrix, *this); }
 
     bool operator==(const Matrix &other);
 
@@ -249,7 +249,7 @@ public:
     [[nodiscard]] Matrix starClosureMatrix(MPTime posCycleThreshold = MP_EPSILON) const;
 
     [[nodiscard]] Matrix allPairLongestPathMatrix(MPTime posCycleThreshold,
-                                                   bool implyZeroSelfEdges) const;
+                                                  bool implyZeroSelfEdges) const;
     bool
     allPairLongestPathMatrix(MPTime posCycleThreshold, bool implyZeroSelfEdges, Matrix &res) const;
 
@@ -259,7 +259,6 @@ public:
     // [[nodiscard]] virtual Matrix *makeMatrix(unsigned int nr_rows, unsigned int nr_cols) const;
 
 private:
-
     void init(MatrixFill fill);
     void init();
 
@@ -269,7 +268,6 @@ private:
     unsigned int szRows;
     unsigned int szCols;
 };
-
 
 /****************************************************
  * VectorList: usually represents a set of eigenvectors
