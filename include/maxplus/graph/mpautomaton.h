@@ -45,6 +45,9 @@
 
 #include "maxplus/algebra/mptype.h"
 #include "maxplus/base/fsm/fsm.h"
+#include <list>
+#include <mutex>
+#include <thread>
 
 namespace MaxPlus {
 
@@ -135,6 +138,8 @@ using MPAState = ::FSM::Labeled::State<MPAStateLabel, MPAEdgeLabel>;
 using MPAEdge = ::FSM::Labeled::Edge<MPAStateLabel, MPAEdgeLabel>;
 using MPASetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAEdgeLabel>;
 using MPASetOfEdges = ::FSM::Abstract::SetOfEdges;
+using MPASequence = ::FSM::Labeled::ListOfEdges<MPAStateLabel, MPAEdgeLabel> ;
+ 
 
 /**
  * A max-plus automaton
@@ -143,6 +148,20 @@ class MaxPlusAutomaton : public ::FSM::Labeled::FiniteStateMachine<MPAStateLabel
 public:
     // Destructor.
     ~MaxPlusAutomaton() override = default;
+
+    // prints a graphviz vizualisation of the MPA
+    // use http://www.webgraphviz.com/ to see
+    void printForGraphviz() {
+        std::cout << "printing the max-plus automaton for graphviz \r\n";
+        MPASetOfEdges::CIter e = this->getEdges()->begin();
+        for (; e != this->getEdges()->end(); e++) {
+            auto x = ((MPAEdge *)(*e))->label.scenario;
+
+            std::cout << "\"" << (*e)->getSource()->getId() << "\" -> \""
+                      << (*e)->getDestination()->getId() << "\" [ label = \"" << *x << ","
+                      << ((MPAEdge *)(*e))->label.delay << "\" ];  \r\n";
+        }
+    }
 };
 
 /**
@@ -201,6 +220,7 @@ using MPARState = ::FSM::Labeled::State<MPAStateLabel, MPAREdgeLabel>;
 using MPAREdge = ::FSM::Labeled::Edge<MPAStateLabel, MPAREdgeLabel>;
 using MPARSetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAREdgeLabel>;
 using MPARSetOfEdges = ::FSM::Abstract::SetOfEdges;
+using MPASequence = ::FSM::Labeled::ListOfEdges<MPAStateLabel, MPAEdgeLabel>;
 using MPARCycle = std::list<const ::FSM::Abstract::Edge *>;
 
 /**
@@ -222,6 +242,35 @@ public:
     CDouble calculateMCRAndCycle(std::shared_ptr<std::vector<const MPAREdge *>> *cycle);
 };
 
+class MakespanCalculator {
+public:
+    /**
+     * Compute the worst-case makespan of the maxplus automaton and produce the corresponding
+     * sequence.
+     * TODO : make  pair<CDouble, list<CString*>*> a struct
+     */
+    std::pair<CDouble, std::list<CString *> *> calculateWorstCaseMakespan(MaxPlusAutomaton *mpa);
+    /**
+     * Compute the best-case makespan of the maxplus automaton and produce the corresponding
+     * sequence.
+     */
+    CDouble calculateBestCaseMakespan(MPASequence **sequence);
+
+private:
+    /*
+     * bellman-ford algorithm on max-plus automaton mpa to find the minimum path
+     */
+    std::pair<CDouble, std::list<CString *> *>
+    bellmanFordMin(MaxPlusAutomaton *mpa, MPAState *srcId, bool checkForNegativeCycle);
+    /*
+     * bellman-ford algorithm on max-plus automaton mpa to find the maximum path
+     */
+    std::pair<CDouble, std::list<CString *> *>
+    bellmanFordMax(MaxPlusAutomaton *mpa, MPAState *srcId, bool checkForNegativeCycle);
+
+    std::map<MPAState *, std::pair<CDouble, std::list<CString *> *>>
+    bellmanFord(MaxPlusAutomaton *mpa, MPAState *srcId, bool checkForNegativeCycle);
+};
 } // namespace MaxPlus
 
 #endif

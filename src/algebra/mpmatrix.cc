@@ -114,6 +114,223 @@ void Vector::negate() {
 }
 
 /**
+ * randomize
+ */
+void Vector::randomize(unsigned int max) {
+    unsigned int M = this->getSize();
+
+    for (unsigned int pos = 0; pos < M; pos++) {
+        MPTime r = (MPTime)(rand() % 2);
+        if (r == (MPTime)0) {
+            put(pos, r);
+        } else {
+            r = (MPTime)(rand() % max);
+            put(pos, r);
+        }
+    }
+}
+
+/**
+ * LaTex String representation of vector
+ */
+void Vector::toLaTeXString(CString &outString, double scale) const {
+    outString = "";
+    unsigned int MR = this->getSize();
+    unsigned int MC = 1;
+    outString += "\\begin{bmatrix}\n";
+    for (unsigned int i = 0; i < MR; i++) {
+        for (unsigned int j = 0; j < MC; j++) {
+            outString += timeToLaTeXString(this->get(i) * scale) + " ";
+            if (j < MC - 1) {
+                outString += "&";
+            } else {
+                outString += "\\\\";
+            }
+        }
+        outString += "\n";
+    }
+    outString += "\\end{bmatrix}\n";
+}
+
+/**
+ * Increases the number of cols of the matrix by n and fills the new elements with -\infty.
+ */
+void Matrix::addCols(uint n) {
+    unsigned int rows = this->getRows();
+    unsigned int cols = this->getCols();
+    this->szCols = this->szCols + n;
+    // unsigned int nels = this->getRows() * this->getCols();
+    // this->table.resize(nels);
+    vector<MPTime>::iterator it = this->table.begin() + cols;
+    for (unsigned int r = 0; r < rows; r++) {
+        for (unsigned int c = 0; c < n; c++) {
+            it = this->table.insert(it, MP_MINUSINFINITY);
+            // advance(it, 1);
+        }
+        if (r < rows - 1)
+            advance(it, cols + n);
+    }
+}
+
+/**
+ *  randomizes all elements of an existing matrix
+ */
+void Matrix::randomize(unsigned int max) {
+    for (unsigned int rowIndex = 0; rowIndex < getRows(); rowIndex++) {
+        for (unsigned int colIndex = 0; colIndex < getCols(); colIndex++) {
+
+            unsigned int r = rand() % 2;
+            if (r == 0) {
+                this->put(rowIndex, colIndex, MP_MINUSINFINITY);
+            } else {
+                r = rand() % max;
+                this->put(rowIndex, colIndex, r);
+            }
+        }
+    }
+}
+
+/**
+ * Get a row from the matrix as a vector. Row index must be between 0 and row size-1
+ */
+Vector Matrix::getRowVector(unsigned int row) const {
+    unsigned int sz = this->getCols();
+    Vector result(sz);
+    for (unsigned int i = 0; i < sz; i++) {
+        result.put(i, this->get(row, i));
+    }
+    return result;
+}
+
+/**
+ * Paste rowvector into matrix
+ */
+void Matrix::pasteRowVector(unsigned int top_row,
+                            unsigned int left_column,
+                            const Vector *pastedVector) {
+    const unsigned int p_csz = pastedVector->getSize();
+    const unsigned int right_column = left_column + p_csz - 1;
+    assert(right_column < this->getCols());
+    for (unsigned int col = left_column; col <= right_column; col++) {
+        this->put(top_row, col, pastedVector->get(col));
+    }
+}
+
+
+	/**
+	* Make submatrix with indices in list for non-square matrix. The new matrix only keeps the rows of the original matrix with the selected indices.
+	*/
+	Matrix* Matrix::getSubMatrixNonSquareRows(const list<unsigned int>& rowIndices) const
+	{
+		unsigned int NR = (unsigned int)rowIndices.size();
+		Matrix* newMatrix = new Matrix(NR, this->getCols());
+
+		list<unsigned int>::const_iterator cit = rowIndices.begin();
+		for (unsigned int r = 0; r < NR; r++, cit++) {
+			unsigned int ci = (*cit);
+			for (unsigned int c = 0; c < this->getCols(); c++) {
+				newMatrix->put(r, c, this->get(ci, c));
+			}
+		}
+		return newMatrix;
+	}
+
+
+	/**
+	 * returns the largest finite element of a col
+	 */
+	MPTime Matrix::getMaxOfCol(uint colNumber) const
+	{
+		MPTime largestEl = 0, largestMag = 0;
+		if (colNumber > this->getCols())
+			throw CException("Matrix getMaxOfRow input index out of bounds.");
+		unsigned int MR = this->getRows();
+
+		for (unsigned int r = 0; r < MR; r++) {
+			MPTime t = this->get(r, colNumber);
+			if (t <= MP_MINUSINFINITY) continue;
+
+			MPTime mag = fabs(t);
+			if (mag > largestMag) {
+				largestEl = t;
+				largestMag = mag;
+			}
+		}
+
+		return largestEl;
+	}
+
+
+	/**
+	 * returns the largest finite element of a col until row
+	 */
+	MPTime Matrix::getMaxOfColUntilRow(uint colNumber, uint rowNumber) const
+	{
+		MPTime largestEl = 0, largestMag = 0;
+		if (colNumber > this->getCols())
+			throw CException("Matrix getMaxOfRow input index out of bounds.");
+		 
+		for (unsigned int r = 0; r < rowNumber; r++) {
+			MPTime t = this->get(r, colNumber);
+			if (t <= MP_MINUSINFINITY) continue;
+
+			MPTime mag = fabs(t);
+			if (mag > largestMag) {
+				largestEl = t;
+				largestMag = mag;
+			}
+		}
+
+		return largestEl;
+	}
+	/**
+	 * returns the largest finite element of a row
+	 */
+	MPTime Matrix::getMaxOfRow(uint rowNumber) const
+	{
+		MPTime largestEl = 0, largestMag = 0; 
+		if (rowNumber > this->getRows())
+			throw CException("Matrix getMaxOfRow input index out of bounds.");
+		unsigned int MC = this->getCols();
+
+		for (unsigned int c = 0; c < MC; c++) {
+			MPTime t = this->get(rowNumber, c);
+			if (t<= MP_MINUSINFINITY) continue;
+
+			MPTime mag = fabs(t);
+			if (mag > largestMag) {
+				largestEl = t;
+				largestMag = mag;
+			}
+		}
+
+		return largestEl;
+	}
+
+	/**
+	 * returns the largest finite element of a row up to and including colNumber
+	 */
+	MPTime Matrix::getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const
+	{
+		MPTime largestEl = 0, largestMag = 0;
+		if (rowNumber > this->getRows())
+			throw CException("Matrix getMaxOfRow input row index out of bounds."); 
+		if (colNumber > this->getCols())
+			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
+		for (unsigned int c = 0; c < colNumber; c++) {
+			MPTime t = this->get(rowNumber, c);
+			if (t <= MP_MINUSINFINITY) continue;
+
+			MPTime mag = fabs(t);
+			if (mag > largestMag) {
+				largestEl = t;
+				largestMag = mag;
+			}
+		}
+		return largestEl;
+	}
+
+/**
  * calculate vector norm
  */
 MPTime Vector::norm() const {

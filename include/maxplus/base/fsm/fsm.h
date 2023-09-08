@@ -336,6 +336,11 @@ private:
     EdgeLabelType label;
 };
 
+template <typename StateLabelType, typename EdgeLabelType>
+class ListOfEdges : public Abstract::ListOfEdges {
+public:
+    typedef typename ListOfEdges<StateLabelType, EdgeLabelType>::const_iterator CIter;
+};
 // template <typename StateLabelType, typename EdgeLabelType>
 // class SetOfEdges : public Abstract::SetOfEdges {
 // public:
@@ -419,6 +424,8 @@ private:
     SetOfStates<StateLabelType, EdgeLabelType> states;
     Abstract::SetOfEdges edges;
     State<StateLabelType, EdgeLabelType> *initialState;
+    SetOfStates<StateLabelType, EdgeLabelType> *initialStates;
+    SetOfStates<StateLabelType, EdgeLabelType> *finalStates;
 
 public:
     FiniteStateMachine() : Abstract::FiniteStateMachine(), initialState(nullptr){};
@@ -490,7 +497,19 @@ public:
     void setInitialState(StateLabelType label) {
         this->initialState = this->states.withLabel(label);
     };
+    void addInitialState(State<StateLabelType, EdgeLabelType> *s) {
+        this->initialStates->insert(s);
+        this->initialStates->stateIndex[s->getLabel()] = s;
+    };
 
+    SetOfStates<StateLabelType, EdgeLabelType> *getInitialStates() { return this->initialStates; };
+
+    void addFinalState(State<StateLabelType, EdgeLabelType> *s) {
+        this->finalStates->insert(s);
+        this->finalStates->stateIndex[s->getLabel()] = s;
+    };
+
+    SetOfStates<StateLabelType, EdgeLabelType> *getFinalStates() { return this->finalStates; }
     void setInitialState(State<StateLabelType, EdgeLabelType> &s) {
         // we are asumming s is one of our states
         this->initialState = &s;
@@ -530,6 +549,21 @@ public:
         //     i++;
         // }
         throw CException("error - state not found in FiniteStateMachine::getStateLabeled");
+    };
+
+    State<StateLabelType, EdgeLabelType> *findState(StateLabelType src) {
+        // get all lables
+        SetOfStates<StateLabelType, EdgeLabelType> *allStates = this->getStates();
+
+        typename SetOfStates<StateLabelType, EdgeLabelType>::iterator iter = allStates->begin();
+
+        for (; iter != allStates->end(); iter++) {
+            State<StateLabelType, EdgeLabelType> *s = (State<StateLabelType, EdgeLabelType> *)*iter;
+            if (s->stateLabel == src) {
+                return s;
+            }
+        }
+        return NULL;
     };
 
     SetOfStates<StateLabelType, EdgeLabelType> &getStates() { return this->states; };
@@ -585,6 +619,29 @@ public:
         return result;
     };
 
+    bool hasDirectedCycle() {
+        SetOfStates<StateLabelType, EdgeLabelType> *unmarked =
+                new SetOfStates<StateLabelType, EdgeLabelType>();
+        *unmarked = *this->getStates();
+        SetOfStates<StateLabelType, EdgeLabelType> *tempMarked =
+                new SetOfStates<StateLabelType, EdgeLabelType>();
+
+        typename SetOfStates<StateLabelType, EdgeLabelType>::CIter si;
+        si = unmarked->begin();
+        try {
+            while (!(unmarked->empty())) {
+
+                if (visitState(unmarked, tempMarked, (State<StateLabelType, EdgeLabelType> *)(*si)))
+                    return true;
+                if (unmarked->size() <= 1)
+                    break;
+                si = unmarked->begin();
+            }
+            return false;
+        } catch (exception const &) {
+            return true;
+        }
+    }
     // check if there exists a transition e = (q1,alpha,q2)
     const Edge<StateLabelType, EdgeLabelType> *
     findEdge(StateLabelType src, EdgeLabelType lbl, StateLabelType dst) {
@@ -865,6 +922,34 @@ private:
         }
     };
 
+    bool visitState(SetOfStates<StateLabelType, EdgeLabelType> *unmarked,
+                    SetOfStates<StateLabelType, EdgeLabelType> *tempMarked,
+                    State<StateLabelType, EdgeLabelType> *s) {
+        if (tempMarked->count(s)) {
+            // throw CException("cycle found!");
+            return true;
+        }
+
+        if (unmarked->count(s)) {
+            tempMarked->insert(s);
+
+            auto edges = s->getOutgoingEdges();
+            typename SetOfEdges<StateLabelType, EdgeLabelType>::CIter i;
+            for (i = edges->begin(); i != edges->end(); i++) {
+                State<StateLabelType, EdgeLabelType> *dest =
+                        (State<StateLabelType, EdgeLabelType>
+                                 *)((Edge<StateLabelType, EdgeLabelType> *)(*i))
+                                ->getDestination();
+                if (visitState(unmarked, tempMarked, dest))
+                    return true;
+            }
+            // Mark v permanently.
+            unmarked->erase(s);
+            // Unmark v temporarily.
+            tempMarked->erase(s);
+        }
+        return false;
+    }
     // function only used by minimizeEdgeLabels
     bool edgesEquivalent(EquivalenceMap &m,
                          const State<StateLabelType, EdgeLabelType> *s1,
@@ -983,6 +1068,19 @@ private:
 };
 
 } // namespace Product
+
+// Input/Output Automaton
+typedef CString InputAction;
+typedef CString OutputAction;
+typedef std::pair<InputAction, OutputAction> IOAEdgeLabel;
+typedef FSM::Labeled::State<CId, IOAEdgeLabel> IOAState;
+typedef FSM::Labeled::Edge<CId, IOAEdgeLabel> IOAEdge;
+typedef FSM::Labeled::SetOfStates<CId, CString> IOASetOfStates;
+typedef  SetOfEdges<CId, CString> IOASetOfEdges;
+class IOAutomaton : public ::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel> {
+public:
+    virtual ~IOAutomaton(){};
+};
 
 } // namespace FSM
 

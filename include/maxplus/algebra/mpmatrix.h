@@ -114,6 +114,14 @@ public:
         return *this;
     }
 
+    void Vector::randomize(unsigned int max);
+    void toLaTeXString(CString &outString, double scale = 1.0) const;
+    Matrix *getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
+    MPTime getMaxOfCol(uint colNumber) const;
+    MPTime getMaxOfRow(uint rowNumber) const;
+    MPTime getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const;
+    MPTime getMaxOfColUntilRow(uint colNumber, uint rowNumber) const;
+
     /**
      * Get minimal finite element
      * returns the smallest among the finite elements in the vector or
