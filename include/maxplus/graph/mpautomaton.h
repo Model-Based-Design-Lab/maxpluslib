@@ -151,9 +151,10 @@ public:
 
     // prints a graphviz vizualisation of the MPA
     // use http://www.webgraphviz.com/ to see
+    /*
     void printForGraphviz() {
         std::cout << "printing the max-plus automaton for graphviz \r\n";
-        MPASetOfEdges::CIter e = this->getEdges()->begin();
+        auto e = this->getEdges()->begin();
         for (; e != this->getEdges()->end(); e++) {
             auto x = ((MPAEdge *)(*e))->label.scenario;
 
@@ -162,6 +163,7 @@ public:
                       << ((MPAEdge *)(*e))->label.delay << "\" ];  \r\n";
         }
     }
+    */
 };
 
 /**
