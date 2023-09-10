@@ -31,154 +31,141 @@
  * You are forbidden to forbid anyone else to use, share and improve
  * what you give them.   Happy coding!
  */
-#include "maxplus/base/fsm/fsm.h"
+#include "../../../../../fsmsadf/analysis/throughput/thrutils.h" // TODO: we need thrutils for scenario matrics but...
 #include "graph/mpautomaton.h"
-#include "thrutils.h"// TODO: we need thrutils for scenario matrics but...
+#include "maxplus/base/fsm/fsm.h"
 
+#include <list>
 #include <sstream>
-#include <list> 
 
 using namespace FSM;
 
-namespace MaxPlus
-{
-	class SMPLS
-	{
-	public:
-		ScenarioMatrices *sm = new ScenarioMatrices();
-		EdgeLabeledScenarioFSM *elsFSM = new EdgeLabeledScenarioFSM();
+namespace MaxPlus {
+class SMPLS {
+public:
+    ScenarioMatrices *sm = new ScenarioMatrices();
+    EdgeLabeledScenarioFSM *elsFSM = new EdgeLabeledScenarioFSM();
 
-		MaxPlusAutomaton *convertToMaxPlusAutomaton();
-		void loadAutomatonFromIOAFile(CString fileName);
-		/*
-		Loads max-plus matrices from an mpt file into sm
-		*/
-		void loadMPMatricesFromMPTFile(CString file);
-		void loadAutomatonFromDispatchingFile(CString fileName);
-// transposes all matrices of the SMPLS
-		void transposeMatrices();
-		/*
-		Produces POOSL output from SMPLS
-		*/
-		void convertToPoosl(CString file);
-		
-	};
+    MaxPlusAutomaton *convertToMaxPlusAutomaton();
+    void loadAutomatonFromIOAFile(CString fileName);
+    /*
+    Loads max-plus matrices from an mpt file given by LSAT into sm
+    */
+    void loadMPMatricesFromMPTFile(CString file);
 
-	class DissectedScenarioMatrix
-	{
-	public:
-		ScenarioMatrices *core;
-		std::list<Matrix *> *eventRows;
+    // creates an automaton from an LSAT dispatching file
+    void loadAutomatonFromDispatchingFile(CString fileName);
+    // transposes all matrices of the SMPLS
+    void transposeMatrices();
+    /*
+    Produces POOSL output from SMPLS
+    */
+    void convertToPoosl(CString file);
+};
 
-		DissectedScenarioMatrix()
-		{
-			core = new ScenarioMatrices();
-                    eventRows = new std::list<Matrix *>();
-		}
-	};
-	typedef InputAction Mode;
-	typedef OutputAction Event;
-	typedef CString EventOutcome;
+class DissectedScenarioMatrix {
+public:
+    ScenarioMatrices *core;
+    std::list<Matrix *> *eventRows;
 
-	class SMPLSwithEvents : public SMPLS
-	{
-	public:
-                std::list<std::pair<Mode, Event>> *sigma =
-                    new std::list<pair<Mode, Event>>(); // relation between mode and event
-            std::list<std::pair<Event, EventOutcome>> *gamma =
-                        new std::list<pair<Event, EventOutcome>>(); // relation between event and
-                                                                    // outcome
+    DissectedScenarioMatrix() {
+        core = new ScenarioMatrices();
+        eventRows = new std::list<Matrix *>();
+    }
+};
+typedef InputAction Mode;
+typedef OutputAction Event;
+typedef CString EventOutcome;
 
-		IOAutomaton *ioa;
+class SMPLSwithEvents : public SMPLS {
+public:
+    std::list<std::pair<Mode, Event>> *sigma =
+            new std::list<std::pair<Mode, Event>>(); // relation between mode and event
+    std::list<std::pair<Event, EventOutcome>> *gamma =
+            new std::list<std::pair<Event, EventOutcome>>(); // relation between event
+                                                             // and
+                                                             // outcome
 
-		SMPLSwithEvents()
-		{
-			this->ioa = new IOAutomaton();
-		}
+    IOAutomaton *ioa;
 
-		SMPLSwithEvents(IOAutomaton *ioa)
-		{
-			this->ioa = ioa;
-		}
-		// TODO: control the way sigma and gamma are filled
-                void addToSigma(std::pair<Mode *, Event *> *p)
-		{
-		}
-                void addToGamma(std::pair<Event *, EventOutcome *> *p)
-		{
-		}
+    SMPLSwithEvents() { this->ioa = new IOAutomaton(); }
 
-		/**
-		 * checks the consistency rules for SMPLS with events
-		 */ 
-		bool isConsistent();
+    SMPLSwithEvents(IOAutomaton *ioa) { this->ioa = ioa; }
+    // TODO: control the way sigma and gamma are filled
+    void addToSigma(std::pair<Mode *, Event *> *p) {}
+    void addToGamma(std::pair<Event *, EventOutcome *> *p) {}
 
-		void saveDeterminizedIOAtoFile(CString file);
+    /**
+     * checks the consistency rules for SMPLS with events
+     */
+    bool isConsistent();
 
-		/**
-		 * creates a max-plus automaton from SMPLS with events
-		 */
-		MaxPlusAutomaton *convertToMaxPlusAutomaton();
+    void saveDeterminizedIOAtoFile(CString file);
 
-		/*
-		Loads an IOAutomaton file and stores in elsFMS
-		*/
-		void loadIOAutomatonFromIOAFile(CString fileName);
+    /**
+     * creates a max-plus automaton from SMPLS with events
+     */
+    MaxPlusAutomaton *convertToMaxPlusAutomaton();
 
-		void loadIOAutomatonFromDispatchingFile(CString fileName);
-		/*
-		Loads events from an activity file and fills gamma and sigma
-		*/
-		void loadActivities(CString file);
-		 
+    /*
+    Loads an IOAutomaton file and stores in elsFMS
+    */
+    void loadIOAutomatonFromIOAFile(CString fileName);
 
-		/*
-		* goes through the gamma relation and finds the event of the outcome
-		*/
-		Event findEventByOutcome(EventOutcome outcome);
-	private:
-                std::list<DissectedScenarioMatrix *> *disMatrices =
-                    new std::list<DissectedScenarioMatrix *>();
-		uint numberOfResources = 0;
-		uint biggestMatrixSize = 0;
+    void loadIOAutomatonFromDispatchingFile(CString fileName);
+    /*
+    Loads events from an activity file and fills gamma and sigma
+    */
+    void loadActivities(CString file);
 
-		/*
-		* after we generate the matrices through 'preapreMatrices', we have to make them
-		* all square (to the size of the biggest matrix) by adding rows and cols of -infty
-		*/
-		void makeMatricesSquare();
+    /*
+     * goes through the gamma relation and finds the event of the outcome
+     */
+    Event findEventByOutcome(EventOutcome outcome);
 
-		
+private:
+    std::list<DissectedScenarioMatrix *> *disMatrices = new std::list<DissectedScenarioMatrix *>();
+    uint numberOfResources = 0;
+    uint biggestMatrixSize = 0;
 
-		/*
-		* goes through the sigma relation and finds the event emitted by mode
-		*/
-		Event findEventByMode(Mode mode);
+    /*
+     * after we generate the matrices through 'preapreMatrices', we have to make them
+     * all square (to the size of the biggest matrix) by adding rows and cols of -infty
+     */
+    void makeMatricesSquare();
 
-		/**
-		 * smpls with events needs to prepare the matrices to be able to perform analysis.
-		 * this includes adding rows and columns of -inf and 0 based on the spec
-		 * allowing the system to analyze processing or conveying event timings
-		 */
-		void prepareMatrices(IOAState *s, multiset<Event> *eventList, IOASetOfEdges *visitedEdges);
+    /*
+     * goes through the sigma relation and finds the event emitted by mode
+     */
+    Event findEventByMode(Mode mode);
 
-		DissectedScenarioMatrix *findDissectedScenarioMatrix(CString sName);
+    /**
+     * smpls with events needs to prepare the matrices to be able to perform analysis.
+     * this includes adding rows and columns of -inf and 0 based on the spec
+     * allowing the system to analyze processing or conveying event timings
+     */
+    void prepareMatrices(IOAState *s, multiset<Event> *eventList, IOASetOfEdges *visitedEdges);
 
-		/**
-		 * recursive part of isConsistent
-		 */
-                void isConsistentUtil(IOAState *s,
-                                      std::list<Event> *eventList,
-                                      IOASetOfStates *finalStates,
-                                      CString *errMsg,
-                                      std::map<IOAState *, std::list<Event> *> *visited);
-		 
-		  
-		void determinizeUtil(IOAState* s, IOASetOfStates* visited, IOASetOfStates* finalStates, CString* errMsg, ofstream& outfile);
+    DissectedScenarioMatrix *findDissectedScenarioMatrix(CString sName);
 
-		bool compareEventLists(std::list<Event> *l1, std::list<Event> *l2);
+    /**
+     * recursive part of isConsistent
+     */
+    void isConsistentUtil(IOAState *s,
+                          std::list<Event> *eventList,
+                          IOASetOfStates *finalStates,
+                          CString *errMsg,
+                          std::map<IOAState *, std::list<Event> *> *visited);
 
-		void dissectScenarioMatrices();
-	};
+    void determinizeUtil(IOAState *s,
+                         IOASetOfStates *visited,
+                         IOASetOfStates *finalStates,
+                         CString *errMsg,
+                         ofstream &outfile);
 
-}
+    bool compareEventLists(std::list<Event> *l1, std::list<Event> *l2);
+
+    void dissectScenarioMatrices();
+};
+
+} // namespace MaxPlus

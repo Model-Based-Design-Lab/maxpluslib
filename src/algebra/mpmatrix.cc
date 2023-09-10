@@ -225,7 +225,7 @@ void Matrix::pasteRowVector(unsigned int top_row,
 		unsigned int NR = (unsigned int)rowIndices.size();
 		Matrix* newMatrix = new Matrix(NR, this->getCols());
 
-		list<unsigned int>::const_iterator cit = rowIndices.begin();
+		std::list<unsigned int>::const_iterator cit = rowIndices.begin();
 		for (unsigned int r = 0; r < NR; r++, cit++) {
 			unsigned int ci = (*cit);
 			for (unsigned int c = 0; c < this->getCols(); c++) {
