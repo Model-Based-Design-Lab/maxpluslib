@@ -31,7 +31,7 @@
  * You are forbidden to forbid anyone else to use, share and improve
  * what you give them.   Happy coding!
  */
-#include "../../../../../fsmsadf/analysis/throughput/thrutils.h" // TODO: we need thrutils for scenario matrics but...
+//#include "../../../../../fsmsadf/analysis/throughput/thrutils.h" // TODO: we need thrutils for scenario matrics but...
 #include "graph/mpautomaton.h"
 #include "maxplus/base/fsm/fsm.h"
 
@@ -43,7 +43,8 @@ using namespace FSM;
 namespace MaxPlus {
 class SMPLS {
 public:
-    ScenarioMatrices *sm = new ScenarioMatrices();
+    std::map<CString, std::shared_ptr<MaxPlus::Matrix>> *sm =
+            new std::map<CString, std::shared_ptr<MaxPlus::Matrix>>();
     EdgeLabeledScenarioFSM *elsFSM = new EdgeLabeledScenarioFSM();
 
     MaxPlusAutomaton *convertToMaxPlusAutomaton();
@@ -65,11 +66,11 @@ public:
 
 class DissectedScenarioMatrix {
 public:
-    ScenarioMatrices *core;
+    std::map<CString, std::shared_ptr<MaxPlus::Matrix>> *core;
     std::list<Matrix *> *eventRows;
 
     DissectedScenarioMatrix() {
-        core = new ScenarioMatrices();
+        core = new std::map<CString, std::shared_ptr<MaxPlus::Matrix>>();
         eventRows = new std::list<Matrix *>();
     }
 };
@@ -144,7 +145,7 @@ private:
      * this includes adding rows and columns of -inf and 0 based on the spec
      * allowing the system to analyze processing or conveying event timings
      */
-    void prepareMatrices(IOAState *s, multiset<Event> *eventList, IOASetOfEdges *visitedEdges);
+    void prepareMatrices(IOAState *s, std::multiset<Event> *eventList, IOASetOfEdges *visitedEdges);
 
     DissectedScenarioMatrix *findDissectedScenarioMatrix(CString sName);
 
@@ -161,7 +162,7 @@ private:
                          IOASetOfStates *visited,
                          IOASetOfStates *finalStates,
                          CString *errMsg,
-                         ofstream &outfile);
+                         std::ofstream &outfile);
 
     bool compareEventLists(std::list<Event> *l1, std::list<Event> *l2);
 
