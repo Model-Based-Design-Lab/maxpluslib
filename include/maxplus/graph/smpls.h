@@ -33,9 +33,10 @@
  */
 #include "maxplus/base/fsm/fsm.h"
 #include "graph/mpautomaton.h"
-
+#include "thrutils.h"// TODO: we need thrutils for scenario matrics but...
 
 #include <sstream>
+#include <list> 
 
 using namespace FSM;
 
@@ -67,12 +68,12 @@ namespace MaxPlus
 	{
 	public:
 		ScenarioMatrices *core;
-		list<Matrix *> *eventRows;
+		std::list<Matrix *> *eventRows;
 
 		DissectedScenarioMatrix()
 		{
 			core = new ScenarioMatrices();
-			eventRows = new list<Matrix *>();
+                    eventRows = new std::list<Matrix *>();
 		}
 	};
 	typedef InputAction Mode;
@@ -82,8 +83,11 @@ namespace MaxPlus
 	class SMPLSwithEvents : public SMPLS
 	{
 	public:
-		list<pair<Mode, Event>> *sigma = new list<pair<Mode, Event>>();					//relation between mode and event
-		list<pair<Event, EventOutcome>> *gamma = new list<pair<Event, EventOutcome>>(); //relation between event and outcome
+                std::list<std::pair<Mode, Event>> *sigma =
+                    new std::list<pair<Mode, Event>>(); // relation between mode and event
+            std::list<std::pair<Event, EventOutcome>> *gamma =
+                        new std::list<pair<Event, EventOutcome>>(); // relation between event and
+                                                                    // outcome
 
 		IOAutomaton *ioa;
 
@@ -97,10 +101,10 @@ namespace MaxPlus
 			this->ioa = ioa;
 		}
 		// TODO: control the way sigma and gamma are filled
-		void addToSigma(pair<Mode *, Event *> *p)
+                void addToSigma(std::pair<Mode *, Event *> *p)
 		{
 		}
-		void addToGamma(pair<Event *, EventOutcome *> *p)
+                void addToGamma(std::pair<Event *, EventOutcome *> *p)
 		{
 		}
 
@@ -133,7 +137,8 @@ namespace MaxPlus
 		*/
 		Event findEventByOutcome(EventOutcome outcome);
 	private:
-		list<DissectedScenarioMatrix *> *disMatrices = new list<DissectedScenarioMatrix *>();
+                std::list<DissectedScenarioMatrix *> *disMatrices =
+                    new std::list<DissectedScenarioMatrix *>();
 		uint numberOfResources = 0;
 		uint biggestMatrixSize = 0;
 
@@ -162,12 +167,16 @@ namespace MaxPlus
 		/**
 		 * recursive part of isConsistent
 		 */
-		void isConsistentUtil(IOAState *s, list<Event> *eventList, IOASetOfStates *finalStates, CString *errMsg, map<IOAState *, list<Event> *> *visited);
+                void isConsistentUtil(IOAState *s,
+                                      std::list<Event> *eventList,
+                                      IOASetOfStates *finalStates,
+                                      CString *errMsg,
+                                      std::map<IOAState *, std::list<Event> *> *visited);
 		 
 		  
 		void determinizeUtil(IOAState* s, IOASetOfStates* visited, IOASetOfStates* finalStates, CString* errMsg, ofstream& outfile);
 
-		bool compareEventLists(list<Event> *l1, list<Event> *l2);
+		bool compareEventLists(std::list<Event> *l1, std::list<Event> *l2);
 
 		void dissectScenarioMatrices();
 	};

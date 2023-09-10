@@ -116,7 +116,7 @@ public:
 
     void Vector::randomize(unsigned int max);
     void toLaTeXString(CString &outString, double scale = 1.0) const;
-    Matrix *getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
+    Matrix* getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
     MPTime getMaxOfCol(uint colNumber) const;
     MPTime getMaxOfRow(uint rowNumber) const;
     MPTime getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const;
@@ -200,7 +200,8 @@ public:
      * Increases the number of rows of the matrix by n and fills the new elements with -\infty.
      */
     void addRows(uint n);
-
+    void addCols(uint n);
+    void randomize(unsigned int max);
     void toString(CString &outString, CDouble scale = 1.0) const;
     void toMatlabString(CString &outString, CDouble scale = 1.0) const;
     void toLaTeXString(CString &outString, CDouble scale = 1.0) const;
