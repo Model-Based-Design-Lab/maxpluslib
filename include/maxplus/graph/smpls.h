@@ -31,9 +31,9 @@
  * You are forbidden to forbid anyone else to use, share and improve
  * what you give them.   Happy coding!
  */
-#include "../../base/fsm/fsm.h"
-#include "../../maxplus/graph/mpautomaton.h"
-#include "../../fsmsadf/analysis/throughput/thrutils.h"
+#include "maxplus/base/fsm/fsm.h"
+#include "graph/mpautomaton.h"
+
 
 #include <sstream>
 

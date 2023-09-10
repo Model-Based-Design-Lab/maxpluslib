@@ -31,7 +31,7 @@
  * You are forbidden to forbid anyone else to use, share and improve
  * what you give them.   Happy coding!
  */
-#include "smpls.h"
+#include "graph/smpls.h"
 
 using namespace FSM;
 
