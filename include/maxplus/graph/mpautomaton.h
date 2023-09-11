@@ -268,7 +268,7 @@ private:
      * bellman-ford algorithm on max-plus automaton mpa to find the maximum path
      */
     std::pair<CDouble, std::list<CString *> *>
-    bellmanFordMax(MaxPlusAutomaton *mpa, MPAState *srcId, bool checkForNegativeCycle);
+    bellmanFordMax(MaxPlusAutomaton *mpa, MPAState &srcId, bool checkForNegativeCycle);
 
     std::map<MPAState *, std::pair<CDouble, std::list<CString *> *>>
     bellmanFord(MaxPlusAutomaton *mpa, MPAState *srcId, bool checkForNegativeCycle);

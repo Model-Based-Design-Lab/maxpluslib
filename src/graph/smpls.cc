@@ -41,7 +41,7 @@ namespace MaxPlus {
 /*
  * Loads an entitiy from its starting '{' to the corresponding '}'
  */
-std::string loadEntity(ifstream &stream, string line) {
+std::string loadEntity(ifstream &stream, std::string line) {
     string out = line;
     size_t openBracketCount = 0, closeBracketCount = 0;
     openBracketCount += std::count(line.begin(), line.end(), '{');
@@ -928,8 +928,8 @@ void SMPLS::loadAutomatonFromDispatchingFile(CString fileName) {
         }
     }
     elsFSM->addFinalState(lastState);
-    cout << endl << "automaton states size: " << elsFSM->getStates()->size() << endl;
-    cout << "automaton transitions size: " << elsFSM->getEdges()->size() << endl;
+    //std::cout << endl << "automaton states size: " << elsFSM->getStates()->size() << endl;
+    //std::cout << "automaton transitions size: " << elsFSM->getEdges()->size() << endl;
 }
 
 void SMPLSwithEvents::loadIOAutomatonFromDispatchingFile(CString fileName) {

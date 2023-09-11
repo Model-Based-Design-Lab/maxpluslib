@@ -96,14 +96,14 @@ MakespanCalculator::calculateWorstCaseMakespan(MaxPlusAutomaton *mpa) {
     MPASetOfStates *I = mpa->getInitialStates();
 
     // we add a dummy state and dummy 0-weight transitions to all initial states
-    MPAState *dummyState = new MPAState(make_mpastatelabel(0, 0));
+    MPAState dummyState = MPAState(makeMPAStateLabel(0, 0));
     CString dummyScenario = CString("dummyScenario");
 
     MPASetOfStates::CIter i;
     for (i = I->begin(); i != I->end(); i++) {
-        MPAState *id = ((MPAState *)(*i));
-        MPAEdgeLabel l = make_mpaedgelabel(0, &dummyScenario);
-        l.scenario = (CString *)&dummyScenario;
+        MPAState id = (MPAState )(*i);
+        MPAEdgeLabel l = makeMPAEdgeLabel(MPTime(0), dummyScenario);
+        l.scenario =  dummyScenario;
         mpa->addEdge(dummyState, l, id);
     }
     std::pair<CDouble, std::list<CString *> *> makespan = bellmanFordMax(mpa, dummyState, false);
@@ -153,7 +153,7 @@ std::pair<CDouble, std::list<CString *> *> MakespanCalculator::bellmanFordMin(
  * returns only makespan of accepted words
  */
 std::pair<CDouble, std::list<CString *> *> MakespanCalculator::bellmanFordMax(
-        MaxPlusAutomaton *mpa, MPAState *srcId, bool checkForNegativeCycle = false) {
+        MaxPlusAutomaton *mpa, MPAState &srcId, bool checkForNegativeCycle = false) {
     MPASetOfEdges *e = mpa->getEdges();
     MPASetOfStates *F = mpa->getFinalStates();
     // negate all edge weights to find the longest path
@@ -202,7 +202,7 @@ void bellmanFordThread(MPASetOfEdges *edges,
                 MPAState *destId = (MPAState *)(*j)->getDestination();
                 CDouble weight = ((MPAEdge *)*j)->label.delay;
                 if (dis[sourceId].first + weight < dis[destId].first) {
-                    std::list<CString *> *scList = new list<CString *>(*dis[sourceId].second);
+                    std::list<CString *> *scList = new std::list<CString *>(*dis[sourceId].second);
                     scList->push_back(((MPAEdge *)*j)->label.scenario);
                     m.lock();
                     dis[destId] = make_pair(dis[sourceId].first + weight, scList);
@@ -299,10 +299,10 @@ void bellmanFordFindCriticalEdges(CDouble *vDst,
     for (size_t i = 0; i < nrEdges; i++) {
         EdgeData *e = &(edges[i]);
         size_t sourceId = e->sourceId;
-        CDouble sd = vDst[sourceId];
+        MPTime sd (vDst[sourceId]);
         size_t destId = e->destId;
-        CDouble weight = e->weight;
-        CDouble dd = vDst[destId];
+        MPTime weight (e->weight);
+        MPTime dd (vDst[destId]);
         if (sd + weight <= dd + MP_EPSILON) {
             if (sourceId
                 != destId) { // hack: remove if loop on first state labelled DummyState is fixed
@@ -369,7 +369,7 @@ std::map<MPAState *, std::pair<CDouble, std::list<CString *> *>> MakespanCalcula
     bellmanFordFindCriticalEdges(vDist, edgesArray, critical, nrEdges);
 
     // destination, distance, list of edges to get there
-    std::map<MPAState *, pair<CDouble, list<CString *> *>> dis;
+    std::map<MPAState *, std::pair<CDouble, std::list<CString *> *>> dis;
 
     // copy results from BF analysis
     for (MPASetOfStates::CIter i = s->begin(); i != s->end(); i++) {

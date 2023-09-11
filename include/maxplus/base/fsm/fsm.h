@@ -341,11 +341,11 @@ class ListOfEdges : public Abstract::ListOfEdges {
 public:
     typedef typename ListOfEdges<StateLabelType, EdgeLabelType>::const_iterator CIter;
 };
-// template <typename StateLabelType, typename EdgeLabelType>
-// class SetOfEdges : public Abstract::SetOfEdges {
-// public:
-//     using CIter = typename Abstract::SetOfEdges::const_iterator;
-// };
+ template <typename StateLabelType, typename EdgeLabelType>
+ class SetOfEdges : public Abstract::SetOfEdges {
+ public:
+     using CIter = typename Abstract::SetOfEdges::const_iterator;
+ };
 
 // template <typename StateLabelType, typename EdgeLabelType>
 // class SetOfEdgeRefs : public Abstract::SetOfEdgeRefs {
@@ -1076,7 +1076,7 @@ typedef std::pair<InputAction, OutputAction> IOAEdgeLabel;
 typedef FSM::Labeled::State<CId, IOAEdgeLabel> IOAState;
 typedef FSM::Labeled::Edge<CId, IOAEdgeLabel> IOAEdge;
 typedef FSM::Labeled::SetOfStates<CId, CString> IOASetOfStates;
-typedef  SetOfEdges<CId, CString> IOASetOfEdges;
+typedef FSM::Labeled::SetOfEdges<CId, CString> IOASetOfEdges;
 class IOAutomaton : public ::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel> {
 public:
     virtual ~IOAutomaton(){};

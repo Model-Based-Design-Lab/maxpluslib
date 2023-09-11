@@ -34,9 +34,10 @@
 //#include "../../../../../fsmsadf/analysis/throughput/thrutils.h" // TODO: we need thrutils for scenario matrics but...
 #include "graph/mpautomaton.h"
 #include "maxplus/base/fsm/fsm.h"
-
+ 
 #include <list>
 #include <sstream>
+#include <algebra/mpmatrix.h>
 
 using namespace FSM;
 
@@ -45,7 +46,7 @@ class SMPLS {
 public:
     std::map<CString, std::shared_ptr<MaxPlus::Matrix>> *sm =
             new std::map<CString, std::shared_ptr<MaxPlus::Matrix>>();
-    EdgeLabeledScenarioFSM *elsFSM = new EdgeLabeledScenarioFSM();
+    IOAutomaton *elsFSM = new IOAutomaton();
 
     MaxPlusAutomaton *convertToMaxPlusAutomaton();
     void loadAutomatonFromIOAFile(CString fileName);

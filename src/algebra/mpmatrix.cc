@@ -179,28 +179,17 @@ void Matrix::randomize(unsigned int max) {
     for (unsigned int rowIndex = 0; rowIndex < getRows(); rowIndex++) {
         for (unsigned int colIndex = 0; colIndex < getCols(); colIndex++) {
 
-            unsigned int r = rand() % 2;
-            if (r == 0) {
+            MPTime r = (MPTime)(rand() % 2);
+            if (r == (MPTime)0) {
                 this->put(rowIndex, colIndex, MP_MINUSINFINITY);
             } else {
-                r = rand() % max;
+                r = (MPTime)(rand() % max);
                 this->put(rowIndex, colIndex, r);
             }
         }
     }
 }
-
-/**
- * Get a row from the matrix as a vector. Row index must be between 0 and row size-1
- */
-Vector Matrix::getRowVector(unsigned int row) const {
-    unsigned int sz = this->getCols();
-    Vector result(sz);
-    for (unsigned int i = 0; i < sz; i++) {
-        result.put(i, this->get(row, i));
-    }
-    return result;
-}
+ 
 
 /**
  * Paste rowvector into matrix
@@ -216,119 +205,116 @@ void Matrix::pasteRowVector(unsigned int top_row,
     }
 }
 
+/**
+ * Make submatrix with indices in list for non-square matrix. The new matrix only keeps the rows of
+ * the original matrix with the selected indices.
+ */
+Matrix *Matrix::getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const {
+    unsigned int NR = (unsigned int)rowIndices.size();
+    Matrix *newMatrix = new Matrix(NR, this->getCols());
 
-	/**
-	* Make submatrix with indices in list for non-square matrix. The new matrix only keeps the rows of the original matrix with the selected indices.
-	*/
-	Matrix* Matrix::getSubMatrixNonSquareRows(const list<unsigned int>& rowIndices) const
-	{
-		unsigned int NR = (unsigned int)rowIndices.size();
-		Matrix* newMatrix = new Matrix(NR, this->getCols());
+    std::list<unsigned int>::const_iterator cit = rowIndices.begin();
+    for (unsigned int r = 0; r < NR; r++, cit++) {
+        unsigned int ci = (*cit);
+        for (unsigned int c = 0; c < this->getCols(); c++) {
+            newMatrix->put(r, c, this->get(ci, c));
+        }
+    }
+    return newMatrix;
+}
 
-		std::list<unsigned int>::const_iterator cit = rowIndices.begin();
-		for (unsigned int r = 0; r < NR; r++, cit++) {
-			unsigned int ci = (*cit);
-			for (unsigned int c = 0; c < this->getCols(); c++) {
-				newMatrix->put(r, c, this->get(ci, c));
-			}
-		}
-		return newMatrix;
-	}
+/**
+ * returns the largest finite element of a col
+ */
+MPTime Matrix::getMaxOfCol(uint colNumber) const {
+    MPTime largestEl(0), largestMag(0);
+    if (colNumber > this->getCols())
+        throw CException("Matrix getMaxOfRow input index out of bounds.");
+    unsigned int MR = this->getRows();
 
+    for (unsigned int r = 0; r < MR; r++) {
+        MPTime t = this->get(r, colNumber);
+        if (t <= MP_MINUSINFINITY)
+            continue;
 
-	/**
-	 * returns the largest finite element of a col
-	 */
-	MPTime Matrix::getMaxOfCol(uint colNumber) const
-	{
-		MPTime largestEl = 0, largestMag = 0;
-		if (colNumber > this->getCols())
-			throw CException("Matrix getMaxOfRow input index out of bounds.");
-		unsigned int MR = this->getRows();
+        MPTime mag (fabs((double)t));
+        if (mag > largestMag) {
+            largestEl = t;
+            largestMag = mag;
+        }
+    }
 
-		for (unsigned int r = 0; r < MR; r++) {
-			MPTime t = this->get(r, colNumber);
-			if (t <= MP_MINUSINFINITY) continue;
+    return largestEl;
+}
 
-			MPTime mag = fabs(t);
-			if (mag > largestMag) {
-				largestEl = t;
-				largestMag = mag;
-			}
-		}
+/**
+ * returns the largest finite element of a col until row
+ */
+MPTime Matrix::getMaxOfColUntilRow(uint colNumber, uint rowNumber) const {
+    MPTime largestEl(0), largestMag  (0);
+    if (colNumber > this->getCols())
+        throw CException("Matrix getMaxOfRow input index out of bounds.");
 
-		return largestEl;
-	}
+    for (unsigned int r = 0; r < rowNumber; r++) {
+        MPTime t = this->get(r, colNumber);
+        if (t <= MP_MINUSINFINITY)
+            continue;
 
+        MPTime mag(fabs((double)t));
+        if (mag > largestMag) {
+            largestEl = t;
+            largestMag = mag;
+        }
+    }
 
-	/**
-	 * returns the largest finite element of a col until row
-	 */
-	MPTime Matrix::getMaxOfColUntilRow(uint colNumber, uint rowNumber) const
-	{
-		MPTime largestEl = 0, largestMag = 0;
-		if (colNumber > this->getCols())
-			throw CException("Matrix getMaxOfRow input index out of bounds.");
-		 
-		for (unsigned int r = 0; r < rowNumber; r++) {
-			MPTime t = this->get(r, colNumber);
-			if (t <= MP_MINUSINFINITY) continue;
+    return largestEl;
+}
+/**
+ * returns the largest finite element of a row
+ */
+MPTime Matrix::getMaxOfRow(uint rowNumber) const {
+    MPTime largestEl(0), largestMag(0);
+    if (rowNumber > this->getRows())
+        throw CException("Matrix getMaxOfRow input index out of bounds.");
+    unsigned int MC = this->getCols();
 
-			MPTime mag = fabs(t);
-			if (mag > largestMag) {
-				largestEl = t;
-				largestMag = mag;
-			}
-		}
+    for (unsigned int c = 0; c < MC; c++) {
+        MPTime t = this->get(rowNumber, c);
+        if (t <= MP_MINUSINFINITY)
+            continue;
 
-		return largestEl;
-	}
-	/**
-	 * returns the largest finite element of a row
-	 */
-	MPTime Matrix::getMaxOfRow(uint rowNumber) const
-	{
-		MPTime largestEl = 0, largestMag = 0; 
-		if (rowNumber > this->getRows())
-			throw CException("Matrix getMaxOfRow input index out of bounds.");
-		unsigned int MC = this->getCols();
+        MPTime mag(fabs((double)t));
+        if (mag > largestMag) {
+            largestEl = t;
+            largestMag = mag;
+        }
+    }
 
-		for (unsigned int c = 0; c < MC; c++) {
-			MPTime t = this->get(rowNumber, c);
-			if (t<= MP_MINUSINFINITY) continue;
+    return largestEl;
+}
 
-			MPTime mag = fabs(t);
-			if (mag > largestMag) {
-				largestEl = t;
-				largestMag = mag;
-			}
-		}
+/**
+ * returns the largest finite element of a row up to and including colNumber
+ */
+MPTime Matrix::getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const {
+    MPTime largestEl(0), largestMag(0);
+    if (rowNumber > this->getRows())
+        throw CException("Matrix getMaxOfRow input row index out of bounds.");
+    if (colNumber > this->getCols())
+        throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
+    for (unsigned int c = 0; c < colNumber; c++) {
+        MPTime t = this->get(rowNumber, c);
+        if (t <= MP_MINUSINFINITY)
+            continue;
 
-		return largestEl;
-	}
-
-	/**
-	 * returns the largest finite element of a row up to and including colNumber
-	 */
-	MPTime Matrix::getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const
-	{
-		MPTime largestEl = 0, largestMag = 0;
-		if (rowNumber > this->getRows())
-			throw CException("Matrix getMaxOfRow input row index out of bounds."); 
-		if (colNumber > this->getCols())
-			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
-		for (unsigned int c = 0; c < colNumber; c++) {
-			MPTime t = this->get(rowNumber, c);
-			if (t <= MP_MINUSINFINITY) continue;
-
-			MPTime mag = fabs(t);
-			if (mag > largestMag) {
-				largestEl = t;
-				largestMag = mag;
-			}
-		}
-		return largestEl;
-	}
+        MPTime mag(fabs((double)t));
+        if (mag > largestMag) {
+            largestEl = t;
+            largestMag = mag;
+        }
+    }
+    return largestEl;
+}
 
 /**
  * calculate vector norm

@@ -116,7 +116,7 @@ public:
 
     void Vector::randomize(unsigned int max);
     void toLaTeXString(CString &outString, double scale = 1.0) const;
-    Matrix* getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
+    
     MPTime getMaxOfCol(uint colNumber) const;
     MPTime getMaxOfRow(uint rowNumber) const;
     MPTime getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const;
@@ -160,7 +160,7 @@ public:
     Matrix(const Matrix &) = default;
 
     Matrix &operator=(const Matrix &);
-
+    Matrix *getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
     virtual ~Matrix();
 
     [[nodiscard]] inline unsigned int getRows() const { return this->szRows; }
@@ -252,6 +252,11 @@ public:
      */
     [[nodiscard]] MPTime largestFiniteElement() const;
     [[nodiscard]] MPTime minimalFiniteElement() const;
+
+    MPTime getMaxOfCol(uint colNumber) const;
+    MPTime getMaxOfColUntilRow(uint colNumber, uint rowNumber) const;
+    MPTime getMaxOfRow(uint rowNumber) const;
+    MPTime getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const;
 
     [[nodiscard]] Matrix plusClosureMatrix(MPTime posCycleThreshold = MP_EPSILON) const;
 
