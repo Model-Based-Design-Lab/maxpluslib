@@ -168,6 +168,7 @@ public:
     using CIter = SetOfStates::const_iterator;
     using Iter = SetOfStates::iterator;
     void remove(const State &s) { this->erase(s.getId()); }
+    virtual ~SetOfStates() = default;
 };
 
 struct StateRefCompareLessThan {
@@ -197,6 +198,8 @@ public:
     virtual std::shared_ptr<FiniteStateMachine> newInstance() = 0;
 
     [[nodiscard]] virtual State &getInitialState() const = 0;
+    [[nodiscard]] virtual const SetOfStates &getInitialStates() const = 0;
+    [[nodiscard]] virtual const SetOfStates &getFinalStates() const = 0;
 };
 
 //
@@ -336,11 +339,11 @@ private:
     EdgeLabelType label;
 };
 
-// template <typename StateLabelType, typename EdgeLabelType>
-// class SetOfEdges : public Abstract::SetOfEdges {
-// public:
-//     using CIter = typename Abstract::SetOfEdges::const_iterator;
-// };
+template <typename StateLabelType, typename EdgeLabelType>
+class SetOfEdges : public Abstract::SetOfEdges {
+public:
+    using CIter = typename Abstract::SetOfEdges::const_iterator;
+};
 
 // template <typename StateLabelType, typename EdgeLabelType>
 // class SetOfEdgeRefs : public Abstract::SetOfEdgeRefs {
@@ -418,10 +421,12 @@ class FiniteStateMachine : public Abstract::FiniteStateMachine {
 private:
     SetOfStates<StateLabelType, EdgeLabelType> states;
     Abstract::SetOfEdges edges;
-    State<StateLabelType, EdgeLabelType> *initialState;
+    // State<StateLabelType, EdgeLabelType> *initialState;
+    SetOfStates<StateLabelType, EdgeLabelType> initialStates;
+    SetOfStates<StateLabelType, EdgeLabelType> finalStates;
 
 public:
-    FiniteStateMachine() : Abstract::FiniteStateMachine(), initialState(nullptr){};
+    FiniteStateMachine() : Abstract::FiniteStateMachine() {};
 
     ~FiniteStateMachine() override = default;
 
@@ -488,16 +493,40 @@ public:
 
     // set initial state to state with label;
     void setInitialState(StateLabelType label) {
-        this->initialState = this->states.withLabel(label);
+        this->setInitialState(*(this->states.withLabel(label)));
     };
 
     void setInitialState(State<StateLabelType, EdgeLabelType> &s) {
-        // we are asumming s is one of our states
-        this->initialState = &s;
+        // we are assuming s is one of our states
+        this->initialStates.clear();
+        this->addInitialState(s);
     };
 
-    [[nodiscard]] State<StateLabelType, EdgeLabelType> &getInitialState() const override {
-        return *this->initialState;
+    void addInitialState(State<StateLabelType, EdgeLabelType> &s) {
+        // we are assuming s is one of our states
+        this->initialStates.emplace(s.getId(), &s);
+    };
+
+    void addFinalState(State<StateLabelType, EdgeLabelType> &s) {
+        // we are assuming s is one of our states
+        this->finalStates.emplace(s.getId(), &s);
+    };
+
+
+    [[nodiscard]] State<StateLabelType, EdgeLabelType>& getInitialState() const override {
+        if (this->initialStates.empty()) {
+            throw CException("FSM has no initial state.");
+        }
+        auto xx = (this->initialStates.begin())->second;
+        return dynamic_cast<State<StateLabelType, EdgeLabelType>&>(*xx);
+    };
+
+    [[nodiscard]] const ::FSM::Abstract::SetOfStates &getInitialStates() const override {
+        return this->initialStates;
+    };
+
+    [[nodiscard]] const ::FSM::Abstract::SetOfStates &getFinalStates() const override {
+        return this->finalStates;
     };
 
     State<StateLabelType, EdgeLabelType> &getStateLabeled(const StateLabelType &s) {

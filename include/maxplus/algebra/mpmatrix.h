@@ -170,7 +170,9 @@ public:
 
     void pasteRowVector(unsigned int top_row, unsigned int left_column, const Vector *pastedVector);
 
-    // [[nodiscard]] virtual Matrix *createCopy() const;
+    [[nodiscard]] virtual std::shared_ptr<Matrix> createCopy() const;
+
+    [[nodiscard]] virtual std::shared_ptr<Matrix> getTransposedCopy() const;
 
     [[nodiscard]] Matrix transpose() const;
 
@@ -192,6 +194,11 @@ public:
      * Increases the number of rows of the matrix by n and fills the new elements with -\infty.
      */
     void addRows(uint n);
+
+    /**
+     * Increases the number of columns of the matrix by n and fills the new elements with -\infty.
+     */
+    void addCols(uint n);
 
     void toString(CString &outString, CDouble scale = 1.0) const;
     void toMatlabString(CString &outString, CDouble scale = 1.0) const;
@@ -243,6 +250,10 @@ public:
      */
     [[nodiscard]] MPTime largestFiniteElement() const;
     [[nodiscard]] MPTime minimalFiniteElement() const;
+    [[nodiscard]] MPTime getMaxOfCol(uint colNumber) const;
+    [[nodiscard]] MPTime getMaxOfRow(uint rowNumber) const;
+    [[nodiscard]] MPTime  getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const;
+    [[nodiscard]] MPTime getMaxOfColUntilRow(uint colNumber,uint rowNumber) const;
 
     [[nodiscard]] Matrix plusClosureMatrix(MPTime posCycleThreshold = MP_EPSILON) const;
 

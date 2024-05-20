@@ -17,3 +17,4 @@ CMakeSettings.json
 *.vcxproj
 *.sln
 *.filters
+compile_commands.json

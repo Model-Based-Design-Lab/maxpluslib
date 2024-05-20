@@ -68,8 +68,9 @@ This library contains contributions by the following authors.
 - Sander Stuijk
 - Peter Poplavko
 - Bart Theelen
+- Alireza Mohammadkhani
 
-## Documentation 
+## Documentation
 
 To make documentation, install doxygen and graphviz and run the following command.
 

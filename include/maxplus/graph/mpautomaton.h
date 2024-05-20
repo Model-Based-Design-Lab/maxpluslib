@@ -98,6 +98,18 @@ using MPAEdgeLabel = struct MPAEdgeLabel {
     CString scenario;
 };
 
+/**
+    * Create a new edge label
+    * @param stateId FSM state id
+    * @param tokenId token number
+    */
+inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const CString& scenario) {
+    MPAEdgeLabel el;
+    el.delay = delay;
+    el.scenario = scenario;
+    return el;
+}
+
 inline bool operator==(const MPAEdgeLabel &s, const MPAEdgeLabel &t) {
     if (s.delay != t.delay) {
         return false;

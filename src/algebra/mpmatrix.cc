@@ -355,6 +355,30 @@ void Matrix::addRows(uint n) {
 }
 
 /**
+* Increases the number of cols of the matrix by n and fills the new elements with -\infty.
+*/
+void Matrix::addCols(uint n)
+{
+    unsigned int rows = this->getRows();
+    unsigned int cols = this->getCols();
+    this->szCols = this->szCols + n;
+    //unsigned int nels = this->getRows() * this->getCols();
+    //this->table.resize(nels);
+    vector<MPTime>::iterator it = this->table.begin() + cols;
+    for (unsigned int r = 0; r < rows; r++)
+    {
+        for (unsigned int c = 0; c < n; c++)
+        {
+            it= this->table.insert(it, MP_MINUSINFINITY);
+            //advance(it, 1);
+        }
+        if (r < rows - 1)
+            advance(it, cols+n);
+    }
+}
+
+
+/**
  * Get size of a square matrix
  */
 unsigned int Matrix::getSize() const {
@@ -549,6 +573,37 @@ Matrix Matrix::mp_power(const unsigned int p) const {
     Matrix m_pow = this->mp_power(p / 2);
     return m_pow.mp_multiply(m_pow);
 }
+
+/**
+    * Matrix copy.
+    */
+std::shared_ptr<Matrix> Matrix::createCopy() const
+{
+    std::shared_ptr<Matrix> newMatrix = makeMatrix(this->getRows(), this->getCols());
+    unsigned int nels = this->getRows() * this->getCols();
+    for (unsigned int pos = 0; pos < nels; pos++) {
+        newMatrix->table[pos] = this->table[pos];
+    }
+    return newMatrix;
+}
+
+/**
+    * Matrix transposed copy.
+    */
+std::shared_ptr<Matrix> Matrix::getTransposedCopy() const {
+    unsigned int MR = this->getCols();
+    unsigned int MC = this->getRows();
+    std::shared_ptr<Matrix> newMatrix = makeMatrix(MR, MC);
+    for (unsigned int col = 0; col < MC; col++)
+    {
+        for (unsigned int row = 0; row < MR; row++)
+        {
+            newMatrix->put(row, col, this->get(col, row));
+        }
+    }
+    return newMatrix;
+}
+
 
 Matrix Matrix::transpose() const {
     unsigned int MR = this->getCols();
