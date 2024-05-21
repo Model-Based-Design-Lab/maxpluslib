@@ -190,6 +190,11 @@ public:
 
     [[nodiscard]] Matrix getSubMatrixNonSquare(const std::list<unsigned int> &indices) const;
 
+    [[nodiscard]] Matrix getSubMatrixNonSquareRows(const std::list<unsigned int>& rowIndices) const;
+
+    [[nodiscard]] virtual std::shared_ptr<Matrix>
+    getSubMatrixNonSquareRowsPtr(const std::list<unsigned int>& rowIndices) const;
+
     /**
      * Increases the number of rows of the matrix by n and fills the new elements with -\infty.
      */
@@ -266,8 +271,8 @@ public:
 
     [[nodiscard]] MCMgraph mpMatrixToPrecedenceGraph() const;
 
-    // // factory methods
-    // [[nodiscard]] virtual Matrix *makeMatrix(unsigned int nr_rows, unsigned int nr_cols) const;
+    // factory methods
+    [[nodiscard]] virtual std::shared_ptr<Matrix> makeMatrix(unsigned int nr_rows, unsigned int nr_cols) const;
 
 private:
     void init(MatrixFill fill);

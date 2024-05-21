@@ -33,11 +33,13 @@ namespace MaxPlus
 
 		MaxPlusAutomaton *convertToMaxPlusAutomaton();
 		void loadAutomatonFromIOAFile(CString fileName);
-		/*
-		Loads max-plus matrices from an mpt file into sm
-		*/
-		void loadMPMatricesFromMPTFile(CString file);
-		void loadAutomatonFromDispatchingFile(CString fileName);
+
+		// No file loading or xml in this library
+		// /*
+		// Loads max-plus matrices from an mpt file into sm
+		// */
+		// void loadMPMatricesFromMPTFile(CString file);
+		// void loadAutomatonFromDispatchingFile(CString fileName);
 // transposes all matrices of the SMPLS
 		void transposeMatrices();
 		/*
@@ -148,7 +150,7 @@ namespace MaxPlus
 		 */
 		void isConsistentUtil(const IOAState& s, std::list<Event> *eventList, const IOASetOfStates& finalStates, CString *errMsg, std::map<const IOAState*,std::list<Event> *> *visited);
 
-		void determinizeUtil(const IOAState& s, IOASetOfStates* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile);
+		void determinizeUtil(const IOAState& s, IOASetOfStateRefs* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile);
 
 		bool compareEventLists(std::list<Event> *l1, std::list<Event> *l2);
 

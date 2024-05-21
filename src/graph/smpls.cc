@@ -202,7 +202,7 @@ namespace MaxPlus
 		{
 			ioa->removeState(dynamic_cast<const IOAState&>(*((*i).second)));
 		}
-		IOASetOfStates* visitedStates = new IOASetOfStates();
+		IOASetOfStateRefs* visitedStates = new IOASetOfStateRefs();
 		determinizeUtil(s, visitedStates, finalStates, &errMsg, outfile);
 		outfile << "}";
 		outfile.close();
@@ -523,7 +523,7 @@ namespace MaxPlus
 			return;
 		}
 		else
-			visited->emplace(s, eventList);
+			visited->emplace(&s, eventList);
 		if (finalStates.count(s.getLabel()))
 		{
 			if (eventList->size() > 0)
@@ -603,7 +603,7 @@ namespace MaxPlus
 	/**
 		 * recursive part of determinize
 		 */
-	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStates* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile)
+	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile)
 	{
 		/**
 		 * Deterministic IOA is defined with:
@@ -612,10 +612,10 @@ namespace MaxPlus
 		 *	and branches only based on different outcomes of the same event;
 		 */
 		 // implementation is incomplete yet. we have to remove unreachable states and their edges after this
-		if (visited->count(s.getId()))
+		if (visited->count(&s))
 			return;
 
-		visited->emplace(s.getId(), &s);
+		visited->insert(&s);
 
 		const IOASetOfEdgeRefs& outEdge = dynamic_cast<const IOASetOfEdgeRefs&>(s.getOutgoingEdges());
 		IOASetOfEdgeRefs::CIter i = outEdge.begin();
@@ -736,14 +736,14 @@ namespace MaxPlus
 				//numberOfResources++;
 			}
 
-			dis->core->begin()->second = m->getSubMatrixNonSquareRows(mSubIndices);
+			dis->core->begin()->second = m->getSubMatrixNonSquareRowsPtr(mSubIndices);
 			if (m->getRows() > numberOfResources) // if we have event rows
 			{
 				mSubIndices.clear();
-				for (uint x = numberOfResources; x < max(m->getRows(), m->getCols()); x++)
+				for (uint x = numberOfResources; x < std::max(m->getRows(), m->getCols()); x++)
 				{
 					mSubIndices.push_back(x);
-					std::shared_ptr<Matrix> mEventRow = m->getSubMatrixNonSquareRows(mSubIndices);
+					std::shared_ptr<Matrix> mEventRow = m->getSubMatrixNonSquareRowsPtr(mSubIndices);
 					dis->eventRows->push_back(mEventRow);
 					mSubIndices.clear();
 				}
@@ -761,7 +761,7 @@ namespace MaxPlus
 
 		std::ifstream input_stream(fileName);
 		if (!input_stream)
-			cerr << "Can't open input file : " << fileName << std::endl;
+			std::cerr << "Can't open input file : " << fileName << std::endl;
 		std::string line;
 
 		CId stateId = 0;
@@ -776,21 +776,21 @@ namespace MaxPlus
 			{
 				if (i1 < i2) // if we have a valid line as in "state i f --edge--> state2 f"
 				{
-					std::string srcState = "";
+					CString srcState = "";
 					CString edge = "";
-					std::string destState = "";
+					CString destState = "";
 
-					CString srcStateDescription = line.substr(0, i1);
+					CString srcStateDescription = CString(line.substr(0, i1));
 					srcStateDescription.trim();
-					srcState = srcStateDescription.substr(0, srcStateDescription.find(" "));
+					srcState = CString(srcStateDescription.substr(0, srcStateDescription.find(" ")));
 
-					CString destStateDescription = line.substr(i2 + 2);
+					CString destStateDescription = CString(line.substr(i2 + 2));
 					destStateDescription.trim();
-					destState = destStateDescription.substr(0, destStateDescription.find_first_of(" "));
+					destState = CString(destStateDescription.substr(0, destStateDescription.find_first_of(" ")));
 
 					std::string edgeDescription = line.substr(i1, i2 - i1);
-					edge = edgeDescription.substr(edgeDescription.find_first_not_of("-"));
-					edge = edge.substr(0, edge.find("-"));
+					edge = CString(edgeDescription.substr(edgeDescription.find_first_not_of("-")));
+					edge = CString(edge.substr(0, edge.find("-")));
 					edge.trim();
 
 					// look for invalid edge desc
@@ -802,57 +802,58 @@ namespace MaxPlus
 
 					// look if the state already exists
 					bool duplicateState = false;
-					ELSState* q1 = new ELSState(stateId);
+					ELSState* q1 = nullptr;
 					for (unsigned int i = 0; i < stateMap.size(); i++)
 					{
 						if (stateMap[i] == srcState)
 						{
 							duplicateState = true;
-							q1 = elsFSM->getStateLabeled(i);
+							delete q1;
+							q1 = &(elsFSM->getStateLabeled(i));
 							break;
 						}
 					}
 
 					if (!duplicateState)
 					{
-						elsFSM->addState(q1);
+						q1 = elsFSM->addState(stateId);
 						stateMap[stateId] = srcState;
 						stateId++;
 					}
 					// look for state annotations
 					srcStateDescription.erase(0, srcState.length());
 					if (srcStateDescription.find(" i") != std::string::npos || srcStateDescription.find(" initial") != std::string::npos)
-						elsFSM->addInitialState(q1);
+						elsFSM->addInitialState(*q1);
 					if (srcStateDescription.find(" f") != std::string::npos || srcStateDescription.find(" final") != std::string::npos)
-						elsFSM->addFinalState(q1);
+						elsFSM->addFinalState(*q1);
 
 					duplicateState = false;
-					ELSState* q2 = new ELSState(stateId);
+					ELSState* q2 = nullptr;
 					for (unsigned int i = 0; i < stateMap.size(); i++)
 					{
 						if (stateMap[i] == destState)
 						{
 							duplicateState = true;
 
-							q2 = elsFSM->getStateLabeled(i);
+							q2 = &(elsFSM->getStateLabeled(i));
 							break;
 						}
 					}
 
 					if (!duplicateState)
 					{
-						elsFSM->addState(q2);
+						q2 = elsFSM->addState(stateId);
 						stateMap[stateId] = destState;
 						stateId++;
 					}
 					// look for state annotations
 					destStateDescription.erase(0, destState.length());
 					if (destStateDescription.find(" i") != std::string::npos || destStateDescription.find(" initial") != std::string::npos)
-						elsFSM->addInitialState(q2);
+						elsFSM->addInitialState(*q2);
 					if (destStateDescription.find(" f") != std::string::npos || destStateDescription.find(" final") != std::string::npos)
-						elsFSM->addFinalState(q2);
+						elsFSM->addFinalState(*q2);
 
-					elsFSM->addEdge(q1, edge, q2);
+					elsFSM->addEdge(*q1, edge, *q2);
 				}
 				else
 				{
@@ -861,118 +862,118 @@ namespace MaxPlus
 			}
 		}
 		std::cout << std::endl
-			<< "automaton states size: " << elsFSM->getStates()->size() << std::endl;
-		std::cout << "automaton transitions size: " << elsFSM->getEdges()->size() << std::endl;
+			<< "automaton states size: " << elsFSM->getStates().size() << std::endl;
+		std::cout << "automaton transitions size: " << elsFSM->getEdges().size() << std::endl;
 	}
 
-	void SMPLS::loadAutomatonFromDispatchingFile(CString fileName)
-	{
-		std::cout << "Loading dispatching file." << std::endl;
-		// remember which state maps to which new state
-		std::map<CId, CString> stateMap;
-		elsFSM = new EdgeLabeledScenarioFSM();
+	// void SMPLS::loadAutomatonFromDispatchingFile(CString fileName)
+	// {
+	// 	std::cout << "Loading dispatching file." << std::endl;
+	// 	// remember which state maps to which new state
+	// 	std::map<CId, CString> stateMap;
+	// 	elsFSM = new EdgeLabeledScenarioFSM();
 
-		std::ifstream input_stream(fileName);
-		if (!input_stream)
-			cerr << "Can't open input file : " << fileName << std::endl;
-		CString line;
+	// 	std::ifstream input_stream(fileName);
+	// 	if (!input_stream)
+	// 		std::cerr << "Can't open input file : " << fileName << std::endl;
+	// 	CString line;
 
-		int counter = 0;
-		while (getline(input_stream, line))
-		{
-			size_t i1 = line.find("{");
-			if (i1 != std::string::npos)
-				break;
-			if (counter == 10000)
-			{
-				throw CException("ERROR : Could not find a { which indicates start of dispatching after 10000 lines. are you sure this is a dispatching file?");
-			}
-			counter++;
-		}
+	// 	int counter = 0;
+	// 	while (getline(input_stream, line))
+	// 	{
+	// 		size_t i1 = line.find("{");
+	// 		if (i1 != std::string::npos)
+	// 			break;
+	// 		if (counter == 10000)
+	// 		{
+	// 			throw CException("ERROR : Could not find a { which indicates start of dispatching after 10000 lines. are you sure this is a dispatching file?");
+	// 		}
+	// 		counter++;
+	// 	}
 
-		CId stateId = 0;
+	// 	CId stateId = 0;
 
-		int j = 0;
-		ELSState* lastState = nullptr;
-		// extract all the text from the input file
-		while (getline(input_stream, line))
-		{
-			line.trim();
-			if (line.find("}") != std::string::npos)
-				break;
-			if (line.size() > 0)
-			{
-				std::string srcState = "";
-				CString edge = "";
-				std::string destState = "";
+	// 	int j = 0;
+	// 	ELSState* lastState = nullptr;
+	// 	// extract all the text from the input file
+	// 	while (getline(input_stream, line))
+	// 	{
+	// 		line.trim();
+	// 		if (line.find("}") != std::string::npos)
+	// 			break;
+	// 		if (line.size() > 0)
+	// 		{
+	// 			CString srcState = "";
+	// 			CString edge = "";
+	// 			CString destState = "";
 
-				CString srcStateDescription = "s_" + std::to_string(j);
-				srcStateDescription.trim();
-				srcState = srcStateDescription.substr(0, srcStateDescription.find(" "));
+	// 			CString srcStateDescription = "s_" + CString(std::to_string(j));
+	// 			srcStateDescription.trim();
+	// 			srcState = CString(srcStateDescription.substr(0, srcStateDescription.find(" ")));
 
-				CString destStateDescription = "s_" + std::to_string(1 + j);
-				destStateDescription.trim();
-				destState = destStateDescription.substr(0, destStateDescription.find_first_of(" "));
+	// 			CString destStateDescription = "s_" + CString(std::to_string(1 + j));
+	// 			destStateDescription.trim();
+	// 			destState = CString(destStateDescription.substr(0, destStateDescription.find_first_of(" ")));
 
-				std::string edgeDescription = line;
-				edge = edgeDescription.substr(edgeDescription.find_first_not_of("-"));
-				edge = edge.substr(0, edge.find("-"));
-				edge.trim();
+	// 			std::string edgeDescription = line;
+	// 			edge = CString(edgeDescription.substr(edgeDescription.find_first_not_of("-")));
+	// 			edge = CString(edge.substr(0, edge.find("-")));
+	// 			edge.trim();
 
-				std::cout << "Edge: " << edge << std::endl;
-				// look if the state already exists
-				bool duplicateState = false;
-				ELSState* q1 = new ELSState(stateId);
-				for (unsigned int i = 0; i < stateMap.size(); i++)
-				{
-					if (stateMap[i] == srcState)
-					{
-						duplicateState = true;
-						q1 = elsFSM->getStateLabeled(i);
-						break;
-					}
-				}
+	// 			std::cout << "Edge: " << edge << std::endl;
+	// 			// look if the state already exists
+	// 			bool duplicateState = false;
+	// 			ELSState* q1 = nullptr;
+	// 			for (unsigned int i = 0; i < stateMap.size(); i++)
+	// 			{
+	// 				if (stateMap[i] == srcState)
+	// 				{
+	// 					duplicateState = true;
+	// 					q1 = &(elsFSM->getStateLabeled(i));
+	// 					break;
+	// 				}
+	// 			}
 
-				if (!duplicateState)
-				{
-					elsFSM->addState(q1);
-					stateMap[stateId] = srcState;
-					stateId++;
-				}
+	// 			if (!duplicateState)
+	// 			{
+	// 				q1 = elsFSM->addState(stateId);
+	// 				stateMap[stateId] = srcState;
+	// 				stateId++;
+	// 			}
 
-				if (j == 0)
-					elsFSM->addInitialState(q1);
+	// 			if (j == 0)
+	// 				elsFSM->addInitialState(*q1);
 
-				duplicateState = false;
-				ELSState* q2 = new ELSState(stateId);
-				for (unsigned int i = 0; i < stateMap.size(); i++)
-				{
-					if (stateMap[i] == destState)
-					{
-						duplicateState = true;
+	// 			duplicateState = false;
+	// 			ELSState* q2 = nullptr;
+	// 			for (unsigned int i = 0; i < stateMap.size(); i++)
+	// 			{
+	// 				if (stateMap[i] == destState)
+	// 				{
+	// 					duplicateState = true;
 
-						q2 = elsFSM->getStateLabeled(i);
-						break;
-					}
-				}
+	// 					q2 = &(elsFSM->getStateLabeled(i));
+	// 					break;
+	// 				}
+	// 			}
 
-				if (!duplicateState)
-				{
-					elsFSM->addState(q2);
-					stateMap[stateId] = destState;
-					stateId++;
-				}
-				lastState = q2;
+	// 			if (!duplicateState)
+	// 			{
+	// 				q2 = elsFSM->addState(stateId);
+	// 				stateMap[stateId] = destState;
+	// 				stateId++;
+	// 			}
+	// 			lastState = q2;
 
-				elsFSM->addEdge(q1, edge, q2);
-				j++;
-			}
-		}
-		elsFSM->addFinalState(lastState);
-		std::cout << std::endl
-			<< "automaton states size: " << elsFSM->getStates()->size() << std::endl;
-		std::cout << "automaton transitions size: " << elsFSM->getEdges()->size() << std::endl;
-	}
+	// 			elsFSM->addEdge(*q1, edge, *q2);
+	// 			j++;
+	// 		}
+	// 	}
+	// 	elsFSM->addFinalState(*lastState);
+	// 	std::cout << std::endl
+	// 		<< "automaton states size: " << elsFSM->getStates().size() << std::endl;
+	// 	std::cout << "automaton transitions size: " << elsFSM->getEdges().size() << std::endl;
+	// }
 
 	void SMPLSwithEvents::loadIOAutomatonFromDispatchingFile(CString fileName)
 	{
@@ -981,7 +982,7 @@ namespace MaxPlus
 		std::map<CId, CString> stateMap;
 		std::ifstream input_stream(fileName);
 		if (!input_stream)
-			cerr << "Can't open input file : " << fileName << std::endl;
+			std::cerr << "Can't open input file : " << fileName << std::endl;
 		CString line;
 		int lineNumber = 0;
 		CId stateId = 0;
@@ -1004,9 +1005,9 @@ namespace MaxPlus
 		while (getline(input_stream, line))
 		{
 			lineNumber++;
-			std::string srcState = "";
+			CString srcState = "";
 			CString edge = "";
-			std::string destState = "";
+			CString destState = "";
 			CString inputAction = "";
 			CString outputAction = "";
 			line.trim();
@@ -1014,17 +1015,17 @@ namespace MaxPlus
 				break;
 			if (line.size() <= 0)
 				continue;
-			CString srcStateDescription = "s_" + std::to_string(j);
+			CString srcStateDescription = CString("s_" + std::to_string(j));
 			srcStateDescription.trim();
-			srcState = srcStateDescription.substr(0, srcStateDescription.find(" "));
+			srcState = CString(srcStateDescription.substr(0, srcStateDescription.find(" ")));
 
-			CString destStateDescription = "s_" + std::to_string(1 + j);
+			CString destStateDescription = CString("s_" + std::to_string(1 + j));
 			destStateDescription.trim();
-			destState = destStateDescription.substr(0, destStateDescription.find_first_of(" "));
+			destState = CString(destStateDescription.substr(0, destStateDescription.find_first_of(" ")));
 
 			std::string edgeDescription = line;
-			edge = edgeDescription.substr(edgeDescription.find_first_not_of("-"));
-			edge = edge.substr(0, edge.find("-"));
+			edge = CString(edgeDescription.substr(edgeDescription.find_first_not_of("-")));
+			edge = CString(edge.substr(0, edge.find("-")));
 			edge.trim();
 
 			// look for the input;output pair on the edge description
@@ -1042,8 +1043,8 @@ namespace MaxPlus
 			{
 				// not sure if we have to split edge label at this stage or later. let's go with later.
 				size_t delimiterIndex = edge.find(delimiter);
-				inputAction = edge.substr(0, delimiterIndex);
-				outputAction = edge.substr(delimiterIndex + 1, edge.length() - delimiterIndex + 1);
+				inputAction = CString(edge.substr(0, delimiterIndex));
+				outputAction = CString(edge.substr(delimiterIndex + 1, edge.length() - delimiterIndex + 1));
 				inputAction.trim();
 				outputAction.trim();
 			}
@@ -1061,20 +1062,20 @@ namespace MaxPlus
 
 			// look if the state already exists
 			bool duplicateState = false;
-			IOAState* q1 = new IOAState(stateId);
+			IOAState* q1 = nullptr;
 			for (unsigned int i = 0; i < stateMap.size(); i++)
 			{
 				if (stateMap[i] == srcState)
 				{
 					duplicateState = true;
-					q1 = ioa->getStateLabeled(i);
+					q1 = &(ioa->getStateLabeled(i));
 					break;
 				}
 			}
 
 			if (!duplicateState)
 			{
-				ioa->addState(q1);
+				q1 = ioa->addState(stateId);
 				stateMap[stateId] = srcState;
 				stateId++;
 			}
@@ -1082,24 +1083,24 @@ namespace MaxPlus
 			srcStateDescription.erase(0, srcState.length());
 			srcStateDescription.trim();
 			if (j == 0)
-				ioa->addInitialState(q1);
+				ioa->addInitialState(*q1);
 
 			duplicateState = false;
-			IOAState* q2 = new IOAState(stateId);
+			IOAState* q2 = nullptr;
 			for (unsigned int i = 0; i < stateMap.size(); i++)
 			{
 				if (stateMap[i] == destState)
 				{
 					duplicateState = true;
 
-					q2 = ioa->getStateLabeled(i);
+					q2 = &(ioa->getStateLabeled(i));
 					break;
 				}
 			}
 
 			if (!duplicateState)
 			{
-				ioa->addState(q2);
+				q2 = ioa->addState(stateId);
 				stateMap[stateId] = destState;
 				stateId++;
 			}
@@ -1107,18 +1108,18 @@ namespace MaxPlus
 			destStateDescription.erase(0, destState.length());
 			destStateDescription.trim();
 			if (destStateDescription.find("i") != std::string::npos || destStateDescription.find("initial") != std::string::npos)
-				ioa->addInitialState(q2);
+				ioa->addInitialState(*q2);
 			if (destStateDescription.find("f") != std::string::npos || destStateDescription.find("final") != std::string::npos)
-				ioa->addFinalState(q2);
+				ioa->addFinalState(*q2);
 			lastState = q2;
 			//std::cout << "Edge: -" << inputAction << "," << outputAction << std::endl;
-			ioa->addEdge(q1, *edgeLabel, q2);
+			ioa->addEdge(*q1, *edgeLabel, *q2);
 			j++;
 		}
-		ioa->addFinalState(lastState);
+		ioa->addFinalState(*lastState);
 		std::cout << std::endl
-			<< "IO Automaton states size: " << ioa->getStates()->size() << std::endl;
-		std::cout << "IO Automaton transitions size: " << ioa->getEdges()->size() << std::endl;
+			<< "IO Automaton states size: " << ioa->getStates().size() << std::endl;
+		std::cout << "IO Automaton transitions size: " << ioa->getEdges().size() << std::endl;
 	}
 
 	void SMPLSwithEvents::loadIOAutomatonFromIOAFile(CString fileName)
@@ -1128,7 +1129,7 @@ namespace MaxPlus
 		std::map<CId, CString> stateMap;
 		std::ifstream input_stream(fileName);
 		if (!input_stream)
-			cerr << "Can't open input file : " << fileName << std::endl;
+			std::cerr << "Can't open input file : " << fileName << std::endl;
 		std::string line;
 		int lineNumber = 0;
 		CId stateId = 0;
@@ -1143,23 +1144,23 @@ namespace MaxPlus
 			{
 				if (i1 < i2) // if we have a valid line as in "state i f --edge--> state2 f"
 				{
-					std::string srcState = "";
+					CString srcState = "";
 					CString edge = "";
-					std::string destState = "";
+					CString destState = "";
 					CString inputAction = "";
 					CString outputAction = "";
 
-					CString srcStateDescription = line.substr(0, i1);
+					CString srcStateDescription = CString(line.substr(0, i1));
 					srcStateDescription.trim();
-					srcState = srcStateDescription.substr(0, srcStateDescription.find(" "));
+					srcState = CString(srcStateDescription.substr(0, srcStateDescription.find(" ")));
 
-					CString destStateDescription = line.substr(i2 + 2);
+					CString destStateDescription = CString(line.substr(i2 + 2));
 					destStateDescription.trim();
-					destState = destStateDescription.substr(0, destStateDescription.find_first_of(" "));
+					destState = CString(destStateDescription.substr(0, destStateDescription.find_first_of(" ")));
 
-					CString edgeDescription = line.substr(i1, i2 - i1);
-					edge = edgeDescription.substr(edgeDescription.find_first_not_of("-"));
-					edge = edge.substr(0, edge.find("-"));
+					CString edgeDescription = CString(line.substr(i1, i2 - i1));
+					edge = CString(edgeDescription.substr(edgeDescription.find_first_not_of("-")));
+					edge = CString(edge.substr(0, edge.find("-")));
 					edge.trim();
 
 					// look for the input;output pair on the edge description
@@ -1173,12 +1174,12 @@ namespace MaxPlus
 					else if (tempIndex1 != std::string::npos)
 						delimiter = ";";
 					else
-						throw CException("Can not split edge into input and output action. Edge description is invalid. at line: " + lineNumber);
+						throw CException("Can not split edge into input and output action. Edge description is invalid. at line: " + CString(lineNumber));
 
 					// not sure if we have to split edge label at this stage or later. let's go with later.
 					size_t delimiterIndex = edge.find(delimiter);
-					inputAction = edge.substr(0, delimiterIndex);
-					outputAction = edge.substr(delimiterIndex + 1, edge.length() - delimiterIndex + 1);
+					inputAction = CString(edge.substr(0, delimiterIndex));
+					outputAction = CString(edge.substr(delimiterIndex + 1, edge.length() - delimiterIndex + 1));
 					inputAction.trim();
 					outputAction.trim();
 
@@ -1192,20 +1193,20 @@ namespace MaxPlus
 
 					// look if the state already exists
 					bool duplicateState = false;
-					IOAState* q1 = new IOAState(stateId);
+					IOAState* q1 = nullptr;
 					for (unsigned int i = 0; i < stateMap.size(); i++)
 					{
 						if (stateMap[i] == srcState)
 						{
 							duplicateState = true;
-							q1 = ioa->getStateLabeled(i);
+							q1 = &(ioa->getStateLabeled(i));
 							break;
 						}
 					}
 
 					if (!duplicateState)
 					{
-						ioa->addState(q1);
+						q1 = ioa->addState(stateId);
 						stateMap[stateId] = srcState;
 						stateId++;
 					}
@@ -1213,26 +1214,26 @@ namespace MaxPlus
 					srcStateDescription.erase(0, srcState.length());
 					srcStateDescription.trim();
 					if (srcStateDescription.find("i") != std::string::npos || srcStateDescription.find("initial") != std::string::npos)
-						ioa->addInitialState(q1);
+						ioa->addInitialState(*q1);
 					if (srcStateDescription.find("f") != std::string::npos || srcStateDescription.find("final") != std::string::npos)
-						ioa->addFinalState(q1);
+						ioa->addFinalState(*q1);
 
 					duplicateState = false;
-					IOAState* q2 = new IOAState(stateId);
+					IOAState* q2 = nullptr;
 					for (unsigned int i = 0; i < stateMap.size(); i++)
 					{
 						if (stateMap[i] == destState)
 						{
 							duplicateState = true;
 
-							q2 = ioa->getStateLabeled(i);
+							q2 = &(ioa->getStateLabeled(i));
 							break;
 						}
 					}
 
 					if (!duplicateState)
 					{
-						ioa->addState(q2);
+						q2 = ioa->addState(stateId);
 						stateMap[stateId] = destState;
 						stateId++;
 					}
@@ -1240,158 +1241,158 @@ namespace MaxPlus
 					destStateDescription.erase(0, destState.length());
 					destStateDescription.trim();
 					if (destStateDescription.find("i") != std::string::npos || destStateDescription.find("initial") != std::string::npos)
-						ioa->addInitialState(q2);
+						ioa->addInitialState(*q2);
 					if (destStateDescription.find("f") != std::string::npos || destStateDescription.find("final") != std::string::npos)
-						ioa->addFinalState(q2);
+						ioa->addFinalState(*q2);
 
-					ioa->addEdge(q1, *edgeLabel, q2);
+					ioa->addEdge(*q1, *edgeLabel, *q2);
 				}
 				else
 				{
-					throw CException("invalid line in ioa file! at line: " + lineNumber);
+					throw CException("invalid line in ioa file! at line: " + CString(lineNumber));
 				}
 			}
 		}
 	}
 
-	void SMPLS::loadMPMatricesFromMPTFile(CString file)
-	{
+	// void SMPLS::loadMPMatricesFromMPTFile(CString file)
+	// {
 
-		std::cout << "Loading max-plus matrices." << std::endl;
-		// Open file
-		CDoc* appGraphDoc = CParseFile(file);
-		sm = new ScenarioMatrices();
+	// 	std::cout << "Loading max-plus matrices." << std::endl;
+	// 	// Open file
+	// 	CDoc* appGraphDoc = CParseFile(file);
+	// 	sm = new ScenarioMatrices();
 
-		// Locate the root element
-		CNode* rootNode = CGetRootNode(appGraphDoc);
+	// 	// Locate the root element
+	// 	CNode* rootNode = CGetRootNode(appGraphDoc);
 
-		// TODO : properly check if this is a valid mpt
-		/*if (rootNode->name != temp)
-		throw CException("Root element in file '" + file + "' is not "
-			"mpt:MaxPlusSpecification");*/
+	// 	// TODO : properly check if this is a valid mpt
+	// 	/*if (rootNode->name != temp)
+	// 	throw CException("Root element in file '" + file + "' is not "
+	// 		"mpt:MaxPlusSpecification");*/
 
-		CNode* matrices = CGetChildNode(rootNode, "matrices");
+	// 	CNode* matrices = CGetChildNode(rootNode, "matrices");
 
-		// go through every matrix in the xml
-		// and create their Matrix object
-		while (matrices != NULL)
-		{
-			// get number of cols and rows to initialize the matrix
-			int rows = CGetNumberOfChildNodes(matrices, "rows");
-			int cols = 0;
-			CNode* rowNode = CGetChildNode(matrices, "rows");
-			if (rowNode != NULL)
-				cols = CGetNumberOfChildNodes(rowNode, "values");
+	// 	// go through every matrix in the xml
+	// 	// and create their Matrix object
+	// 	while (matrices != NULL)
+	// 	{
+	// 		// get number of cols and rows to initialize the matrix
+	// 		int rows = CGetNumberOfChildNodes(matrices, "rows");
+	// 		int cols = 0;
+	// 		CNode* rowNode = CGetChildNode(matrices, "rows");
+	// 		if (rowNode != NULL)
+	// 			cols = CGetNumberOfChildNodes(rowNode, "values");
 
-			// init the matrix
-			std::shared_ptr<Matrix> matrix = new Matrix(rows, cols);
+	// 		// init the matrix
+	// 		std::shared_ptr<Matrix> matrix = new Matrix(rows, cols);
 
-			// reset the ints to be used as indices afterward
-			rows = 0;
-			cols = 0;
+	// 		// reset the ints to be used as indices afterward
+	// 		rows = 0;
+	// 		cols = 0;
 
-			while (rowNode != NULL)
-			{
-				cols = 0;
-				CNode* vNode = CGetChildNode(rowNode, "values");
-				while (vNode != NULL)
-				{
-					std::string content = CGetNodeContent(vNode);
+	// 		while (rowNode != NULL)
+	// 		{
+	// 			cols = 0;
+	// 			CNode* vNode = CGetChildNode(rowNode, "values");
+	// 			while (vNode != NULL)
+	// 			{
+	// 				std::string content = CGetNodeContent(vNode);
 
-					if (content != "-Infinity")
-					{
-						double value = atof(content.c_str());
-						matrix->put(rows, cols, value);
-					}
-					cols++;
-					vNode = CNextNode(vNode, "values");
-				}
-				rows++;
-				rowNode = CNextNode(rowNode, "rows");
-			}
+	// 				if (content != "-Infinity")
+	// 				{
+	// 					double value = atof(content.c_str());
+	// 					matrix->put(rows, cols, value);
+	// 				}
+	// 				cols++;
+	// 				vNode = CNextNode(vNode, "values");
+	// 			}
+	// 			rows++;
+	// 			rowNode = CNextNode(rowNode, "rows");
+	// 		}
 
-			// we transpose the matrix, this is needed when reading from LSAT mpt files.
-			// Gaubert MPA uses transposed version
-			//matrix = matrix->getTransposedCopy();
-			CString matrixName = CGetAttribute(matrices, "name");
-			(*sm)[matrixName] = matrix;
-			matrices = CNextNode(matrices, "matrices");
-		}
-	}
+	// 		// we transpose the matrix, this is needed when reading from LSAT mpt files.
+	// 		// Gaubert MPA uses transposed version
+	// 		//matrix = matrix->getTransposedCopy();
+	// 		CString matrixName = CGetAttribute(matrices, "name");
+	// 		(*sm)[matrixName] = matrix;
+	// 		matrices = CNextNode(matrices, "matrices");
+	// 	}
+	// }
 
-	void SMPLSwithEvents::loadActivities(CString file)
-	{
-		std::cout << "Loading activities." << std::endl;
-		// remember which state maps to which new state
-		std::ifstream input_stream(file);
-		if (!input_stream)
-			cerr << "Can't open input file : " << file << std::endl;
-		std::string line;
+	// void SMPLSwithEvents::loadActivities(CString file)
+	// {
+	// 	std::cout << "Loading activities." << std::endl;
+	// 	// remember which state maps to which new state
+	// 	std::ifstream input_stream(file);
+	// 	if (!input_stream)
+	// 		std::cerr << "Can't open input file : " << file << std::endl;
+	// 	std::string line;
 
-		CString lastActivity = "";
-		// extract all the text from the input file line by line
-		while (getline(input_stream, line))
-		{
+	// 	CString lastActivity = "";
+	// 	// extract all the text from the input file line by line
+	// 	while (getline(input_stream, line))
+	// 	{
 
-			size_t i = line.find("activity");
-			if (i != std::string::npos)
-			{
-				// get the activity name
-				lastActivity = line.substr(i + 9);
-				lastActivity.trim();
-				lastActivity = lastActivity.erase(lastActivity.find_first_of("{"));
-				lastActivity.trim();
-				std::string activityString = loadEntity(input_stream, line);
+	// 		size_t i = line.find("activity");
+	// 		if (i != std::string::npos)
+	// 		{
+	// 			// get the activity name
+	// 			lastActivity = line.substr(i + 9);
+	// 			lastActivity.trim();
+	// 			lastActivity = lastActivity.erase(lastActivity.find_first_of("{"));
+	// 			lastActivity.trim();
+	// 			std::string activityString = loadEntity(input_stream, line);
 
-				i = activityString.find("events");
-				if (i != std::string::npos)
-				{
-					std::string eventString = activityString.substr(i + 6);
-					i = eventString.find("{");
-					eventString = eventString.substr(i + 1, eventString.find("}") - i - 1);
-					eventString.erase(std::remove(eventString.begin(), eventString.end(), '\t'), eventString.end()); // lsat fills a lot of \t in files which make their way into here, we get rid of them
+	// 			i = activityString.find("events");
+	// 			if (i != std::string::npos)
+	// 			{
+	// 				std::string eventString = activityString.substr(i + 6);
+	// 				i = eventString.find("{");
+	// 				eventString = eventString.substr(i + 1, eventString.find("}") - i - 1);
+	// 				eventString.erase(std::remove(eventString.begin(), eventString.end(), '\t'), eventString.end()); // lsat fills a lot of \t in files which make their way into here, we get rid of them
 
-					std::stringstream ss(eventString);
-					Event str;
-					while (getline(ss, str, ','))
-					{
-						str.trim();
-						// the magic we have been waiting for happens here.
-						// add to sigma
-						sigma->insert(sigma->end(), make_pair(lastActivity, str));
-					}
-				}
-			}
+	// 				std::stringstream ss(eventString);
+	// 				Event str;
+	// 				while (getline(ss, str, ','))
+	// 				{
+	// 					str.trim();
+	// 					// the magic we have been waiting for happens here.
+	// 					// add to sigma
+	// 					sigma->insert(sigma->end(), make_pair(lastActivity, str));
+	// 				}
+	// 			}
+	// 		}
 
-			i = line.find("event");
-			if (i != std::string::npos)
-			{
-				// get the event name
-				Event eventName = line.substr(i + 6);
-				eventName.trim();
-				eventName = eventName.erase(eventName.find_first_of(" "));
+	// 		i = line.find("event");
+	// 		if (i != std::string::npos)
+	// 		{
+	// 			// get the event name
+	// 			Event eventName = line.substr(i + 6);
+	// 			eventName.trim();
+	// 			eventName = eventName.erase(eventName.find_first_of(" "));
 
-				eventName.trim();
-				std::string eventString = loadEntity(input_stream, line);
-				//
-				i = eventString.find("{");
-				eventString = eventString.substr(i + 1, eventString.find("}") - i - 1);
-				eventString.erase(std::remove(eventString.begin(), eventString.end(), '\t'), eventString.end()); // lsat fills a lot of \t in files which make their way into here, we get rid of them
+	// 			eventName.trim();
+	// 			std::string eventString = loadEntity(input_stream, line);
+	// 			//
+	// 			i = eventString.find("{");
+	// 			eventString = eventString.substr(i + 1, eventString.find("}") - i - 1);
+	// 			eventString.erase(std::remove(eventString.begin(), eventString.end(), '\t'), eventString.end()); // lsat fills a lot of \t in files which make their way into here, we get rid of them
 
-				// go to outcomes
-				eventString = eventString.substr(eventString.find("outcomes") + 8);
-				eventString = eventString.substr(eventString.find(":") + 1);
+	// 			// go to outcomes
+	// 			eventString = eventString.substr(eventString.find("outcomes") + 8);
+	// 			eventString = eventString.substr(eventString.find(":") + 1);
 
-				std::stringstream ss(eventString);
-				EventOutcome str;
-				while (getline(ss, str, ','))
-				{
-					str.trim();
-					// the magic we have been waiting for happens here.
-					// add to gamma
-					gamma->insert(gamma->end(), make_pair(eventName, str));
-				}
-			}
-		}
-	}
+	// 			std::stringstream ss(eventString);
+	// 			EventOutcome str;
+	// 			while (getline(ss, str, ','))
+	// 			{
+	// 				str.trim();
+	// 				// the magic we have been waiting for happens here.
+	// 				// add to gamma
+	// 				gamma->insert(gamma->end(), make_pair(eventName, str));
+	// 			}
+	// 		}
+	// 	}
+	// }
 }

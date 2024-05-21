@@ -370,11 +370,11 @@ public:
     }
 };
 
-// template <typename StateLabelType, typename EdgeLabelType>
-// class SetOfStateRefs : public Abstract::SetOfStateRefs {
-// public:
-//     using CIter = typename SetOfStateRefs::const_iterator;
-// };
+template <typename StateLabelType, typename EdgeLabelType>
+class SetOfStateRefs : public Abstract::SetOfStateRefs {
+public:
+    using CIter = typename SetOfStateRefs::const_iterator;
+};
 
 template <typename StateLabelType, typename EdgeLabelType> class State : public Abstract::State {
 public:
@@ -560,6 +560,29 @@ public:
         // }
         throw CException("error - state not found in FiniteStateMachine::getStateLabeled");
     };
+
+    bool &hasStateLabeled(const StateLabelType &s) {
+        // try the index first
+        State<StateLabelType, EdgeLabelType> *sp = this->states.withLabel(s);
+        if (sp != nullptr) {
+            return true;
+        }
+        // a linear search
+        for (auto &it : this->states) {
+            auto &i = *(it.second);
+            auto &t = dynamic_cast<const State<StateLabelType, EdgeLabelType> &>(i);
+            // TODO: remove const_cast set of states provides only const iterator, but states are
+            // identified only by ID.
+            auto &ct = const_cast<State<StateLabelType, EdgeLabelType> &>(t);
+            if ((ct.stateLabel) == s) {
+                // TODO: manage index inside SetOfStates
+                this->states.addToStateIndex(s, &ct);
+                return true;
+            }
+        }
+        return false;
+    };
+
 
     SetOfStates<StateLabelType, EdgeLabelType> &getStates() { return this->states; };
     Abstract::SetOfStateRefs getStateRefs() {
