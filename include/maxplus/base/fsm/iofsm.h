@@ -1,5 +1,5 @@
 #include "fsm.h"
-#include "base/string/cstring.h"
+#include "maxplus/base/string/cstring.h"
 
 // Input/Output Automaton
 using InputAction = CString;
