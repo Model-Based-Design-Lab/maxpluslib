@@ -223,7 +223,7 @@ namespace MaxPlus
 
 		const IOASetOfStates& finalStates = dynamic_cast<const IOASetOfStates&>(this->ioa->getFinalStates());
 
-		std::map<IOAState*, std::list<Event>*>* visited = new std::map<IOAState*, std::list<Event>*>;
+		std::map<const IOAState*, std::list<Event>*>* visited = new std::map<const IOAState*, std::list<Event>*>;
 		CString errMsg = "";
 		typename IOASetOfStates::CIter i;
 		for (i = I.begin(); i != I.end(); i++)
@@ -249,7 +249,7 @@ namespace MaxPlus
 	MaxPlusAutomaton* SMPLSwithEvents::convertToMaxPlusAutomaton()
 	{
 		dissectScenarioMatrices();
-		IOASetOfEdges* visitedEdges = new IOASetOfEdges();
+		IOASetOfEdgeRefs* visitedEdges = new IOASetOfEdgeRefs();
 		std::multiset<Event>* eventList = new std::multiset<Event>();
 
 		// create the elsFsm with the same state structure but we change the matrices in a depth-first search
@@ -341,14 +341,14 @@ namespace MaxPlus
 		 * this includes adding rows and columns of -inf and 0 based on the spec
 		 * allowing the system to analyze processing or conveying event timings
 		 */
-	void SMPLSwithEvents::prepareMatrices(IOAState& s, std::multiset<Event>* eventList, IOASetOfEdges* visitedEdges)
+	void SMPLSwithEvents::prepareMatrices(const IOAState& s, std::multiset<Event>* eventList, IOASetOfEdgeRefs* visitedEdges)
 	{
 		const IOASetOfEdgeRefs& adj = dynamic_cast<const IOASetOfEdgeRefs&>(s.getOutgoingEdges());
 		typename IOASetOfEdgeRefs::CIter i;
 		for (i = adj.begin(); i != adj.end(); ++i)
 		{
 			IOAEdge& e = dynamic_cast<IOAEdge&>(*(*i));
-			if (visitedEdges->count(e.getId()) > 0)
+			if (visitedEdges->count(&e) > 0)
 				continue;
 
 			//create a unique label for the new edge. this name will also be the scenario name for sm
@@ -485,12 +485,12 @@ namespace MaxPlus
 			}
 
 			(*sm)[scenarioName] = sMatrix;
-			visitedEdges->insert(e);
+			visitedEdges->insert(&e);
 
 			// we nned this later to make all matrices square
-			biggestMatrixSize = max(biggestMatrixSize, max(sMatrix->getCols(), sMatrix->getRows()));
+			biggestMatrixSize = std::max(biggestMatrixSize, std::max(sMatrix->getCols(), sMatrix->getRows()));
 
-			prepareMatrices(dynamic_cast<IOAState*>(e->getDestination()), eList, visitedEdges);
+			prepareMatrices(dynamic_cast<const IOAState&>(e.getDestination()), eList, visitedEdges);
 		}
 	}
 
@@ -510,21 +510,21 @@ namespace MaxPlus
 	/**
 		 * recursive part of isConsistent
 		 */
-	void SMPLSwithEvents::isConsistentUtil(IOAState* s, std::list<Event>* eventList, IOASetOfStates* finalStates, CString* errMsg, std::map<IOAState*, std::list<Event>*>* visited)
+	void SMPLSwithEvents::isConsistentUtil(const IOAState& s, std::list<Event> *eventList, const IOASetOfStates& finalStates, CString *errMsg, std::map<const IOAState*, std::list<Event> *> *visited)
 	{
-		std::map<IOAState*, std::list<Event>*>::iterator it = visited->find(s);
+		std::map<const IOAState*, std::list<Event>*>::iterator it = visited->find(&s);
 		if (it != visited->end()) // we have already visited this state but we must check for inconsistency before leaving the state
 		{
 			if (!compareEventLists(it->second, eventList))
 			{
-				*errMsg = "Different paths leading to different events at state " + to_string(s->getLabel());
+				*errMsg = CString("Different paths leading to different events at state " + std::to_string(s.getLabel()));
 			}
 			// we have checked for inconsistency, no need to go further down this state
 			return;
 		}
 		else
-			visited->insert(make_pair(s, eventList));
-		if (finalStates->count(s))
+			visited->emplace(s, eventList);
+		if (finalStates.count(s.getLabel()))
 		{
 			if (eventList->size() > 0)
 			{
@@ -534,17 +534,17 @@ namespace MaxPlus
 		}
 		else // If current state is not final
 		{
-			IOASetOfEdges* adj = dynamic_cast<IOASetOfEdgeRefs&>(s->getOutgoingEdges());
-			typename IOASetOfEdges::CIter i;
-			for (i = adj->begin(); i != adj->end(); ++i)
+			const IOASetOfEdgeRefs& adj = dynamic_cast<const IOASetOfEdgeRefs&>(s.getOutgoingEdges());
+			typename IOASetOfEdgeRefs::CIter i;
+			for (i = adj.begin(); i != adj.end(); ++i)
 			{
 				// make a copy so that child node can not modify the parent nodes list
 				// only adds and removes and passes it to its children
 				std::list<Event>* eList = new std::list<Event>(*eventList);
 
-				IOAEdge* e = dynamic_cast<IOAEdge&>(*i);
-				OutputAction output = e->label.second;
-				InputAction input = e->label.first;
+				IOAEdge& e = dynamic_cast<IOAEdge&>(*(*i));
+				OutputAction output = e.getLabel().second;
+				InputAction input = e.getLabel().first;
 				if (input != "")
 				{
 					bool eventFound = false;
@@ -571,7 +571,7 @@ namespace MaxPlus
 					if (!eventFound)
 					{
 						// we are processing a non-emitted event
-						*errMsg = "on edge: " + to_string(s->getLabel()) + " - " + std::string(input + "," + output + ", Processing event outcome : " + input + " where the event is not emitted yet.\r\n");
+						*errMsg = CString("on edge: " + std::to_string(s.getLabel()) + " - " + std::string(input + "," + output + ", Processing event outcome : " + input + " where the event is not emitted yet.\r\n"));
 						return;
 					}
 				}
@@ -589,7 +589,7 @@ namespace MaxPlus
 						}
 					}
 				}
-				IOAState* s2 = dynamic_cast<IOAState*>(e->getDestination());
+				const IOAState& s2 = dynamic_cast<const IOAState&>(e.getDestination());
 
 
 				isConsistentUtil(s2, eList, finalStates, errMsg, visited);
@@ -603,42 +603,42 @@ namespace MaxPlus
 	/**
 		 * recursive part of determinize
 		 */
-	void SMPLSwithEvents::determinizeUtil(IOAState* s, IOASetOfStates* visited, IOASetOfStates* finalStates, CString* errMsg, ofstream& outfile)
+	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStates* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile)
 	{
 		/**
-		 * Deteministic IOA is defined with:
+		 * Deterministic IOA is defined with:
 		 *	exactly one initial state;
 		 *  final states that have no outgoing transition;
 		 *	and branches only based on different outcomes of the same event;
 		 */
 		 // implementation is incomplete yet. we have to remove unreachable states and their edges after this
-		if (visited->count(s))
+		if (visited->count(s.getId()))
 			return;
 
-		visited->insert(s);
+		visited->emplace(s.getId(), &s);
 
-		IOASetOfEdges* outEdge = dynamic_cast<IOASetOfEdgeRefs&>(s->getOutgoingEdges());
-		IOASetOfEdges::CIter i = outEdge->begin();
+		const IOASetOfEdgeRefs& outEdge = dynamic_cast<const IOASetOfEdgeRefs&>(s.getOutgoingEdges());
+		IOASetOfEdgeRefs::CIter i = outEdge.begin();
 
-		IOAEdge* e = dynamic_cast<IOAEdge&>(*i);
-		InputAction input = e->label.first;
+		const IOAEdge* e = dynamic_cast<const IOAEdge*>(*i);
+		InputAction input = e->getLabel().first;
 		if (input == "")
 		{
-			IOAState* s2 = dynamic_cast<IOAState*>(e->getDestination());
-			outfile << s->stateLabel << "-," << e->label.second << "->" << s2->stateLabel;
-			ioa->removeEdge(e);
+			const IOAState& s2 = dynamic_cast<const IOAState&>(e->getDestination());
+			outfile << s.stateLabel << "-," << e->getLabel().second << "->" << s2.stateLabel;
+			ioa->removeEdge(*e);
 
 			i++;
 			//we go through all the rest of the edges and remove them from the automaton
-			for (; i != outEdge->end(); ++i)
+			for (; i != outEdge.end(); ++i)
 			{
-				e = dynamic_cast<IOAEdge&>(*i);
-				ioa->removeEdge(e);
+				e = dynamic_cast<IOAEdge*>(*i);
+				ioa->removeEdge(*e);
 				// since we only start with one initial state and remove the others, then the destination state of this edge will be unreachable
 				//ioa->removeState(dynamic_cast<IOAState*>(e->getDestination()));
 			}
 
-			if (finalStates->count(s2))
+			if (finalStates.count(s2.getId()))
 			{
 				outfile << " f\n";
 			}
@@ -652,14 +652,14 @@ namespace MaxPlus
 		{
 			Event ev = this->findEventByOutcome(input);
 			//we go through all the edges
-			for (; i != outEdge->end(); i++)
+			for (; i != outEdge.end(); i++)
 			{
-				e = dynamic_cast<IOAEdge&>(*i);
-				input = e->label.first;
+				e = dynamic_cast<const IOAEdge*>(*i);
+				input = e->getLabel().first;
 				// we remove the ones that dont have an input action from the automaton
 				if (input == "")
 				{
-					ioa->removeEdge(e);
+					ioa->removeEdge(*e);
 					// since we only start with one initial state and remove the others, then the destination state of this edge will be unreachable
 					//ioa->removeState(dynamic_cast<IOAState*>(e->getDestination()));
 				}
@@ -668,11 +668,11 @@ namespace MaxPlus
 					// only allow edges with the outcome of the same event
 					if (this->findEventByOutcome(input) == ev)
 					{
-						IOAState* s2 = dynamic_cast<IOAState*>(e->getDestination());
-						outfile << s->stateLabel << "-" << e->label.first << "," << e->label.second << "->" << s2->stateLabel;
+						const IOAState& s2 = dynamic_cast<const IOAState&>(e->getDestination());
+						outfile << s.stateLabel << "-" << e->getLabel().first << "," << e->getLabel().second << "->" << s2.stateLabel;
 
-						ioa->removeEdge(e);
-						if (finalStates->count(s2))
+						ioa->removeEdge(*e);
+						if (finalStates.count(s2.getId()))
 						{
 							outfile << " f\n";
 						}
@@ -683,7 +683,7 @@ namespace MaxPlus
 					}
 					else
 					{
-						ioa->removeEdge(e);
+						ioa->removeEdge(*e);
 					}
 
 				}
@@ -729,7 +729,7 @@ namespace MaxPlus
 
 			std::shared_ptr<Matrix> m = s->second; //->getTransposedCopy();
 			std::list<uint> mSubIndices;
-			numberOfResources = min(m->getRows(), m->getCols());
+			numberOfResources = std::min(m->getRows(), m->getCols());
 			for (uint x = 0; x < numberOfResources; x++)
 			{
 				mSubIndices.push_back(x);

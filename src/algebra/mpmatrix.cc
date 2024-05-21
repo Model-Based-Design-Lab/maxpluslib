@@ -364,7 +364,7 @@ void Matrix::addCols(uint n)
     this->szCols = this->szCols + n;
     //unsigned int nels = this->getRows() * this->getCols();
     //this->table.resize(nels);
-    vector<MPTime>::iterator it = this->table.begin() + cols;
+    std::vector<MPTime>::iterator it = this->table.begin() + cols;
     for (unsigned int r = 0; r < rows; r++)
     {
         for (unsigned int c = 0; c < n; c++)

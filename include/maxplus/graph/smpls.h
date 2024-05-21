@@ -59,9 +59,9 @@ namespace MaxPlus
 			eventRows = new std::list<std::shared_ptr<Matrix>>();
 		}
 	};
-	typedef InputAction Mode;
-	typedef OutputAction Event;
-	typedef CString EventOutcome;
+	using Mode = InputAction;
+	using Event = OutputAction;
+	using EventOutcome = CString;
 
 	class SMPLSwithEvents : public SMPLS
 	{
@@ -139,17 +139,16 @@ namespace MaxPlus
 		 * this includes adding rows and columns of -inf and 0 based on the spec
 		 * allowing the system to analyze processing or conveying event timings
 		 */
-		void prepareMatrices(IOAState& s, std::multiset<Event> *eventList, IOASetOfEdges *visitedEdges);
+		void prepareMatrices(const IOAState& s, std::multiset<Event> *eventList, IOASetOfEdgeRefs *visitedEdges);
 
 		DissectedScenarioMatrix *findDissectedScenarioMatrix(CString sName);
 
 		/**
 		 * recursive part of isConsistent
 		 */
-		void isConsistentUtil(IOAState& s, std::list<Event> *eventList, const IOASetOfStates& finalStates, CString *errMsg, std::map<IOAState *, std::list<Event> *> *visited);
+		void isConsistentUtil(const IOAState& s, std::list<Event> *eventList, const IOASetOfStates& finalStates, CString *errMsg, std::map<const IOAState*,std::list<Event> *> *visited);
 
-
-		void determinizeUtil(IOAState& s, IOASetOfStates* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile);
+		void determinizeUtil(const IOAState& s, IOASetOfStates* visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile);
 
 		bool compareEventLists(std::list<Event> *l1, std::list<Event> *l2);
 
