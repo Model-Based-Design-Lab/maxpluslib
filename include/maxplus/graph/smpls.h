@@ -1,7 +1,7 @@
-#include "base/fsm/fsm.h"
-#include "base/fsm/iofsm.h"
-#include "graph/mpautomaton.h"
-#include "algebra/mpmatrix.h"
+#include "maxplus/base/fsm/fsm.h"
+#include "maxplus/base/fsm/iofsm.h"
+#include "maxplus/graph/mpautomaton.h"
+#include "maxplus/algebra/mpmatrix.h"
 #include <sstream>
 #include <map>
 
