@@ -12,9 +12,11 @@ using IOASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<CId, CString>;
 using IOASetOfEdges = ::FSM::Labeled::SetOfEdges<CId, CString>;
 using IOASetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
 
-class IOAutomaton : public
-    ::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel>
-{
+namespace FSM::Labeled {
+
+class IOAutomaton : public ::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel> {
 public:
-    virtual ~IOAutomaton() {};
+    virtual ~IOAutomaton(){};
 };
+
+} // namespace FSM::Labeled
