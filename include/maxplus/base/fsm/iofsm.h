@@ -1,5 +1,10 @@
-#include "fsm.h"
+#ifndef MAXPLUS_BASE_FSM_IOFSM_H
+#define MAXPLUS_BASE_FSM_IOFSM_H
+
+#include "maxplus/base/basic_types.h"
+#include "maxplus/base/fsm/fsm.h"
 #include "maxplus/base/string/cstring.h"
+#include <utility>
 
 // Input/Output Automaton
 using InputAction = CString;
@@ -20,3 +25,5 @@ public:
 };
 
 } // namespace FSM::Labeled
+
+#endif
