@@ -561,7 +561,7 @@ public:
         throw CException("error - state not found in FiniteStateMachine::getStateLabeled");
     };
 
-    bool &hasStateLabeled(const StateLabelType &s) {
+    bool hasStateLabeled(const StateLabelType &s) {
         // try the index first
         State<StateLabelType, EdgeLabelType> *sp = this->states.withLabel(s);
         if (sp != nullptr) {
