@@ -51,7 +51,7 @@ namespace MaxPlus {
 using ELSState = ::FSM::Labeled::State<CId, CString>;
 using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
 using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
-using ELSSetOfEdges = ::FSM::Abstract::SetOfEdges;
+using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, CString>;
 
 // /**
 //  * Edge labeled scenario FSM.

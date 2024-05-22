@@ -257,8 +257,6 @@ public:
     [[nodiscard]] MPTime minimalFiniteElement() const;
     [[nodiscard]] MPTime getMaxOfCol(uint colNumber) const;
     [[nodiscard]] MPTime getMaxOfRow(uint rowNumber) const;
-    [[nodiscard]] MPTime  getMaxOfRowUntilCol(uint rowNumber, uint colNumber) const;
-    [[nodiscard]] MPTime getMaxOfColUntilRow(uint colNumber,uint rowNumber) const;
 
     [[nodiscard]] Matrix plusClosureMatrix(MPTime posCycleThreshold = MP_EPSILON) const;
 
@@ -270,9 +268,6 @@ public:
     allPairLongestPathMatrix(MPTime posCycleThreshold, bool implyZeroSelfEdges, Matrix &res) const;
 
     [[nodiscard]] MCMgraph mpMatrixToPrecedenceGraph() const;
-
-    // factory methods
-    [[nodiscard]] virtual std::shared_ptr<Matrix> makeMatrix(unsigned int nr_rows, unsigned int nr_cols) const;
 
 private:
     void init(MatrixFill fill);

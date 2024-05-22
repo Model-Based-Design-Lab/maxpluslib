@@ -579,7 +579,7 @@ Matrix Matrix::mp_power(const unsigned int p) const {
     */
 std::shared_ptr<Matrix> Matrix::createCopy() const
 {
-    std::shared_ptr<Matrix> newMatrix = makeMatrix(this->getRows(), this->getCols());
+    std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(this->getRows(), this->getCols());
     unsigned int nels = this->getRows() * this->getCols();
     for (unsigned int pos = 0; pos < nels; pos++) {
         newMatrix->table[pos] = this->table[pos];
@@ -593,7 +593,7 @@ std::shared_ptr<Matrix> Matrix::createCopy() const
 std::shared_ptr<Matrix> Matrix::getTransposedCopy() const {
     unsigned int MR = this->getCols();
     unsigned int MC = this->getRows();
-    std::shared_ptr<Matrix> newMatrix = makeMatrix(MR, MC);
+    std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(MR, MC);
     for (unsigned int col = 0; col < MC; col++)
     {
         for (unsigned int row = 0; row < MR; row++)
@@ -682,6 +682,35 @@ Matrix Matrix::getSubMatrixNonSquare(const std::list<unsigned int> &colIndices) 
         for (unsigned int c = 0; c < NC; c++, cit++) {
             unsigned int ci = (*cit);
             newMatrix.put(r, c, this->get(r, ci));
+        }
+    }
+    return newMatrix;
+}
+
+
+Matrix Matrix::getSubMatrixNonSquareRows(const std::list<unsigned int>& rowIndices) const {
+    auto NR = static_cast<unsigned int>(rowIndices.size());
+    Matrix newMatrix(NR, this->getCols());
+
+    std::list<unsigned int>::const_iterator cit = rowIndices.begin();
+    for (unsigned int r = 0; r < NR; r++, cit++) {
+        unsigned int ci = (*cit);
+        for (unsigned int c = 0; c < this->getCols(); c++) {
+            newMatrix.put(r, c, this->get(ci, c));
+        }
+    }
+    return newMatrix;
+}
+
+std::shared_ptr<Matrix> Matrix::getSubMatrixNonSquareRowsPtr(const std::list<unsigned int>& rowIndices) const {
+    auto NR = static_cast<unsigned int>(rowIndices.size());
+    auto newMatrix = std::make_shared<Matrix>(NR, this->getCols());
+
+    std::list<unsigned int>::const_iterator cit = rowIndices.begin();
+    for (unsigned int r = 0; r < NR; r++, cit++) {
+        unsigned int ci = (*cit);
+        for (unsigned int c = 0; c < this->getCols(); c++) {
+            newMatrix->put(r, c, this->get(ci, c));
         }
     }
     return newMatrix;
@@ -1084,6 +1113,23 @@ CDouble Matrix::mp_eigenvalue() const {
     // compute MCM
     CDouble res = pruned->calculateMaximumCycleMeanKarpDouble();
     return res;
+}
+
+/**
+ * returns the largest element of a row
+ */
+MPTime Matrix::getMaxOfRow(uint rowNumber) const
+{
+    if (rowNumber > this->getRows()) {
+        throw CException("Matrix getMaxOfRow input index out of bounds.");
+    }
+    MPTime largestEl = MP_MINUSINFINITY;
+    unsigned int MC = this->getCols();
+
+    for (unsigned int c = 0; c < MC; c++) {
+        largestEl = MP_MAX(largestEl, this->get(rowNumber, c));
+    }
+    return largestEl;
 }
 
 MCMgraph Matrix::mpMatrixToPrecedenceGraph() const {

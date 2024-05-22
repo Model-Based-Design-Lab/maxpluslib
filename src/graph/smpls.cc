@@ -7,15 +7,137 @@ using namespace FSM;
 using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
 using ELSState = ::FSM::Labeled::State<CId, CString>;
 using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
-using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, CString>;
+using ELSSetOfEdges = ::FSM::Abstract::SetOfEdges;
 using ELSSetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
+using ELSSetOfStateRefs = ::FSM::Abstract::SetOfStateRefs;
 
 namespace FSM {
+
+    // destructor is put deliberately into the cc source to ensure the class vtable is accessible
+    // see: <https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable>
+
 	EdgeLabeledScenarioFSM::~EdgeLabeledScenarioFSM(){}
+
+    /*removes states of the fsm with no outgoing edges.*/
+    void EdgeLabeledScenarioFSM::removeDanglingStates()
+    {
+
+        // temporary sets of states and edges
+        ELSSetOfEdgeRefs edgesToBeRemoved;
+        ELSSetOfStateRefs statesToBeRemoved;
+
+        ELSSetOfStates& elsStates = this->getStates();
+        ELSSetOfEdges& elsEdges = dynamic_cast<ELSSetOfEdges&>(this->getEdges());
+
+
+        /*go through all edges and find all edges that end in
+        dangling states. Also store dangling states.*/
+        for (ELSSetOfEdges::iterator it = elsEdges.begin();
+            it != elsEdges.end(); it++)
+        {
+
+            ELSEdge& e = dynamic_cast<ELSEdge&>(*(*it).second);
+            const ELSState& s = dynamic_cast<const ELSState&>(e.getDestination());
+            const ELSSetOfEdges& oEdges = dynamic_cast<const ELSSetOfEdges&>(s.getOutgoingEdges());
+            if (oEdges.empty())
+            {
+                edgesToBeRemoved.insert(&e);
+                statesToBeRemoved.insert(&s);
+            }
+        }
+
+        while (edgesToBeRemoved.size() != 0)
+        {
+
+            //remove dangling states
+            for (ELSSetOfStateRefs::iterator srit = statesToBeRemoved.begin(); srit != statesToBeRemoved.end(); srit++)
+            {
+				this->removeState(dynamic_cast<const ELSState&>(*(*srit)));
+                delete *srit;
+            }
+
+            //remove edges ending in dangling states
+            //remove edges ending in dangling states from the outgoing edges of their source states
+            for (ELSSetOfEdgeRefs::iterator erit = edgesToBeRemoved.begin(); erit != edgesToBeRemoved.end(); erit++)
+            {
+                const ELSEdge& e = dynamic_cast<const ELSEdge&>(*(*erit));
+                this->removeEdge(e);
+				const ELSState& s = dynamic_cast<const ELSState&>(e.getSource());
+
+
+				// TODO (Marc Geilen) redesign for opportunities for subclasses to modify their FSM structure while external users get const access only. Perhaps through protected access.
+				// Maybe request modifiable access to a given const state/edge?
+				ELSState& ms = const_cast<ELSState&>(s);
+                ms.removeOutgoingEdge(e);
+            }
+
+            //empty the temporary sets
+            edgesToBeRemoved.clear();
+            statesToBeRemoved.clear();
+
+            elsStates = this->getStates();
+            elsEdges = this->getEdges();
+
+            /*go through all edges and find all edges that end in
+            dangling states. Also store dangling states.*/
+            for (ELSSetOfEdges::iterator it = elsEdges.begin(); it != elsEdges.end(); it++)
+            {
+
+                ELSEdge& e = dynamic_cast<ELSEdge&>(*((*it).second));
+                const ELSState& s = dynamic_cast<const ELSState&>(e.getDestination());
+                const ELSSetOfEdges& oEdges = dynamic_cast<const ELSSetOfEdges&>(s.getOutgoingEdges());
+                if (oEdges.empty())
+                {
+                    edgesToBeRemoved.insert(&e);
+                    statesToBeRemoved.insert(&s);
+                }
+            }
+        }
+    }
+
 }
+
+
 
 namespace MaxPlus
 {
+
+	/**
+	 * returns the largest finite element of a row up to and including colNumber
+	 */
+	MPTime getMaxOfRowUntilCol(Matrix& M, uint rowNumber, uint colNumber)
+	{
+		if (rowNumber > M.getRows()) {
+			throw CException("Matrix getMaxOfRow input row index out of bounds.");
+		}
+		if (colNumber > M.getCols()) {
+			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
+		}
+    	MPTime largestEl = MP_MINUSINFINITY;
+		for (unsigned int c = 0; c < colNumber; c++) {
+			largestEl = MP_MAX(largestEl, M.get(rowNumber, c));
+		}
+		return largestEl;
+	}
+
+	/**
+	 * returns the largest finite element of a row up to and including colNumber
+	 */
+	MPTime getMaxOfColUntilRow(Matrix& M, uint colNumber, uint rowNumber)
+	{
+		if (rowNumber > M.getRows()) {
+			throw CException("Matrix getMaxOfRow input row index out of bounds.");
+		}
+		if (colNumber > M.getCols()) {
+			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
+		}
+    	MPTime largestEl = MP_MINUSINFINITY;
+		for (unsigned int r = 0; r < rowNumber; r++) {
+			largestEl = MP_MAX(largestEl, M.get(r, colNumber));
+		}
+		return largestEl;
+	}
+
 
 	/*
 	* Loads an entity from its starting '{' to the corresponding '}'
@@ -438,7 +560,7 @@ namespace MaxPlus
 						}
 						for (; y < numberOfResources; y++) // B_e (refer to paper)
 						{
-							sMatrix->put(y, cols - 1, sMatrix->getMaxOfRowUntilCol(y, numberOfResources));
+							sMatrix->put(y, cols - 1, getMaxOfRowUntilCol(*sMatrix, y, numberOfResources));
 						}
 
 						eList->erase(eList->lower_bound(*eventIter)); // event is processed, remove from eList
@@ -462,8 +584,8 @@ namespace MaxPlus
 						}
 						for (; x < sMatrix->getCols(); x++) // B_e (refer to paper), this happens when we add B_c before adding A_e, so we have to make sure B_e that's added here is max of row
 						{
-							if (sMatrix->getMaxOfColUntilRow(x, numberOfResources) > MP_MINUSINFINITY) // we must only add B_e under cols that correspondto B_c
-								sMatrix->put(sMatrix->getRows() - 1, x, eventRow->getMaxOfRowUntilCol(0, numberOfResources));
+							if (getMaxOfColUntilRow(*sMatrix, x, numberOfResources) > MP_MINUSINFINITY) // we must only add B_e under cols that correspondto B_c
+								sMatrix->put(sMatrix->getRows() - 1, x, getMaxOfRowUntilCol(*eventRow, 0, numberOfResources));
 						}
 					}
 
