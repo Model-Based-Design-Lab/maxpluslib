@@ -43,11 +43,9 @@
 
 #include "../exception/exception.h"
 #include "../string/cstring.h"
-#include "maxplus/algebra/mptype.h"
 #include <algorithm>
 #include <list>
 #include <memory>
-#include <ostream>
 #include <set>
 
 namespace FSM {
@@ -134,7 +132,7 @@ public:
 
     State(const State &) = default;
     State &operator=(const State &other) = delete;
-    State(State &&) = default;
+    State(State &&)  noexcept = default;
     State &operator=(State &&) = delete;
 
     // add an outgoing edge to the state
@@ -148,21 +146,17 @@ public:
         return this->outgoingEdges;
     }
 
-    void removeOutgoingEdge(const Edge &e) { this->outgoingEdges.erase(const_cast<Edge *>(&e)); }
+    // TODO (Marc Geilen) get rid of const cast
+    void removeOutgoingEdge(const Edge &e) {
+        this->outgoingEdges.erase(const_cast<Edge *>(&e)); }
     void insertOutgoingEdge(Edge &e) { this->outgoingEdges.insert(&e); }
 
 private:
     SetOfEdgeRefs outgoingEdges;
 };
 
-// struct StateCompareLessThan {
-//     bool operator()(const State &lhs, const State &rhs) const { return lhs.lessThan(rhs); };
-// };
-
 // A set of states
 // the set is assumed to have unique ownership of the states
-// TODO: wanted to make it a unique pointer, but  compiler complains we are a deleted copy
-// constructor...
 class SetOfStates : public std::map<CId, std::shared_ptr<State>> {
 public:
     using CIter = SetOfStates::const_iterator;
@@ -549,15 +543,6 @@ public:
                 return ct;
             }
         }
-        // typename SetOfStates<StateLabelType, EdgeLabelType>::CIter i = this->states.begin();
-        // while (i != this->states.end()) {
-        //     State<StateLabelType, EdgeLabelType>& t = static_cast<State<StateLabelType,
-        //     EdgeLabelType>>(*i); if ((t.stateLabel) == s) {
-        //         this->states.stateIndex[s] = &t;
-        //         return t;
-        //     }
-        //     i++;
-        // }
         throw CException("error - state not found in FiniteStateMachine::getStateLabeled");
     };
 
@@ -704,11 +689,11 @@ public:
                 this->insertOutgoingLabels(&s, labels);
             }
 
-            // for each label in labels get the image states into a set Qnext
+            // for each label in labels get the image states into a set QNext
             for (auto l : labels) {
 
-                // collect image state in Qnext
-                std::shared_ptr<Abstract::SetOfStateRefs> Qnext =
+                // collect image state in QNext
+                std::shared_ptr<Abstract::SetOfStateRefs> QNext =
                         std::make_shared<Abstract::SetOfStateRefs>();
 
                 // for every state s in Q
@@ -716,27 +701,27 @@ public:
                     const auto &s = dynamic_cast<const State<StateLabelType, EdgeLabelType> &>(*i);
                     std::shared_ptr<Abstract::SetOfStateRefs> l_img = s.nextStatesOfEdgeLabel(l);
 
-                    // add all l-images from s to Qnext
+                    // add all l-images from s to QNext
                     for (const auto &k : *l_img) {
                         const auto *simg = k;
-                        Qnext->insert(simg);
+                        QNext->insert(simg);
                     }
                 }
 
                 // add new state in fsm if necessary
                 const State<StateLabelType, EdgeLabelType> *ns = nullptr;
-                if (newStatesMap.find(*Qnext) == newStatesMap.end()) {
+                if (newStatesMap.find(*QNext) == newStatesMap.end()) {
                     // state does not yet exist, make new state
                     ns = result->addState(
                             (dynamic_cast<const State<StateLabelType, EdgeLabelType> &>(
-                                     *(*(Qnext->begin()))))
+                                     *(*(QNext->begin()))))
                                     .getLabel());
 
-                    newStatesMap[*Qnext] = ns;
-                    unprocessed.push_back(Qnext);
+                    newStatesMap[*QNext] = ns;
+                    unprocessed.push_back(QNext);
                 } else {
                     // state already exists, fetch from newStatesMap
-                    ns = newStatesMap[*Qnext];
+                    ns = newStatesMap[*QNext];
                 }
 
                 // add an edge in the new fsm
@@ -936,12 +921,12 @@ private:
             // collect classes of states in ns1 and ns2
             std::set<std::shared_ptr<Abstract::SetOfStateRefs>> cs1;
             std::set<std::shared_ptr<Abstract::SetOfStateRefs>> cs2;
-            for (auto j : *ns1) {
-                auto s = j;
+            for (const auto *j : *ns1) {
+                const auto *s = j;
                 cs1.insert(m[s]);
             }
-            for (auto j : *ns2) {
-                auto s = j;
+            for (const auto *j : *ns2) {
+                const auto *s = j;
                 cs2.insert(m[s]);
             }
 
@@ -955,7 +940,7 @@ private:
 
     // function only used by minimizeEdgeLabels
     void mapStates(EquivalenceMap &m, std::shared_ptr<Abstract::SetOfStateRefs> &sos) {
-        for (auto i : *sos) {
+        for (const auto *i : *sos) {
             m[i] = sos;
         }
     }
@@ -979,7 +964,7 @@ public:
 
 class FiniteStateMachine : public Labeled::FiniteStateMachine<CString, char> {
 public:
-    State &getInitialState() const {
+    [[nodiscard]] State &getInitialState() const override {
         return dynamic_cast<State &>(Labeled::FiniteStateMachine<CString, char>::getInitialState());
     };
 
@@ -1021,7 +1006,7 @@ public:
                        const Abstract::FiniteStateMachine &fsm2) :
         fsm_a(fsm1), fsm_b(fsm2) {}
 
-    State &getInitialState() const;
+    [[nodiscard]] State &getInitialState() const override;
 
     [[nodiscard]] virtual bool matchEdges(const Abstract::Edge &e1,
                                           const Abstract::Edge &e2) const = 0;
