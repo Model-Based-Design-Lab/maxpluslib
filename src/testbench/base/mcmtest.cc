@@ -9,6 +9,7 @@
 #include <base/analysis/mcm/mcmhoward.h>
 #include <base/analysis/mcm/mcmyto.h>
 #include <random>
+#include <array>
 #include <type_traits>
 
 using namespace MaxPlus;
