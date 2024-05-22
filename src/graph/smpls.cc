@@ -4,11 +4,15 @@
 
 using namespace FSM;
 
-typedef ::FSM::Labeled::Edge<CId, CString> ELSEdge;
-typedef ::FSM::Labeled::State<CId, CString> ELSState;
-typedef ::FSM::Labeled::SetOfStates<CId, CString> ELSSetOfStates;
-typedef ::FSM::Labeled::SetOfEdges<CId, CString> ELSSetOfEdges;
-typedef ::FSM::Abstract::SetOfEdgeRefs ELSSetOfEdgeRefs;
+using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
+using ELSState = ::FSM::Labeled::State<CId, CString>;
+using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
+using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, CString>;
+using ELSSetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
+
+namespace FSM {
+	EdgeLabeledScenarioFSM::~EdgeLabeledScenarioFSM(){}
+}
 
 namespace MaxPlus
 {
