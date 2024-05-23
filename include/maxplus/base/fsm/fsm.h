@@ -38,8 +38,8 @@
  *  SOFTWARE.
  */
 
-#ifndef FSM_H_INCLUDED
-#define FSM_H_INCLUDED
+#ifndef MAXPLUS_BASE_FSM_H
+#define MAXPLUS_BASE_FSM_H
 
 #include "../exception/exception.h"
 #include "../string/cstring.h"

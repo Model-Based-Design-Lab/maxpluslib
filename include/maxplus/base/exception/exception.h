@@ -38,10 +38,9 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_EXCEPTION_EXCEPTION_H
-#define BASE_EXCEPTION_EXCEPTION_H
+#ifndef MAXPLUS_BASE_EXCEPTION_EXCEPTION_H
+#define MAXPLUS_BASE_EXCEPTION_EXCEPTION_H
 
-#include "../basic_types.h"
 #include "../string/cstring.h"
 #include <exception>
 
