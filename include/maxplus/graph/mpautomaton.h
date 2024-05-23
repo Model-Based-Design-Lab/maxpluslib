@@ -91,11 +91,11 @@ inline CString toString(const MPAStateLabel &l) {
 };
 
 /**
- * An MPA edge is labeled with a delay and a scenario name.
+ * An MPA edge is labeled with a delay and a mode name.
  */
 using MPAEdgeLabel = struct MPAEdgeLabel {
     MPDelay delay;
-    CString scenario;
+    CString mode;
 };
 
 /**
@@ -103,10 +103,10 @@ using MPAEdgeLabel = struct MPAEdgeLabel {
     * @param stateId FSM state id
     * @param tokenId token number
     */
-inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const CString& scenario) {
+inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const CString& mode) {
     MPAEdgeLabel el;
     el.delay = delay;
-    el.scenario = scenario;
+    el.mode = mode;
     return el;
 }
 
@@ -114,7 +114,7 @@ inline bool operator==(const MPAEdgeLabel &s, const MPAEdgeLabel &t) {
     if (s.delay != t.delay) {
         return false;
     }
-    return s.scenario == t.scenario;
+    return s.mode == t.mode;
 }
 
 /**
@@ -127,7 +127,7 @@ inline bool operator<(const MPAEdgeLabel &s, const MPAEdgeLabel &t) {
     if (s.delay > t.delay) {
         return false;
     }
-    return s.scenario < t.scenario;
+    return s.mode < t.mode;
 }
 
 /**
@@ -135,10 +135,10 @@ inline bool operator<(const MPAEdgeLabel &s, const MPAEdgeLabel &t) {
  * @param stateId FSM state id
  * @param tokenId token number
  */
-inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, CString &scenario) {
+inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, CString &mode) {
     MPAEdgeLabel el;
     el.delay = delay;
-    el.scenario = scenario;
+    el.mode = mode;
     return el;
 }
 
@@ -162,7 +162,7 @@ public:
  */
 using MPAREdgeLabel = struct MPAREdgeLabel {
     MPDelay delay;
-    const CString scenario;
+    const CString mode;
     CDouble reward{0.0};
 };
 
@@ -178,7 +178,7 @@ inline bool operator==(const MPAREdgeLabel &s, const MPAREdgeLabel &t) {
     if (s.delay != t.delay) {
         return false;
     }
-    if (s.scenario != t.scenario) {
+    if (s.mode != t.mode) {
         return false;
     }
     return s.reward == t.reward;
@@ -194,17 +194,17 @@ inline bool operator<(const MPAREdgeLabel &s, const MPAREdgeLabel &t) {
     if (s.delay > t.delay) {
         return false;
     }
-    if (s.scenario < t.scenario) {
+    if (s.mode < t.mode) {
         return true;
     }
-    if (s.scenario > t.scenario) {
+    if (s.mode > t.mode) {
         return false;
     }
     return s.reward < t.reward;
 }
 
 inline CString toString(const MPAREdgeLabel &l) {
-    return "(delay: " + CString(l.delay) + ", scenario: " + CString(l.scenario)
+    return "(delay: " + CString(l.delay) + ", mode: " + CString(l.mode)
            + ", reward: " + CString(l.reward) + ")";
 };
 

@@ -568,8 +568,7 @@ public:
         return false;
     };
 
-
-    SetOfStates<StateLabelType, EdgeLabelType> &getStates() { return this->states; };
+    [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const { return this->states; };
     Abstract::SetOfStateRefs getStateRefs() {
         Abstract::SetOfStateRefs result;
         for (auto i : this->states) {
