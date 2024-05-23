@@ -170,3 +170,5 @@ private:
 };
 
 } // namespace MaxPlus::SMPLS
+
+#endif
