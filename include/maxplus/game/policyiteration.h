@@ -167,7 +167,7 @@ private:
                 // Outgoing edges.
                 auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(v->getOutgoingEdges());
                 for (const auto &ei : es) {
-                    auto e = dynamic_cast<Edge<SL, EL> *>(ei);
+                    auto e = dynamic_cast<EdgeRef<SL, EL>>(ei);
 
                     const auto &u = dynamic_cast<const State<SL, EL> *>(&(e->getDestination()));
 
@@ -260,7 +260,7 @@ private:
                 const auto &es =
                         dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(v->getOutgoingEdges());
                 for (const auto &ei : es) {
-                    auto e = dynamic_cast<Edge<SL, EL> *>(ei);
+                    auto e = dynamic_cast<EdgeRef<SL, EL>>(ei);
 
                     auto u = dynamic_cast<const State<SL, EL> *>(&(e->getDestination()));
 
@@ -393,7 +393,7 @@ private:
                     const State<SL, EL> *x = currentStrategy->getSuccessor(u);
 
                     // Initialize both numerator and denominator.
-                    Edge<SL, EL> *e = game.getEdge(*u, *(currentStrategy->getSuccessor(u)));
+                    EdgeRef<SL, EL> e = game.getEdge(*u, *(currentStrategy->getSuccessor(u)));
                     auto w1sum = static_cast<CDouble>(game.getWeight1(e));
                     auto w2sum = static_cast<CDouble>(game.getWeight2(e));
 
@@ -404,7 +404,7 @@ private:
                         if (stateIds[x] < stateIds[v_s]) {
                             v_s = x;
                         }
-                        Edge<SL, EL> *x_succ =
+                        EdgeRef<SL, EL> x_succ =
                                 game.getEdge(*x, *(currentStrategy->getSuccessor(x)));
                         auto w1 = static_cast<CDouble>(game.getWeight1(x_succ));
                         auto w2 = static_cast<CDouble>(game.getWeight2(x_succ));
@@ -491,7 +491,7 @@ private:
                 while (!stack.empty()) {
                     const State<SL, EL> *x = stack.top();
                     stack.pop();
-                    Edge<SL, EL> *e = game.getEdge(*x, *u);
+                    EdgeRef<SL, EL> e = game.getEdge(*x, *u);
                     auto w1 = static_cast<CDouble>(game.getWeight1(e));
                     auto w2 = static_cast<CDouble>(game.getWeight2(e));
 

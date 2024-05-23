@@ -1,11 +1,16 @@
+#include "maxplus/base/fsm/fsm.h"
 #include "graph/smpls.h"
 #include "algebra/mptype.h"
+#include "maxplus/base/fsm/iofsm.h"
+#include "maxplus/graph/mpautomaton.h"
 #include <memory>
 
 using namespace FSM;
 
 using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
+using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, CString>;
 using ELSState = ::FSM::Labeled::State<CId, CString>;
+using ELSStateRef = ::FSM::Labeled::StateRef<CId, CString>;
 using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
 using ELSSetOfEdges = ::FSM::Abstract::SetOfEdges;
 using ELSSetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
@@ -36,13 +41,13 @@ namespace MaxPlus::SMPLS {
         for (const auto& it: elsEdges)
         {
 
-            auto& e = dynamic_cast<ELSEdge&>(*it.second);
-            const auto& s = dynamic_cast<const ELSState&>(e.getDestination());
-            const auto& oEdges = dynamic_cast<const ELSSetOfEdges&>(s.getOutgoingEdges());
+            auto e = dynamic_cast<ELSEdgeRef>(&(*it.second));
+            const auto& s = dynamic_cast<ELSStateRef>(e->getDestination());
+            const auto& oEdges = dynamic_cast<const ELSSetOfEdges&>(s->getOutgoingEdges());
             if (oEdges.empty())
             {
-                edgesToBeRemoved.insert(&e);
-                statesToBeRemoved.insert(&s);
+                edgesToBeRemoved.insert(e);
+                statesToBeRemoved.insert(s);
             }
         }
 
@@ -57,16 +62,13 @@ namespace MaxPlus::SMPLS {
 
             //remove edges ending in dangling states
             //remove edges ending in dangling states from the outgoing edges of their source states
-            for (auto *erIt: edgesToBeRemoved) {
+            for (const auto *erIt: edgesToBeRemoved) {
                 const auto& e = dynamic_cast<const ELSEdge&>(*erIt);
                 this->removeEdge(e);
-				const auto& s = dynamic_cast<const ELSState&>(e.getSource());
+				const auto *const s = dynamic_cast<ELSStateRef>(e.getSource());
 
-
-				// TODO (Marc Geilen) redesign for opportunities for subclasses to modify their FSM structure while external users get const access only. Perhaps through protected access.
-				// Maybe request modifiable access to a given const state/edge?
-				auto& ms = const_cast<ELSState&>(s);
-                ms.removeOutgoingEdge(e);
+				const auto *ms = dynamic_cast<ELSStateRef>(s);
+                this->removeEdge(e);
             }
 
             //empty the temporary sets
@@ -81,13 +83,13 @@ namespace MaxPlus::SMPLS {
             for (const auto& it: elsEdges)
             {
 
-                auto& e = dynamic_cast<ELSEdge&>(*(it.second));
-                const auto& s = dynamic_cast<const ELSState&>(e.getDestination());
-                const auto& oEdges = dynamic_cast<const ELSSetOfEdges&>(s.getOutgoingEdges());
+                auto e = dynamic_cast<ELSEdgeRef>(&(*(it.second)));
+                const auto s = dynamic_cast<ELSStateRef>(e->getDestination());
+                const auto& oEdges = dynamic_cast<const ELSSetOfEdges&>(s->getOutgoingEdges());
                 if (oEdges.empty())
                 {
-                    edgesToBeRemoved.insert(&e);
-                    statesToBeRemoved.insert(&s);
+                    edgesToBeRemoved.insert(e);
+                    statesToBeRemoved.insert(s);
                 }
             }
         }
@@ -165,8 +167,8 @@ namespace MaxPlus::SMPLS {
 		// create the FSM states for every pair of a states of the FSM
 		// and an initial token
 
-		const auto& I = dynamic_cast<const ELSSetOfStates&>(this->elsFSM.getInitialStates());
-		const auto& F = dynamic_cast<const ELSSetOfStates&>(this->elsFSM.getFinalStates());
+		const auto& I = dynamic_cast<const ELSSetOfStateRefs&>(this->elsFSM.getInitialStates());
+		const auto& F = dynamic_cast<const ELSSetOfStateRefs&>(this->elsFSM.getFinalStates());
 		const auto& Q = dynamic_cast<const ELSSetOfStates&>(this->elsFSM.getStates());
 		for (const auto& q: Q)
 		{
@@ -175,7 +177,7 @@ namespace MaxPlus::SMPLS {
 			unsigned int nrTokens = 0;
 			if (! e.empty())
 			{
-				CString label = (dynamic_cast<ELSEdge*>(*e.begin()))->getLabel();
+				CString label = (dynamic_cast<ELSEdgeRef>(*e.begin()))->getLabel();
 
 				for (const auto& smIt: this->sm)
 				{
@@ -191,13 +193,13 @@ namespace MaxPlus::SMPLS {
 				nrTokens = (*this->sm.begin()).second->getCols();
 			}
 			// create a state for (q, k)
-			CId qId = (dynamic_cast<ELSState&>(qq)).getLabel();
+			const CId qId = (dynamic_cast<ELSState&>(qq)).getLabel();
 			bool isInitial = false;
 			bool isFinal = false;
 			// if els state is initial
 			for (const auto& i: I)
 			{
-				CId iId = (dynamic_cast<ELSState&>(*(i.second))).getLabel();
+				CId iId = (dynamic_cast<const ELSState&>(*i)).getLabel();
 				if (iId == qId)
 				{
 					isInitial = true;
@@ -207,7 +209,7 @@ namespace MaxPlus::SMPLS {
 			// if els state is final
 			for (const auto& f: F)
 			{
-				CId fId = (dynamic_cast<ELSState&>(*(f.second))).getLabel();
+				CId fId = (dynamic_cast<const ELSState&>(*f)).getLabel();
 				if (fId == qId)
 				{
 					isFinal = true;
@@ -241,11 +243,11 @@ namespace MaxPlus::SMPLS {
 
 			// for every outgoing edge of the state
 			const auto& t = dynamic_cast<const ELSSetOfEdgeRefs&>(q1.getOutgoingEdges());
-			for (auto *e: t)
+			for (const auto *e: t)
 			{
-				auto& tr = dynamic_cast<ELSEdge&>(*e);
-				CId q2Id = dynamic_cast<const ELSState&>(tr.getDestination()).getLabel();
-				CString sc = tr.getLabel();
+				const auto *tr = dynamic_cast<ELSEdgeRef>(e);
+				CId q2Id = dynamic_cast<ELSStateRef>(tr->getDestination())->getLabel();
+				CString sc = tr->getLabel();
 				std::shared_ptr<Matrix> Ms = this->sm.at(sc);
 				size_t r = Ms->getRows();
 				size_t c = Ms->getCols();
@@ -255,14 +257,14 @@ namespace MaxPlus::SMPLS {
 				{
 					for (size_t col = 0; col < c; col++)
 					{
-						MPDelay d = Ms->get(static_cast<unsigned int>(row), static_cast<unsigned int>(col));
+						const MPDelay d = Ms->get(static_cast<unsigned int>(row), static_cast<unsigned int>(col));
 
 						if (!MP_IS_MINUS_INFINITY(d))
 						{
-							MPAState& src = mpa->getStateLabeled(makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
+							MPAStateRef src = mpa->getStateLabeled(makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
 							MPAState& dst = mpa->getStateLabeled(makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
 							MPAEdgeLabel el = makeMPAEdgeLabel(d, sc);
-							el.mode = CString(tr.getLabel());
+							el.mode = CString(tr->getLabel());
 							mpa->addEdge(src, el, dst);
 						}
 					}
@@ -434,27 +436,27 @@ namespace MaxPlus::SMPLS {
 	void SMPLSwithEvents::prepareMatrices(const IOAState& s, std::multiset<Event>& eventList, IOASetOfEdgeRefs& visitedEdges)
 	{
 		const auto& adj = dynamic_cast<const IOASetOfEdgeRefs&>(s.getOutgoingEdges());
-		for (auto *i: adj)
+		for (const auto *i: adj)
 		{
-			auto& e = dynamic_cast<IOAEdge&>(*i);
-			if (visitedEdges.count(&e) > 0) {
+			const auto *e = dynamic_cast<IOAEdgeRef>(i);
+			if (visitedEdges.count(e) > 0) {
 				continue;
 			}
 
 			//create a unique label for the new edge. this name will also be the mode name for sm
 			CString modeName = CString(s.getId());
 			modeName += ",";
-			modeName += e.getLabel().first + "," + e.getLabel().second;
+			modeName += e->getLabel().first + "," + e->getLabel().second;
 
 			// add the edge with unique name between the corresponding states
-			this->elsFSM.addEdge(this->elsFSM.getStateLabeled(s.getLabel()), modeName, this->elsFSM.getStateLabeled((dynamic_cast<const IOAState&>(e.getDestination())).getLabel()));
+			this->elsFSM.addEdge(this->elsFSM.getStateLabeled(s.getLabel()), modeName, this->elsFSM.getStateLabeled((dynamic_cast<const IOAState&>(e->getDestination())).getLabel()));
 
 			// make a copy so that child node can not modify the parent nodes list of events
 			// only adds and removes and passes it to it's children
 			std::multiset<Event> eList(eventList);
 
-			OutputAction output = e.getLabel().second;
-			InputAction input = e.getLabel().first;
+			OutputAction output = e->getLabel().second;
+			InputAction input = e->getLabel().first;
 
 			auto disSm = std::make_shared<DissectedModeMatrix>();
 			std::shared_ptr<Matrix> sMatrix; //matrix to be generated and assigned to this edge
@@ -579,12 +581,12 @@ namespace MaxPlus::SMPLS {
 			}
 
 			this->sm[modeName] = sMatrix;
-			visitedEdges.insert(&e);
+			visitedEdges.insert(e);
 
 			// we need this later to make all matrices square
 			biggestMatrixSize = std::max(biggestMatrixSize, std::max(sMatrix->getCols(), sMatrix->getRows()));
 
-			prepareMatrices(dynamic_cast<const IOAState&>(e.getDestination()), eList, visitedEdges);
+			prepareMatrices(dynamic_cast<const IOAState&>(e->getDestination()), eList, visitedEdges);
 		}
 	}
 
@@ -629,21 +631,20 @@ namespace MaxPlus::SMPLS {
 		else // If current state is not final
 		{
 			const auto& adj = dynamic_cast<const IOASetOfEdgeRefs&>(s.getOutgoingEdges());
-			for (auto *i: adj)
+			for (const auto *i: adj)
 			{
 				// make a copy so that child node can not modify the parent nodes list
 				// only adds and removes and passes it to its children
 				EventList eList(eventList);
 
-				auto& e = dynamic_cast<IOAEdge&>(*i);
-				OutputAction output = e.getLabel().second;
-				InputAction input = e.getLabel().first;
+				const auto *e = dynamic_cast<IOAEdgeRef>(i);
+				const OutputAction output = e->getLabel().second;
+				const InputAction input = e->getLabel().first;
 				if (!input.empty()) {
 					bool eventFound = false;
 					EventList::iterator eventIter;
 					for (eventIter = eList.begin(); eventIter != eList.end(); eventIter++)
 					{
-						std::list<EventOutcomePair>::iterator gammaIterator;
 						for (const auto& gammaIterator: this->gamma)
 						{
 							auto p = (EventOutcomePair(gammaIterator));
@@ -682,7 +683,7 @@ namespace MaxPlus::SMPLS {
 						}
 					}
 				}
-				const auto& s2 = dynamic_cast<const IOAState&>(e.getDestination());
+				const auto& s2 = dynamic_cast<const IOAState&>(e->getDestination());
 
 				isConsistentUtil(s2, eList, finalStates, errMsg, visited);
 			}
@@ -722,7 +723,7 @@ namespace MaxPlus::SMPLS {
 			//we go through all the rest of the edges and remove them from the automaton
 			for (; i != outEdge.end(); ++i)
 			{
-				e = dynamic_cast<IOAEdge*>(*i);
+				e = dynamic_cast<IOAEdgeRef>(*i);
 				ioa->removeEdge(*e);
 				// since we only start with one initial state and remove the others, then the destination state of this edge will be unreachable
 				//ioa->removeState(dynamic_cast<IOAState*>(e->getDestination()));

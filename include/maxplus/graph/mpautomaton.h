@@ -144,7 +144,9 @@ inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, CString &mode) {
 
 // Types for edges and states and sets.
 using MPAState = ::FSM::Labeled::State<MPAStateLabel, MPAEdgeLabel>;
+using MPAStateRef = ::FSM::Labeled::StateRef<MPAStateLabel, MPAEdgeLabel>;
 using MPAEdge = ::FSM::Labeled::Edge<MPAStateLabel, MPAEdgeLabel>;
+using MPAEdgeRef = ::FSM::Labeled::EdgeRef<MPAStateLabel, MPAEdgeLabel>;
 using MPASetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAEdgeLabel>;
 using MPASetOfEdges = ::FSM::Abstract::SetOfEdges;
 
@@ -210,7 +212,9 @@ inline CString toString(const MPAREdgeLabel &l) {
 
 // Types of states, edges, sets and cycle of an MPA with rewards.
 using MPARState = ::FSM::Labeled::State<MPAStateLabel, MPAREdgeLabel>;
+using MPARStateRef = ::FSM::Labeled::StateRef<MPAStateLabel, MPAREdgeLabel>;
 using MPAREdge = ::FSM::Labeled::Edge<MPAStateLabel, MPAREdgeLabel>;
+using MPAREdgeRef = ::FSM::Labeled::EdgeRef<MPAStateLabel, MPAREdgeLabel>;
 using MPARSetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAREdgeLabel>;
 using MPARSetOfEdges = ::FSM::Abstract::SetOfEdges;
 using MPARCycle = std::list<const ::FSM::Abstract::Edge *>;

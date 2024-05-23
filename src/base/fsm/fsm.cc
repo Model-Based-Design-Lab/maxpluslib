@@ -51,9 +51,9 @@ namespace StateStringLabeled {
 void FiniteStateMachine::addStateLabeled(const CString &sl) { this->addState(sl); }
 
 void FiniteStateMachine::addEdgeLabeled(const CString &src, const CString &dst) {
-    Labeled::State<CString, char> &s_src = this->getStateLabeled(src);
-    Labeled::State<CString, char> &s_dst = this->getStateLabeled(dst);
-    Labeled::FiniteStateMachine<CString, char>::addEdge(s_src, 'X', s_dst);
+    const Labeled::StateRef<CString, char> s_src = this->getStateLabeled(src);
+    const Labeled::StateRef<CString, char> s_dst = this->getStateLabeled(dst);
+    Labeled::FiniteStateMachine<CString, char>::addEdge(*s_src, 'X', *s_dst);
 }
 
 std::shared_ptr<Abstract::SetOfStateRefs> FiniteStateMachine::reachableStates() {

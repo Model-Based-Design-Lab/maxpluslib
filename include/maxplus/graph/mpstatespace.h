@@ -50,6 +50,7 @@ namespace MaxPlus {
 
 using ELSState = ::FSM::Labeled::State<CId, CString>;
 using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
+using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, CString>;
 using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
 using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, CString>;
 

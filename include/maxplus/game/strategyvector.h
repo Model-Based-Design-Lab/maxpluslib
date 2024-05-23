@@ -84,10 +84,10 @@ public:
                     dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(src.getOutgoingEdges());
 
             // Find the first outgoing edge, and get the target.
-            auto *e = dynamic_cast<Edge<SL, EL> *>(*es.begin());
-            auto &dest = dynamic_cast<const State<SL, EL> &>(e->getDestination());
+            auto *e = dynamic_cast<EdgeRef<SL, EL>>(*es.begin());
+            auto dest = dynamic_cast<StateRef<SL, EL>>(e->getDestination());
 
-            strategyVector[&src] = &dest;
+            strategyVector[&src] = dest;
         }
     }
 
