@@ -626,7 +626,7 @@ public:
     findEdge(StateLabelType src, EdgeLabelType lbl, StateLabelType dst) {
 
         // get all labels
-        SetOfStates<StateLabelType, EdgeLabelType> &allStates = this->getStates();
+        const SetOfStates<StateLabelType, EdgeLabelType> &allStates = this->getStates();
 
         for (auto iter : allStates) {
             auto s = dynamic_cast<State<StateLabelType, EdgeLabelType> &>(*(iter.second));

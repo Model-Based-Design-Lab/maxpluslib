@@ -9,6 +9,7 @@
 #include <base/analysis/mcm/mcmhoward.h>
 #include <base/analysis/mcm/mcmyto.h>
 #include <random>
+#include <array>
 #include <type_traits>
 
 using namespace MaxPlus;
@@ -210,7 +211,6 @@ void MCMTest::test_yto() {
     eid = cycle.at(0)->id;
     ASSERT_THROW(eid == 6);
 
-    // TODO: check of the cycle ratio are identical to old SDF3
     std::array<CDouble, 250> expectedMinCycleRatios = {
             0.526141,  0.124523,  0.0389826, 0.289127,   0.11451,    0.723313,   1.07027,
             0.956067,  0.570066,  0.746341,  0.33622,    0.475978,   0.902663,   1.02951,

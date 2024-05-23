@@ -547,7 +547,7 @@ private:
      * @return map where each vertex is mapped to the default value
      */
     template <typename T>
-    std::map<const State<SL, EL> *, T> initializeVector(SetOfStates<SL, EL> &states, T value) {
+    std::map<const State<SL, EL> *, T> initializeVector(const SetOfStates<SL, EL> &states, T value) {
         std::map<const State<SL, EL> *, T> vector;
 
         for (auto &it : states) {
