@@ -160,8 +160,8 @@ SparseVector SparseVector::UnitVector(unsigned int size, unsigned int n) {
  */
 void SparseVector::negate() {
     for (auto &e : this->table) {
-        if (e.second == MP_MINUSINFINITY) {
-            throw CException("Cannot negate vectors with MP_MINUSINFINITY elements in"
+        if (e.second == MP_MINUS_INFINITY) {
+            throw CException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
                              "SparseVector::negate");
         }
         e.second = -e.second;
@@ -172,7 +172,7 @@ void SparseVector::negate() {
  * calculate vector norm
  */
 MPTime SparseVector::norm() const {
-    MPTime maxEl = MP_MINUSINFINITY;
+    MPTime maxEl = MP_MINUS_INFINITY;
     for (const auto &e : this->table) {
         maxEl = MP_MAX(maxEl, e.second);
     }
@@ -186,7 +186,7 @@ MPTime SparseVector::normalize() {
     MPTime maxEl = this->norm();
 
     if (maxEl.isMinusInfinity()) {
-        throw CException("Cannot normalize vector with norm MP_MINUSINFINITY"
+        throw CException("Cannot normalize vector with norm MP_MINUS_INFINITY"
                          "SparseVector::normalize");
     }
     for (auto &e : this->table) {
@@ -332,7 +332,7 @@ void SparseVector::put(unsigned int row, MPTime value) {
         // the spot exceeds the current size
         unsigned int before = rc;
         if (before > 0) {
-            this->table.emplace_back(before, MP_MINUSINFINITY);
+            this->table.emplace_back(before, MP_MINUS_INFINITY);
             k++;
         }
         this->table.emplace_back(1, value);
@@ -493,7 +493,7 @@ void SparseVector::compress() {
 
 MPTime SparseVector::innerProduct(const SparseVector &v) const {
     assert(v.getSize() == this->getSize());
-    MPTime result = MP_MINUSINFINITY;
+    MPTime result = MP_MINUS_INFINITY;
 
     unsigned int k1 = 0;
     unsigned int k2 = 0;
@@ -540,7 +540,7 @@ Vector SparseVector::maxRanges(const Ranges &ranges) const {
     unsigned int idx = 0;
     for (unsigned int m = 0; m < ranges.size(); m++) {
         unsigned int end = ranges[m].first + ranges[m].second;
-        MPTime value = MP_MINUSINFINITY;
+        MPTime value = MP_MINUS_INFINITY;
         while (idx < end) {
             value = MP_MAX(value, this->table[k].second);
             if (idx + this->table[k].first - l > end) {
@@ -634,10 +634,10 @@ void SparseMatrix::put(unsigned int row, unsigned int column, MPTime value) {
         // the spot exceeds the current size
         unsigned int before = cc;
         if (before > 0) {
-            this->table.emplace_back(before, SparseVector(this->rowSize, MP_MINUSINFINITY));
+            this->table.emplace_back(before, SparseVector(this->rowSize, MP_MINUS_INFINITY));
             k++;
         }
-        SparseVector newVector(this->rowSize, MP_MINUSINFINITY);
+        SparseVector newVector(this->rowSize, MP_MINUS_INFINITY);
         newVector.put(r, value);
         this->table.emplace_back(1, newVector);
         this->rowSize += before + 1;
@@ -659,7 +659,7 @@ SparseMatrix &SparseMatrix::operator=(const SparseMatrix &other) {
 }
 
 MPTime SparseMatrix::norm() const {
-    MPTime maxEl = MP_MINUSINFINITY;
+    MPTime maxEl = MP_MINUS_INFINITY;
     for (const auto &e : this->table) {
         maxEl = MP_MAX(maxEl, e.second.norm());
     }
@@ -1021,21 +1021,21 @@ SparseMatrix::mpGeneralizedEigenvectors() {
     Matrix M = this->reduceRows();
     auto evp = M.mp_generalized_eigenvectors();
     auto evs = evp.first;
-    auto gevs = evp.second;
+    auto gev_s = evp.second;
     SparseMatrix::EigenvectorList evl;
     Sizes sizes = this->sizes();
-    for (const auto &evev : evs) {
-        auto ev = evev.first;
-        auto lambda = MPTime(evev.second);
-        evl.push_back(std::make_pair(SparseVector(ev, sizes), static_cast<CDouble>(lambda)));
+    for (const auto &ev_ev : evs) {
+        auto ev = ev_ev.first;
+        auto lambda = MPTime(ev_ev.second);
+        evl.emplace_back(SparseVector(ev, sizes), static_cast<CDouble>(lambda));
     }
-    SparseMatrix::GeneralizedEigenvectorList gevl;
-    for (const auto &evev : gevs) {
-        auto ev = evev.first;
-        Vector lambda = evev.second;
-        gevl.push_back(std::make_pair(SparseVector(ev, sizes), SparseVector(lambda, sizes)));
+    SparseMatrix::GeneralizedEigenvectorList gev_l;
+    for (const auto &ev_ev : gev_s) {
+        auto ev = ev_ev.first;
+        Vector lambda = ev_ev.second;
+        gev_l.emplace_back(SparseVector(ev, sizes), SparseVector(lambda, sizes));
     }
-    return std::make_pair(evl, gevl);
+    return std::make_pair(evl, gev_l);
 }
 
 SparseMatrix::EigenvectorList SparseMatrix::mpEigenvectors() {
@@ -1110,14 +1110,14 @@ SparseMatrix SparseMatrix::starClosure() {
     return result.maximum(SparseMatrix::IdentityMatrix(this->getRowSize()));
 }
 
-SparseMatrix SparseMatrix::expand(const Matrix &M, const Sizes &rszs, const Sizes &cszs) {
-    unsigned int rSize = rszs.sum();
-    unsigned int cSize = cszs.sum();
+SparseMatrix SparseMatrix::expand(const Matrix &M, const Sizes &rsz_s, const Sizes &csz_s) {
+    unsigned int rSize = rsz_s.sum();
+    unsigned int cSize = csz_s.sum();
     SparseMatrix result(rSize, cSize);
     result.table.clear();
     unsigned int ri = 0;
-    for (const auto &rs : rszs) {
-        SparseVector rv(M.getRowVector(ri), cszs);
+    for (const auto &rs : rsz_s) {
+        SparseVector rv(M.getRowVector(ri), csz_s);
         result.table.emplace_back(rs, rv);
         ri++;
     }

@@ -116,15 +116,15 @@ inline CDouble MP_MIN(CDouble a, CDouble b) { return CDouble(MP_MIN(MPTime(a), M
 //==============================
 
 // the quick and dirty way of representing -infinity
-const MPTime MP_MINUSINFINITY = MPTime(-1.0e+30);
-const MPTime MP_MINUSINFINITY_THR = MPTime(-0.5e+30);
+const MPTime MP_MINUS_INFINITY = MPTime(-1.0e+30);
+const MPTime MP_MINUS_INFINITY_THR = MPTime(-0.5e+30);
 const CDouble MPTIME_MIN_INF_VALPTHR = -0.5e+30;
-inline bool MP_ISMINUSINFINITY(CDouble a) { return a <= MPTIME_MIN_INF_VALPTHR; }
-inline bool MP_ISMINUSINFINITY(MPTime a) { return a <= MP_MINUSINFINITY_THR; }
+inline bool MP_IS_MINUS_INFINITY(CDouble a) { return a <= MPTIME_MIN_INF_VALPTHR; }
+inline bool MP_IS_MINUS_INFINITY(MPTime a) { return a <= MP_MINUS_INFINITY_THR; }
 
 inline MPTime MP_PLUS(CDouble a, CDouble b) {
-    return (MP_ISMINUSINFINITY(a) || MP_ISMINUSINFINITY(b))
-                   ? MP_MINUSINFINITY
+    return (MP_IS_MINUS_INFINITY(a) || MP_IS_MINUS_INFINITY(b))
+                   ? MP_MINUS_INFINITY
                    : MPTime(static_cast<CDouble>(a) + static_cast<CDouble>(b));
 }
 
@@ -162,11 +162,11 @@ inline MPTime &MPTime::operator-() {
 inline MPTime operator*(MPTime a, MPTime b) {
     if (a.isMinusInfinity()) {
         assert(((CDouble)b) > 0.0);
-        return MP_MINUSINFINITY;
+        return MP_MINUS_INFINITY;
     }
     if (b.isMinusInfinity()) {
         assert(((CDouble)a) > 0.0);
-        return MP_MINUSINFINITY;
+        return MP_MINUS_INFINITY;
     }
     return MPTime(static_cast<CDouble>(a) * static_cast<CDouble>(b));
 }
@@ -198,7 +198,7 @@ inline bool MPTime::operator<=(MPTime a) const { return this->myVal <= a.myVal; 
 
 inline bool MPTime::operator>=(MPTime a) const { return this->myVal >= a.myVal; }
 
-inline bool MPTime::isMinusInfinity() const { return MP_ISMINUSINFINITY(this->myVal); }
+inline bool MPTime::isMinusInfinity() const { return MP_IS_MINUS_INFINITY(this->myVal); }
 
 inline MPTime MPTime::fabs() const { return MPTime(std::fabs(this->myVal)); }
 

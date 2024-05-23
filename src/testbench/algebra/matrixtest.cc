@@ -21,7 +21,7 @@ int MatrixTest::test_SetMPTimeInMatrix() {
     ASSERT_EQUAL(N, m.getRows());
     ASSERT_EQUAL(N, m.getCols());
     ASSERT_EQUAL(N, m.getSize());
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(0, 0)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(m.get(0, 0)));
 
     // Change entry and restore.
     MPTime newVal(3.0);
@@ -34,7 +34,7 @@ int MatrixTest::test_SetMPTimeInMatrix() {
             if (row == 0 && column == 0) {
                 ASSERT_EQUAL(static_cast<CDouble>(newVal), static_cast<CDouble>(m.get(0, 0)));
             } else {
-                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY),
+                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY),
                              static_cast<CDouble>(m.get(row, column)));
             }
         }
@@ -52,13 +52,13 @@ int MatrixTest::test_PasteMatrix() {
     m.paste(0, 0, &mSub);
     ASSERT_EQUAL(0.0, static_cast<CDouble>(m.get(0, 0)));
     ASSERT_EQUAL(0.0, static_cast<CDouble>(m.get(0, 1)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(0, 2)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(m.get(0, 2)));
     ASSERT_EQUAL(0.0, static_cast<CDouble>(m.get(1, 0)));
     ASSERT_EQUAL(0.0, static_cast<CDouble>(m.get(1, 1)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(1, 2)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(2, 0)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(2, 1)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(m.get(2, 2)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(m.get(1, 2)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(m.get(2, 0)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(m.get(2, 1)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(m.get(2, 2)));
 
     return 0;
 }
@@ -71,8 +71,8 @@ int MatrixTest::test_SubMatrix() {
 
     Matrix sub = m.getSubMatrix(l, l);
     ASSERT_EQUAL(0.0, static_cast<CDouble>(sub.get(0, 0)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(sub.get(0, 1)));
-    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY), static_cast<CDouble>(sub.get(1, 0)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(sub.get(0, 1)));
+    ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY), static_cast<CDouble>(sub.get(1, 0)));
     ASSERT_EQUAL(0.0, static_cast<CDouble>(sub.get(1, 1)));
 
     return 0;
@@ -104,9 +104,9 @@ int MatrixTest::test_Addition() {
                 ASSERT_EQUAL(3.0, static_cast<CDouble>(mResult.get(row, column)));
                 ASSERT_EQUAL(3.0, static_cast<CDouble>(mResult2.get(row, column)));
             } else {
-                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY),
+                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY),
                              static_cast<CDouble>(mResult.get(row, column)));
-                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUSINFINITY),
+                ASSERT_EQUAL(static_cast<CDouble>(MP_MINUS_INFINITY),
                              static_cast<CDouble>(mResult2.get(row, column)));
             }
         }

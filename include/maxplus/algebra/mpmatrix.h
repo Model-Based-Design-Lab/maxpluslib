@@ -58,7 +58,7 @@ using namespace Graphs;
  */
 class Vector {
 public:
-    explicit Vector(unsigned int size = 0, MPTime value = MP_MINUSINFINITY);
+    explicit Vector(unsigned int size = 0, MPTime value = MP_MINUS_INFINITY);
 
     explicit Vector(std::vector<MPTime> *v);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Get minimal finite element
      * returns the smallest among the finite elements in the vector or
-     * MP_MINUSINFINITY if no finite elements exist
+     * MP_MINUS_INFINITY if no finite elements exist
      * itsPosition returns the index of the (a) smallest finite element is set
      * to a pointer to unsigned int, otherwise set or defaults to NULL
      */
@@ -335,7 +335,7 @@ inline unsigned int VectorList::getSize() const { return static_cast<unsigned in
 inline void VectorList::grow() {
     auto last = static_cast<unsigned int>(this->size());
     this->resize(static_cast<size_t>(last + 1));
-    this->insert(this->begin() + last, std::make_unique<Vector>(oneVectorSize, MP_MINUSINFINITY));
+    this->insert(this->begin() + last, std::make_unique<Vector>(oneVectorSize, MP_MINUS_INFINITY));
 }
 
 } // namespace MaxPlus

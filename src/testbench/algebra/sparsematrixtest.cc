@@ -109,7 +109,7 @@ int SparseMatrixTest::test_Addition() {
     N.transpose();
     SparseMatrix S = M.add(N);
 
-    ASSERT_MP_MINUSINFINITY(static_cast<CDouble>(S.get(5, 5)));
+    ASSERT_MP_MINUS_INFINITY(static_cast<CDouble>(S.get(5, 5)));
     ASSERT_APPROX_EQUAL(static_cast<CDouble>(S.get(130, 30)), 2.0, ASSERT_EPSILON);
     return 0;
 }
@@ -127,7 +127,7 @@ int SparseMatrixTest::test_Multiplication() {
     v2.compress();
 
     // v2: [100 * -mp_inf ; 10 * -5 ; 90 * -mp_inf ]
-    ASSERT_MP_MINUSINFINITY(static_cast<CDouble>(v2.get(60)));
+    ASSERT_MP_MINUS_INFINITY(static_cast<CDouble>(v2.get(60)));
     ASSERT_APPROX_EQUAL(static_cast<CDouble>(v2.get(105)), -5.0, ASSERT_EPSILON);
 
     // matrix matrix multiplication

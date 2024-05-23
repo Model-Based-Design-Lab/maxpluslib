@@ -46,14 +46,13 @@ namespace MaxPlus::SMPLS {
             }
         }
 
-        while (edgesToBeRemoved.size() != 0)
+        while (!edgesToBeRemoved.empty())
         {
 
             //remove dangling states
             for (const auto *srIt: statesToBeRemoved)
             {
 				this->removeState(dynamic_cast<const ELSState&>(*srIt));
-                delete srIt;
             }
 
             //remove edges ending in dangling states
@@ -105,7 +104,7 @@ namespace MaxPlus::SMPLS {
 		if (colNumber > M.getCols()) {
 			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
 		}
-    	MPTime largestEl = MP_MINUSINFINITY;
+    	MPTime largestEl = MP_MINUS_INFINITY;
 		for (unsigned int c = 0; c < colNumber; c++) {
 			largestEl = MP_MAX(largestEl, M.get(rowNumber, c));
 		}
@@ -123,7 +122,7 @@ namespace MaxPlus::SMPLS {
 		if (colNumber > M.getCols()) {
 			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
 		}
-    	MPTime largestEl = MP_MINUSINFINITY;
+    	MPTime largestEl = MP_MINUS_INFINITY;
 		for (unsigned int r = 0; r < rowNumber; r++) {
 			largestEl = MP_MAX(largestEl, M.get(r, colNumber));
 		}
@@ -163,7 +162,7 @@ namespace MaxPlus::SMPLS {
 	{
 		auto mpa = std::make_shared<MaxPlusAutomaton>();
 		//transposeMatrices();
-		// create the FSM states for every pair of a state of the FSMSADF's FSM
+		// create the FSM states for every pair of a states of the FSM
 		// and an initial token
 
 		const auto& I = dynamic_cast<const ELSSetOfStates&>(this->elsFSM.getInitialStates());
@@ -189,8 +188,6 @@ namespace MaxPlus::SMPLS {
 			}
 			else
 			{
-				// TODO(mgeilen): check what is going on
-				// this is a bit iffy, but I dont have time to make it solid now
 				nrTokens = (*this->sm.begin()).second->getCols();
 			}
 			// create a state for (q, k)
@@ -260,7 +257,7 @@ namespace MaxPlus::SMPLS {
 					{
 						MPDelay d = Ms->get(static_cast<unsigned int>(row), static_cast<unsigned int>(col));
 
-						if (!MP_ISMINUSINFINITY(d))
+						if (!MP_IS_MINUS_INFINITY(d))
 						{
 							MPAState& src = mpa->getStateLabeled(makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
 							MPAState& dst = mpa->getStateLabeled(makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
@@ -308,7 +305,7 @@ namespace MaxPlus::SMPLS {
 			ioa->removeState(dynamic_cast<const IOAState&>(*((*i).second)));
 		}
 		IOASetOfStateRefs visitedStates;
-		determinizeUtil(s, visitedStates, finalStates, &errMsg, outfile);
+		determinizeUtil(s, visitedStates, finalStates, errMsg, outfile);
 		outfile << "}";
 		outfile.close();
 	}
@@ -322,20 +319,20 @@ namespace MaxPlus::SMPLS {
 		if (this->ioa == nullptr) {
 			throw CException("The automaton of smpls is not loaded!");
 		}
-		std::list<Event> eventList;
+		EventList eventList;
 
 		const auto& I = dynamic_cast<const IOASetOfStates&>(this->ioa->getInitialStates());
 
 		const auto& finalStates = dynamic_cast<const IOASetOfStates&>(this->ioa->getFinalStates());
 
-		std::map<const IOAState*, std::list<Event>*> visited;
+		std::map<IOAStateRef,EventList> visited;
 		CString errMsg = "";
 		for (const auto& i: I)
 		{
 			isConsistentUtil((dynamic_cast<IOAState&>(*(i.second))), eventList, finalStates, errMsg, visited);
 		}
 
-		if (errMsg != "")
+		if (!errMsg.empty())
 		{
 			// TODO(mgeilen) no std:cout
 			std::cout << "IO Automaton is not consistent, error message: " << std::endl;
@@ -465,7 +462,7 @@ namespace MaxPlus::SMPLS {
 			int emittingEventIndex = -1;
 			int processingEventIndex = -1;
 			int eventIndexCounter = 0;
-			if (output != "")
+			if (!output.empty())
 			{
 				// find the dissected matrix structure needed for this edge
 				disSm = findDissectedModeMatrix(output);
@@ -499,7 +496,7 @@ namespace MaxPlus::SMPLS {
 			{
 				sMatrix = std::make_shared<Matrix>(numberOfResources, numberOfResources, MatrixFill::Identity);
 			}
-			if (input != "") // find the index of the event to be removed from the list
+			if (!input.empty()) // find the index of the event to be removed from the list
 			{
 				Event e = findEventByOutcome(input);
 				//we have to find the first occurrence from top
@@ -552,7 +549,7 @@ namespace MaxPlus::SMPLS {
 						}
 						for (; x < sMatrix->getCols(); x++) // B_e (refer to paper), this happens when we add B_c before adding A_e, so we have to make sure B_e that's added here is max of row
 						{
-							if (getMaxOfColUntilRow(*sMatrix, x, numberOfResources) > MP_MINUSINFINITY) {
+							if (getMaxOfColUntilRow(*sMatrix, x, numberOfResources) > MP_MINUS_INFINITY) {
 								// we must only add B_e under cols that correspond to B_c
 								sMatrix->put(sMatrix->getRows() - 1, x, getMaxOfRowUntilCol(*eventRow, 0, numberOfResources));
 							}
@@ -562,7 +559,7 @@ namespace MaxPlus::SMPLS {
 					eventIndexCounter++;
 				}
 			}
-			else if (output != "") {
+			else if (!output.empty()) {
 				if (!disSm->eventRows.empty())
 				{
 					sMatrix->addRows(1);
@@ -576,7 +573,7 @@ namespace MaxPlus::SMPLS {
 				}
 }
 			// we store the events emitted by modes as we move along the automaton
-			if (outputActionEventName != "")
+			if (!outputActionEventName.empty())
 			{
 				eList.insert(outputActionEventName);
 			}
@@ -607,23 +604,23 @@ namespace MaxPlus::SMPLS {
 	/**
 		 * recursive part of isConsistent
 		 */
-	void SMPLSwithEvents::isConsistentUtil(const IOAState& s, std::list<Event>& eventList, const IOASetOfStates& finalStates, CString& errMsg, std::map<const IOAState*, std::list<Event> *> &visited)
+	void SMPLSwithEvents::isConsistentUtil(const IOAState& s, EventList& eventList, const IOASetOfStates& finalStates, CString& errMsg, std::map<IOAStateRef, EventList> &visited)
 	{
 		auto it = visited.find(&s);
 		if (it != visited.end()) // we have already visited this state but we must check for inconsistency before leaving the state
 		{
-			if (!compareEventLists(*it->second, eventList))
+			if (!compareEventLists(it->second, eventList))
 			{
 				errMsg = CString("Different paths leading to different events at state " + std::to_string(s.getLabel()));
 			}
 			// we have checked for inconsistency, no need to go further down this state
 			return;
 		}
-		visited.emplace(&s, &eventList);
+		visited.emplace(&s, eventList);
 
 		if (finalStates.count(s.getLabel())>0)
 		{
-			if (eventList.size() > 0)
+			if (!eventList.empty())
 			{
 				errMsg = "Event " + (*eventList.begin()) + " has not been processed by the end of the word.\r\n";
 				return;
@@ -636,15 +633,14 @@ namespace MaxPlus::SMPLS {
 			{
 				// make a copy so that child node can not modify the parent nodes list
 				// only adds and removes and passes it to its children
-				std::list<Event> eList(eventList);
+				EventList eList(eventList);
 
 				auto& e = dynamic_cast<IOAEdge&>(*i);
 				OutputAction output = e.getLabel().second;
 				InputAction input = e.getLabel().first;
-				if (input != "")
-				{
+				if (!input.empty()) {
 					bool eventFound = false;
-					std::list<Event>::iterator eventIter;
+					EventList::iterator eventIter;
 					for (eventIter = eList.begin(); eventIter != eList.end(); eventIter++)
 					{
 						std::list<EventOutcomePair>::iterator gammaIterator;
@@ -673,7 +669,7 @@ namespace MaxPlus::SMPLS {
 					}
 				}
 				// we store the events emitted by modes as we move along the automaton
-				if (output != "")
+				if (!output.empty())
 				{
 					// look if it has any events to emit
 					std::list<ModeEventPair>::iterator sigmaIterator;
@@ -696,7 +692,7 @@ namespace MaxPlus::SMPLS {
 	/**
 		 * recursive part of determinize
 		 */
-	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs& visited, const IOASetOfStates& finalStates, CString* errMsg, std::ofstream& outfile)
+	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs& visited, const IOASetOfStates& finalStates, CString& errMsg, std::ofstream& outfile)
 	{
 		/**
 		 * Deterministic IOA is defined with:
@@ -716,7 +712,7 @@ namespace MaxPlus::SMPLS {
 
 		const auto* e = dynamic_cast<const IOAEdge*>(*i);
 		InputAction input = e->getLabel().first;
-		if (input == "")
+		if (input.empty())
 		{
 			const auto& s2 = dynamic_cast<const IOAState&>(e->getDestination());
 			outfile << s.stateLabel << "-," << e->getLabel().second << "->" << s2.stateLabel;
@@ -750,7 +746,7 @@ namespace MaxPlus::SMPLS {
 				e = dynamic_cast<const IOAEdge*>(*i);
 				input = e->getLabel().first;
 				// we remove the ones that dont have an input action from the automaton
-				if (input == "")
+				if (input.empty())
 				{
 					ioa->removeEdge(*e);
 					// since we only start with one initial state and remove the others, then the destination state of this edge will be unreachable
@@ -785,7 +781,7 @@ namespace MaxPlus::SMPLS {
 		}
 
 	}
-	bool SMPLSwithEvents::compareEventLists(std::list<Event>& l1, std::list<Event>& l2)
+	bool SMPLSwithEvents::compareEventLists(EventList& l1, EventList& l2)
 	{
 		bool result = true;
 

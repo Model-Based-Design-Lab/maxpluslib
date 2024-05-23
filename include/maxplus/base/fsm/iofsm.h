@@ -11,6 +11,7 @@ using InputAction = CString;
 using OutputAction = CString;
 using IOAEdgeLabel = std::pair<InputAction, OutputAction>;
 using IOAState = ::FSM::Labeled::State<CId, IOAEdgeLabel>;
+using IOAStateRef = const IOAState*;
 using IOAEdge = ::FSM::Labeled::Edge<CId, IOAEdgeLabel>;
 using IOASetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
 using IOASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<CId, CString>;

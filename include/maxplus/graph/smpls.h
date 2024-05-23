@@ -60,7 +60,7 @@ class EdgeLabeledModeFSM : public ::FSM::Labeled::FiniteStateMachine<CId, CStrin
 public:
     // put the destructor deliberately into the cc sourc to ensure the class vtable is accessible
     // see: <https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable>
-    virtual ~EdgeLabeledModeFSM();
+     ~EdgeLabeledModeFSM() override;
     virtual void removeDanglingStates();
 };
 
@@ -89,6 +89,7 @@ public:
 
 using Mode = InputAction;
 using Event = OutputAction;
+using EventList = std::list<Event>;
 using EventOutcome = CString;
 
 using ModeEventPair = std::pair<Mode,Event>;
@@ -153,18 +154,18 @@ private:
      * recursive part of isConsistent
      */
     void isConsistentUtil(const IOAState &s,
-                          std::list<Event> &eventList,
+                          EventList &eventList,
                           const IOASetOfStates &finalStates,
                           CString &errMsg,
-                          std::map<const IOAState *, std::list<Event> *> &visited);
+                          std::map<IOAStateRef,EventList> &visited);
 
     void determinizeUtil(const IOAState &s,
                          IOASetOfStateRefs& visited,
                          const IOASetOfStates &finalStates,
-                         CString *errMsg,
+                         CString &errMsg,
                          std::ofstream &outfile);
 
-    static bool compareEventLists(std::list<Event>& l1, std::list<Event>& l2);
+    static bool compareEventLists(EventList& l1, EventList& l2);
 
     void dissectModeMatrices();
 };

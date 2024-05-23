@@ -118,7 +118,7 @@ private:
     PolicyIterationResult policyIteration(RatioGame<SL, EL> &game,
                                           std::shared_ptr<StrategyVector<SL, EL>> initialStrategy,
                                           CDouble epsilon) {
-        SetOfStates<SL, EL> &states = game.getStates();
+        const SetOfStates<SL, EL> &states = game.getStates();
 
         bool improvement = true;
 
@@ -366,7 +366,7 @@ private:
     CycleResult findCyclesInRestrictedGraph(RatioGame<SL, EL> &game,
                                             std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
                                             std::map<const State<SL, EL> *, CDouble> &stateIds) {
-        SetOfStates<SL, EL> &states = game.getStates();
+        const SetOfStates<SL, EL> &states = game.getStates();
         const State<SL, EL> *BOTTOM_VERTEX = nullptr;
 
         std::shared_ptr<FSM::Abstract::SetOfStateRefs> selectedVertices =
@@ -455,7 +455,7 @@ private:
                      std::map<const State<SL, EL> *, CDouble> &r_prev,
                      std::map<const State<SL, EL> *, CDouble> &dw2_prev,
                      CDouble epsilon) {
-        SetOfStates<SL, EL> &states = game.getStates();
+        const SetOfStates<SL, EL> &states = game.getStates();
 
         std::stack<const State<SL, EL> *> stack;
         // Initialize visited vector.

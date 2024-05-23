@@ -37,9 +37,9 @@ void ValueTest::test_Max() {
                  static_cast<CDouble>(MP_MAX(MPTime(-b), MPTime(a))));
 
     // -Infinity case.
-    ASSERT_THROW((MP_MAX(MP_MINUSINFINITY, MP_MINUSINFINITY)).isMinusInfinity());
+    ASSERT_THROW((MP_MAX(MP_MINUS_INFINITY, MP_MINUS_INFINITY)).isMinusInfinity());
     ASSERT_EQUAL(static_cast<CDouble>(MPTime(3.14)),
-                 static_cast<CDouble>(MP_MAX(MPTime(3.14), MP_MINUSINFINITY)));
+                 static_cast<CDouble>(MP_MAX(MPTime(3.14), MP_MINUS_INFINITY)));
 }
 
 /// Test min operator.
@@ -56,9 +56,9 @@ void ValueTest::test_Min() {
                  static_cast<CDouble>(MP_MIN(MPTime(-3.14), MPTime(5.0))));
 
     // -Infinity case.
-    ASSERT_THROW(MP_MIN(MP_MINUSINFINITY, MP_MINUSINFINITY).isMinusInfinity());
-    ASSERT_THROW(MP_MIN(MPTime(-3.14), MP_MINUSINFINITY).isMinusInfinity());
-    ASSERT_THROW(MP_MIN(MPTime(3.14), MP_MINUSINFINITY).isMinusInfinity());
+    ASSERT_THROW(MP_MIN(MP_MINUS_INFINITY, MP_MINUS_INFINITY).isMinusInfinity());
+    ASSERT_THROW(MP_MIN(MPTime(-3.14), MP_MINUS_INFINITY).isMinusInfinity());
+    ASSERT_THROW(MP_MIN(MPTime(3.14), MP_MINUS_INFINITY).isMinusInfinity());
 }
 
 /// Test basic arithmetic operations.

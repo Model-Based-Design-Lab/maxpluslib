@@ -64,7 +64,7 @@ using Ranges = std::vector<std::pair<unsigned int, unsigned int>>;
  */
 class SparseVector {
 public:
-    explicit SparseVector(unsigned int size = 0, MPTime value = MP_MINUSINFINITY);
+    explicit SparseVector(unsigned int size = 0, MPTime value = MP_MINUS_INFINITY);
 
     explicit SparseVector(const std::vector<MPTime> &v);
 
@@ -137,7 +137,7 @@ class SparseMatrix {
 public:
     explicit SparseMatrix(unsigned int rowSize = 0,
                           unsigned int colSize = 0,
-                          MPTime value = MP_MINUSINFINITY);
+                          MPTime value = MP_MINUS_INFINITY);
 
     SparseMatrix(const SparseMatrix &);
 
@@ -213,7 +213,7 @@ private:
     SparseMatrix combine(const SparseMatrix &M, MPTime f(MPTime a, MPTime b));
     Matrix reduceRows();
     std::pair<Matrix, Sizes> reduceRowsAndColumns();
-    static SparseMatrix expand(const Matrix &M, const Sizes &rszs, const Sizes &cszs);
+    static SparseMatrix expand(const Matrix &M, const Sizes &rsz_s, const Sizes &csz_s);
     [[nodiscard]] Sizes sizes() const;
 };
 
