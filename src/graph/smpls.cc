@@ -6,6 +6,7 @@
 #include <memory>
 
 using namespace FSM;
+using namespace MaxPlus;
 
 using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
 using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, CString>;

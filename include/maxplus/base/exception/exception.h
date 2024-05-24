@@ -44,6 +44,9 @@
 #include "../string/cstring.h"
 #include <exception>
 
+
+namespace MaxPlus {
+
 /*
  * CException
  * CException container class.
@@ -94,11 +97,13 @@ public:
     friend std::ostream &operator<<(std::ostream &stream, const CException &e);
 };
 
+} // namespace MaxPlus
+
 #define ASSERT(condition, msg)                                                                     \
     {                                                                                              \
         if (!(condition))                                                                          \
-            throw CException(CString(__FILE__) + CString(":") + CString(__LINE__) + CString(": ")  \
-                             + CString(msg));                                                      \
+            throw MaxPlus::CException(MaxPlus::CString(__FILE__) + MaxPlus::CString(":") + MaxPlus::CString(__LINE__) + MaxPlus::CString(": ")  \
+                             + MaxPlus::CString(msg));                                                      \
     }
 
 #define EXCEPTION(msg, ...)                                                                        \

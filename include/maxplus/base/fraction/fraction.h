@@ -47,6 +47,8 @@
 #include <climits>
 #include <cstdint>
 
+namespace MaxPlus {
+
 class CFraction {
 public:
     // Constructor
@@ -278,5 +280,7 @@ private:
 using CFractions = std::vector<CFraction>;
 using CFractionsIter = CFractions::iterator;
 using CFractionsCIter = CFractions::const_iterator;
+
+} // namespace MaxPlus
 
 #endif

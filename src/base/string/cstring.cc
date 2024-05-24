@@ -45,6 +45,8 @@
 #include <regex>
 #include <sstream>
 
+namespace MaxPlus {
+
 /**
  * CString ()
  * Constructor.
@@ -563,3 +565,5 @@ CString CString::regexReplaceMultiLine(const CString &regex, const CString &repl
         return *this;
     }
 }
+
+} // namespace MaxPlus

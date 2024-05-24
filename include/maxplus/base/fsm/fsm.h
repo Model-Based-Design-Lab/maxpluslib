@@ -379,7 +379,7 @@ public:
         if (this->labelIndex.find(l) != this->labelIndex.end()) {
             return *this->labelIndex[l];
         }
-        throw CException("error - state not found in FiniteStateMachine::_withLabel");
+        throw MaxPlus::CException("error - state not found in FiniteStateMachine::_withLabel");
     }
 
     bool hasStateWithLabel(StateLabelType l) {
@@ -544,7 +544,7 @@ public:
 
     [[nodiscard]] StateRef<StateLabelType, EdgeLabelType> getInitialState() const override {
         if (this->initialStates.empty()) {
-            throw CException("FSM has no initial state.");
+            throw MaxPlus::CException("FSM has no initial state.");
         }
         auto s = this->initialStates.begin();
         return dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(*s);
@@ -955,34 +955,34 @@ namespace StateStringLabeled {
 // make an FSM class with unlabeled edges, based on the labeled one with some dummy char labels
 //
 
-class State : public Labeled::State<CString, char> {
+class State : public Labeled::State<MaxPlus::CString, char> {
 public:
-    explicit State(const CString &withLabel) : Labeled::State<CString, char>(withLabel) {}
+    explicit State(const MaxPlus::CString &withLabel) : Labeled::State<MaxPlus::CString, char>(withLabel) {}
 
     const Abstract::SetOfEdgeRefs &getOutgoingEdges() {
         return dynamic_cast<const Abstract::SetOfEdgeRefs &>(
-                Labeled::State<CString, char>::getOutgoingEdges());
+                Labeled::State<MaxPlus::CString, char>::getOutgoingEdges());
     }
 };
 
-class FiniteStateMachine : public Labeled::FiniteStateMachine<CString, char> {
+class FiniteStateMachine : public Labeled::FiniteStateMachine<MaxPlus::CString, char> {
 public:
-    [[nodiscard]] Labeled::StateRef<CString, char> getInitialState() const override {
-        return dynamic_cast<Labeled::StateRef<CString, char>>(Labeled::FiniteStateMachine<CString, char>::getInitialState());
+    [[nodiscard]] Labeled::StateRef<MaxPlus::CString, char> getInitialState() const override {
+        return dynamic_cast<Labeled::StateRef<MaxPlus::CString, char>>(Labeled::FiniteStateMachine<MaxPlus::CString, char>::getInitialState());
     };
 
-    void setInitialStateLabeled(const CString &sl);
+    void setInitialStateLabeled(const MaxPlus::CString &sl);
 
-    void addStateLabeled(const CString &sl);
+    void addStateLabeled(const MaxPlus::CString &sl);
 
     void addEdge(State *src, State *dst);
 
-    void addEdgeLabeled(const CString &src, const CString &dst);
+    void addEdgeLabeled(const MaxPlus::CString &src, const MaxPlus::CString &dst);
 
     std::shared_ptr<Abstract::SetOfStateRefs> reachableStates();
 };
 
-class Edge : public Labeled::Edge<CString, char> {};
+class Edge : public Labeled::Edge<MaxPlus::CString, char> {};
 } // namespace StateStringLabeled
 
 namespace Product {

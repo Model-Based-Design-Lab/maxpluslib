@@ -42,6 +42,8 @@
 #include <memory>
 #include <string>
 
+using namespace MaxPlus;
+
 namespace FSM {
 
 CId FSM::Abstract::WithUniqueID::nextID = 0;

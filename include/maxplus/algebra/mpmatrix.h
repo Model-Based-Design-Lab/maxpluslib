@@ -47,9 +47,10 @@
 #include <unordered_set>
 #include <vector>
 
-class CString;
 
 namespace MaxPlus {
+
+class CString;
 
 using namespace Graphs;
 

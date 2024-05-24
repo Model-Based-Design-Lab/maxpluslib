@@ -40,9 +40,13 @@
 
 #include "base/exception/exception.h"
 
+namespace MaxPlus {
+
 // Prototype
 std::ostream &operator<<(std::ostream &stream, const CException &e) {
     e.report(stream);
 
     return stream;
 }
+
+} // namespace MaxPlus

@@ -59,6 +59,8 @@
 #include <cstdlib>
 #include <memory>
 
+using namespace MaxPlus;
+
 namespace Graphs {
 /*
  * Howard terminates with an error if MAX_NIterations occur.

@@ -41,15 +41,11 @@
 #ifndef BASE_STRING_CSTRING_H
 #define BASE_STRING_CSTRING_H
 
-#ifdef _MSC_VER
-#include <regex> // requires feature pack in VS2008
+#include "../basic_types.h"
+#include <regex>
 #include <string>
 
-#else
-#include <cstring>
-#endif
-
-#include "../basic_types.h"
+namespace MaxPlus {
 
 // Forward class definition
 class CString;
@@ -170,5 +166,7 @@ inline CString operator+(const char *lhs, const CString &rhs) {
 
 // Tokenize a string
 void stringTok(CStrings &l, const CString &str, const char *tok = " \t\n");
+
+} // namespace MaxPlus
 
 #endif
