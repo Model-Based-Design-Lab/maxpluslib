@@ -153,8 +153,9 @@ public:
 
     void insertOutgoingEdge(Edge &e) { this->outgoingEdges.insert(&e); }
 
-void removeOutgoingEdge(Edge &e) {
-    this->outgoingEdges.erase(&e); }
+void removeOutgoingEdge(EdgeRef e) {
+    this->outgoingEdges.erase(e);
+}
 
 private:
     SetOfEdgeRefs outgoingEdges;
@@ -203,6 +204,7 @@ public:
     [[nodiscard]] virtual StateRef getInitialState() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getInitialStates() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getFinalStates() const = 0;
+
 };
 
 //
@@ -377,6 +379,10 @@ public:
         throw CException("error - state not found in FiniteStateMachine::_withLabel");
     }
 
+    bool hasStateWithLabel(StateLabelType l) {
+        return this->labelIndex.find(l) != this->labelIndex.end();
+    }
+
     void addState(std::shared_ptr<State<StateLabelType, EdgeLabelType>>& s) {
         this->addToStateIndex(s->getLabel(), s);
     }
@@ -386,7 +392,6 @@ public:
 template <typename StateLabelType, typename EdgeLabelType>
 class SetOfStateRefs : public Abstract::SetOfStateRefs {
 public:
-    using CIter = typename SetOfStateRefs::const_iterator;
 };
 
 template <typename StateLabelType, typename EdgeLabelType> class State : public Abstract::State {
@@ -439,8 +444,11 @@ private:
     SetOfStateRefs<StateLabelType, EdgeLabelType> finalStates;
 
     State<StateLabelType, EdgeLabelType>& _getStateLabeled(const StateLabelType &s) {
-        // try the index first
         return this->states.withLabel(s);
+    };
+
+    State<StateLabelType, EdgeLabelType>& _getState(const State<StateLabelType, EdgeLabelType> &s) {
+        return dynamic_cast<State<StateLabelType, EdgeLabelType>&>(this->states.withId(s.getId()));
     };
 
 
@@ -486,8 +494,8 @@ public:
     void removeEdge(const Edge<StateLabelType, EdgeLabelType> &e) {
         auto csrc = dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(e.getSource());
         // get a non-const version of the state
-        auto& src = this->_getStateLabeled(csrc->getLabel());
-        src.removeOutgoingEdge(e);
+        auto& src = this->_getState(*csrc);
+        src.removeOutgoingEdge(&e);
         this->edges.remove(e);
     }
 
@@ -510,7 +518,7 @@ public:
 
     // set initial state to state with label;
     void setInitialState(StateLabelType label) {
-        this->setInitialState(*this->states.withLabel(label));
+        this->setInitialState(this->states.withLabel(label));
     };
 
     void setInitialState(const State<StateLabelType, EdgeLabelType> &s) {
@@ -526,7 +534,7 @@ public:
 
     void addFinalState(const State<StateLabelType, EdgeLabelType> &s) {
         // we are assuming s is one of our states
-        this->finalStates.emplace(s.getId(), &s);
+        this->finalStates.insert(&s);
     };
 
 
@@ -598,20 +606,9 @@ public:
         return nullptr;
     };
 
-    StateRef<StateLabelType, EdgeLabelType> checkStateLabeled(const StateLabelType &s) {
-        // try the index first
-        if (this->states.withLabel(s) != nullptr) {
-            return this->states.withLabel(s);
-        }
-        // for now just a linear search
-        auto i = this->states.begin();
-        while (i != this->states.end()) {
-            auto &t = dynamic_cast<State<StateLabelType, EdgeLabelType> &>(*((*i).second));
-            if ((t.stateLabel) == s) {
-                this->states.addToStateIndex(s, &t);
-                return &t;
-            }
-            i++;
+    StateRef<StateLabelType, EdgeLabelType> checkStateLabeled(const StateLabelType &l) {
+        if (this->states.hasStateWithLabel(l)) {
+            return &(this->states.withLabel(l));
         }
         return nullptr;
     };
@@ -642,9 +639,8 @@ public:
 
                 for (const auto &it : outgoingEdges) {
                     auto e = dynamic_cast<const Edge<StateLabelType, EdgeLabelType> *>(it);
-                    auto dstState = dynamic_cast<const State<StateLabelType, EdgeLabelType> &>(
-                            e->getDestination());
-                    if (e->getLabel() == lbl && dstState.getLabel() == dst) {
+                    auto dstState = dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(e->getDestination());
+                    if (e->getLabel() == lbl && dstState->getLabel() == dst) {
                         return e;
                     }
                 }
@@ -861,7 +857,7 @@ public:
                 this->newInstance());
 
         // make a state for every equivalence class
-        std::map<std::shared_ptr<Abstract::SetOfStateRefs>, State<StateLabelType, EdgeLabelType> *>
+        std::map<std::shared_ptr<Abstract::SetOfStateRefs>, StateRef<StateLabelType, EdgeLabelType>>
                 newStateMap;
         CId sid = 0;
         for (const auto &cli : eqClasses) {
@@ -883,7 +879,7 @@ public:
                 auto ed = dynamic_cast<EdgeRef<StateLabelType, EdgeLabelType>>(edi);
                 result->addEdge(*(newStateMap[cli]),
                                 ed->getLabel(),
-                                *(newStateMap[eqMap[&(ed->getDestination())]]));
+                                *(newStateMap[eqMap[ed->getDestination()]]));
             }
         }
 

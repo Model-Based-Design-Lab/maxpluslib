@@ -61,21 +61,21 @@ public:
     ~MaxPlusGameAutomatonWithRewards() override = default;
     ;
 
-    std::set<MPARState *> &getV0() override { return this->setV0; }
+    std::set<MPARStateRef> &getV0() override { return this->setV0; }
 
-    std::set<MPARState *> &getV1() override { return this->setV1; }
+    std::set<MPARStateRef> &getV1() override { return this->setV1; }
 
-    void addV0(MPARState *s) { this->setV0.insert(s); }
+    void addV0(MPARStateRef s) { this->setV0.insert(s); }
 
-    void addV1(MPARState *s) { this->setV1.insert(s); }
+    void addV1(MPARStateRef s) { this->setV1.insert(s); }
 
-    MPTime getWeight1(const MPAREdge *e) const override { return MPTime(e->getLabel().reward); }
+    MPTime getWeight1(const MPAREdgeRef e) const override { return MPTime(e->getLabel().reward); }
 
-    MPTime getWeight2(const MPAREdge *e) const override { return e->getLabel().delay; }
+    MPTime getWeight2(const MPAREdgeRef e) const override { return e->getLabel().delay; }
 
 private:
-    std::set<MPARState *> setV0;
-    std::set<MPARState *> setV1;
+    std::set<MPARStateRef> setV0;
+    std::set<MPARStateRef> setV1;
 };
 } // namespace MaxPlus
 

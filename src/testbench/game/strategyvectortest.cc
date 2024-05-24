@@ -23,9 +23,9 @@ void StrategyVectorTest::testSimpleTest() {
     // One FSM state, three tokens:
     CId fsm_s0 = 0;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
-    MPARState *s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
+    MPARStateRef s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
 
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s2);
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s3);

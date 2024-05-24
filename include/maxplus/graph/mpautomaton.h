@@ -235,7 +235,7 @@ public:
     // compute the maximum cycle ratio of delay over progress
     CDouble calculateMCR();
     // compute the maximum cycle ratio of delay over progress and also return a critical cycle
-    CDouble calculateMCRAndCycle(std::shared_ptr<std::vector<const MPAREdge *>> *cycle);
+    CDouble calculateMCRAndCycle(std::shared_ptr<std::vector<MPAREdgeRef>> *cycle);
 };
 
 } // namespace MaxPlus

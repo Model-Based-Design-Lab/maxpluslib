@@ -39,7 +39,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCR() {
 }
 
 CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(
-        std::shared_ptr<std::vector<const MPAREdge *>> *cycle) {
+        std::shared_ptr<std::vector<MPAREdgeRef>> *cycle) {
 
     MCMgraph g;
 
@@ -52,7 +52,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(
     }
 
     CId eId = 0;
-    std::map<const MCMedge *, const MPAREdge *> edgeMap;
+    std::map<const MCMedge *, MPAREdgeRef> edgeMap;
 
     for (const auto &s : this->getStates()) {
         for (auto *e : (s.second)->getOutgoingEdges()) {
@@ -68,7 +68,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(
     std::vector<const MCMedge *> mcmCycle;
     CDouble mcr = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(g, &mcmCycle);
     if (cycle != nullptr) {
-        *cycle = std::make_shared<std::vector<const MPAREdge *>>();
+        *cycle = std::make_shared<std::vector<MPAREdgeRef>>();
         for (const auto *e : mcmCycle) {
             (*cycle)->push_back(edgeMap[e]);
         }

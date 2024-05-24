@@ -220,7 +220,7 @@ namespace MaxPlus::SMPLS {
 			// create the states needed per transition matrix
 			for (unsigned int k = 0; k < nrTokens; k++)
 			{
-				MPAState* s = mpa->addState(makeMPAStateLabel(qId, k));
+				MPAStateRef s = mpa->addState(makeMPAStateLabel(qId, k));
 				//std::cout << "DEBUG adding state to mpa id: " << (CString)(s->getLabel().id) << ", tkn: " <<  (s->getLabel().tokenNr)<< std::endl;
 				if (isInitial) {
 					mpa->addInitialState(*s);

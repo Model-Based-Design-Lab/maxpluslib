@@ -52,9 +52,9 @@ template <typename SL, typename EL> class RatioGame : virtual public DoubleWeigh
 public:
     virtual inline ~RatioGame() = default;
 
-    virtual std::set<State<SL, EL> *> &getV0() = 0;
+    virtual std::set<StateRef<SL, EL>> &getV0() = 0;
 
-    virtual std::set<State<SL, EL> *> &getV1() = 0;
+    virtual std::set<StateRef<SL, EL>> &getV1() = 0;
 };
 
 }; // namespace MaxPlus

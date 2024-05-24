@@ -30,9 +30,9 @@ void MPAutomatonTest::testCreateFSM() {
 
     MaxPlusAutomatonWithRewards mpa;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(0, 1));
-    MPARState *s3 = mpa.addState(makeMPAStateLabel(0, 2));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(0, 1));
+    MPARStateRef s3 = mpa.addState(makeMPAStateLabel(0, 2));
 
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s2);
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s3);
@@ -43,7 +43,7 @@ void MPAutomatonTest::testCreateFSM() {
     for (const auto &i : es) {
         auto *e = dynamic_cast<EdgeRef<MPAStateLabel, MPAREdgeLabel>>(i);
 
-        ASSERT_THROW((&(e->getDestination())) == s2 || (&(e->getDestination())) == s3);
+        ASSERT_THROW(((e->getDestination())) == s2 || ((e->getDestination())) == s3);
     }
 
     mpa.setInitialState(*s1);
@@ -56,7 +56,7 @@ void MPAutomatonTest::testCreateFSM() {
                           makeMPAStateLabel(0, 1));
     ASSERT_THROW(e != nullptr);
 
-    ASSERT_EQUAL_NOPRINT(s1, &(mpa.getInitialState()));
+    ASSERT_EQUAL_NOPRINT(s1, mpa.getInitialState());
 }
 
 void MPAutomatonTest::testDeterminizeFSM() {
@@ -82,10 +82,10 @@ void MPAutomatonTest::testDeterminizeFSM() {
     for (const auto &i : es) {
         const auto *e = dynamic_cast<EdgeRef<MPAStateLabel, MPAREdgeLabel>>(i);
 
-        ASSERT_THROW((&(e->getDestination())) == s2 || (&(e->getDestination())) == s3);
+        ASSERT_THROW((e->getDestination()) == s2 || (e->getDestination()) == s3);
     }
 
-    mpa.setInitialState(s1);
+    mpa.setInitialState(*s1);
 
     std::shared_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized =
             std::dynamic_pointer_cast<MaxPlusAutomatonWithRewards>(mpa.determinizeEdgeLabels());

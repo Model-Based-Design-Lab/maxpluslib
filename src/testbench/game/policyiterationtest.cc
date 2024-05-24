@@ -31,10 +31,10 @@ void PolicyIterationTest::testPlayer1CycleTest() {
     // One FSM state, four tokens:
     CId fsm_s0 = 0;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
-    MPARState *s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
-    MPARState *s4 = mpa.addState(makeMPAStateLabel(fsm_s0, 3));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
+    MPARStateRef s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
+    MPARStateRef s4 = mpa.addState(makeMPAStateLabel(fsm_s0, 3));
     mpa.addV1(s1);
     mpa.addV1(s2);
     mpa.addV1(s3);
@@ -66,10 +66,10 @@ void PolicyIterationTest::testPlayer1CycleTest2() {
     // One FSM state, four tokens:
     CId fsm_s0 = 0;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
-    MPARState *s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
-    MPARState *s4 = mpa.addState(makeMPAStateLabel(fsm_s0, 3));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
+    MPARStateRef s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
+    MPARStateRef s4 = mpa.addState(makeMPAStateLabel(fsm_s0, 3));
 
     mpa.addV1(s1);
     mpa.addV1(s2);
@@ -103,11 +103,11 @@ void PolicyIterationTest::testTwoPlayersTest() {
     // One FSM state, four tokens:
     CId fsm_s0 = 0;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
-    MPARState *s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
-    MPARState *s4 = mpa.addState(makeMPAStateLabel(fsm_s0, 3));
-    MPARState *s5 = mpa.addState(makeMPAStateLabel(fsm_s0, 4));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
+    MPARStateRef s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
+    MPARStateRef s4 = mpa.addState(makeMPAStateLabel(fsm_s0, 3));
+    MPARStateRef s5 = mpa.addState(makeMPAStateLabel(fsm_s0, 4));
 
     mpa.addV0(s1);
     mpa.addV0(s3);
@@ -146,9 +146,9 @@ void PolicyIterationTest::testSimpleTest() {
     // One FSM state, three tokens:
     CId fsm_s0 = 0;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
-    MPARState *s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
+    MPARStateRef s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
 
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s2);
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s3);
@@ -172,8 +172,8 @@ void PolicyIterationTest::testInvalidInputGraphTest() {
     // One FSM state, three tokens:
     CId fsm_s0 = 0;
 
-    MPARState *s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
-    MPARState *s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
+    MPARStateRef s1 = mpa.addState(makeMPAStateLabel(fsm_s0, 0));
+    MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
 
     mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s2);
     mpa.addV0(s1);

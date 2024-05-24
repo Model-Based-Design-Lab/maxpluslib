@@ -138,7 +138,6 @@ private:
         // Initialize state ids.
         std::map<const State<SL, EL> *, CDouble> stateIds;
         int cid = 0;
-        typename SetOfStates<SL, EL>::CIter si;
         for (auto &it : states) {
             auto &si = *(it.second);
             // Source vertex.
@@ -160,16 +159,16 @@ private:
             dw2vector = result.dw2_i_t;
 
             // Improve the strategy of player 0, just one iteration.
-            std::set<State<SL, EL> *> &states = game.getV0();
+            std::set<StateRef<SL, EL>> &states = game.getV0();
             for (auto &si : states) {
                 // Source vertex.
-                auto v = dynamic_cast<State<SL, EL> *>(si);
+                auto v = dynamic_cast<StateRef<SL, EL>>(si);
                 // Outgoing edges.
                 auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(v->getOutgoingEdges());
                 for (const auto &ei : es) {
                     auto e = dynamic_cast<EdgeRef<SL, EL>>(ei);
 
-                    const auto &u = dynamic_cast<const State<SL, EL> *>(&(e->getDestination()));
+                    const auto &u = dynamic_cast<const StateRef<SL, EL>>(e->getDestination());
 
                     CDouble mw = ratioVector[u];
                     CDouble w1 = static_cast<CDouble>(game.getWeight1(e));
@@ -251,10 +250,10 @@ private:
             r_i_t = evalResult.r_i_t;
             dw2_i_t = evalResult.dw2_i_t;
 
-            std::set<State<SL, EL> *> &states = game.getV1();
+            std::set<StateRef<SL, EL>> &states = game.getV1();
             for (auto &si : states) {
                 // Source vertex.
-                auto v = dynamic_cast<State<SL, EL> *>(si);
+                auto v = dynamic_cast<StateRef<SL, EL>>(si);
 
                 // Outgoing edges.
                 const auto &es =
@@ -262,7 +261,7 @@ private:
                 for (const auto &ei : es) {
                     auto e = dynamic_cast<EdgeRef<SL, EL>>(ei);
 
-                    auto u = dynamic_cast<const State<SL, EL> *>(&(e->getDestination()));
+                    auto u = dynamic_cast<const StateRef<SL, EL>>(e->getDestination());
 
                     CDouble cycleRatio = r_i_t[u];
                     CDouble w1 = static_cast<CDouble>(game.getWeight1(e));
