@@ -262,10 +262,10 @@ namespace MaxPlus::SMPLS {
 						if (!MP_IS_MINUS_INFINITY(d))
 						{
 							MPAStateRef src = mpa->getStateLabeled(makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
-							MPAState& dst = mpa->getStateLabeled(makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
+							MPAStateRef dst = mpa->getStateLabeled(makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
 							MPAEdgeLabel el = makeMPAEdgeLabel(d, sc);
 							el.mode = CString(tr->getLabel());
-							mpa->addEdge(src, el, dst);
+							mpa->addEdge(*src, el, *dst);
 						}
 					}
 				}
@@ -293,18 +293,18 @@ namespace MaxPlus::SMPLS {
 
 		std::ofstream outfile(file);
 		outfile << "ioautomaton statespace{ \r\n";
-		const auto& I = dynamic_cast<const IOASetOfStates&>(this->ioa->getInitialStates());
+		const auto& I = this->ioa->getInitialStates();
 
-		const auto& finalStates =dynamic_cast<const IOASetOfStates&>(this->ioa->getFinalStates());
+		const auto& finalStates = dynamic_cast<const IOASetOfStateRefs&>(this->ioa->getFinalStates());
 
 		CString errMsg = "";
 		auto i = I.begin();
-		auto& s = dynamic_cast<IOAState&>(*((*i).second));
+		auto& s = dynamic_cast<const IOAState&>(*(*i));
 		i++;
 		//we remove the rest of the initial states since only one is allowed
 		for (; i != I.end();)
 		{
-			ioa->removeState(dynamic_cast<const IOAState&>(*((*i).second)));
+			ioa->removeState(dynamic_cast<const IOAState&>(*((*i))));
 		}
 		IOASetOfStateRefs visitedStates;
 		determinizeUtil(s, visitedStates, finalStates, errMsg, outfile);
@@ -449,7 +449,7 @@ namespace MaxPlus::SMPLS {
 			modeName += e->getLabel().first + "," + e->getLabel().second;
 
 			// add the edge with unique name between the corresponding states
-			this->elsFSM.addEdge(this->elsFSM.getStateLabeled(s.getLabel()), modeName, this->elsFSM.getStateLabeled((dynamic_cast<const IOAState&>(e->getDestination())).getLabel()));
+			this->elsFSM.addEdge(*this->elsFSM.getStateLabeled(s.getLabel()), modeName, *this->elsFSM.getStateLabeled((dynamic_cast<IOAStateRef>(e->getDestination()))->getLabel()));
 
 			// make a copy so that child node can not modify the parent nodes list of events
 			// only adds and removes and passes it to it's children
@@ -586,7 +586,7 @@ namespace MaxPlus::SMPLS {
 			// we need this later to make all matrices square
 			biggestMatrixSize = std::max(biggestMatrixSize, std::max(sMatrix->getCols(), sMatrix->getRows()));
 
-			prepareMatrices(dynamic_cast<const IOAState&>(e->getDestination()), eList, visitedEdges);
+			prepareMatrices(*dynamic_cast<IOAStateRef>(e->getDestination()), eList, visitedEdges);
 		}
 	}
 
@@ -683,9 +683,9 @@ namespace MaxPlus::SMPLS {
 						}
 					}
 				}
-				const auto& s2 = dynamic_cast<const IOAState&>(e->getDestination());
+				const auto s2 = dynamic_cast<IOAStateRef>(e->getDestination());
 
-				isConsistentUtil(s2, eList, finalStates, errMsg, visited);
+				isConsistentUtil(*s2, eList, finalStates, errMsg, visited);
 			}
 		}
 	}
@@ -693,7 +693,7 @@ namespace MaxPlus::SMPLS {
 	/**
 		 * recursive part of determinize
 		 */
-	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs& visited, const IOASetOfStates& finalStates, CString& errMsg, std::ofstream& outfile)
+	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs& visited, const IOASetOfStateRefs& finalStates, CString& errMsg, std::ofstream& outfile)
 	{
 		/**
 		 * Deterministic IOA is defined with:
@@ -715,8 +715,8 @@ namespace MaxPlus::SMPLS {
 		InputAction input = e->getLabel().first;
 		if (input.empty())
 		{
-			const auto& s2 = dynamic_cast<const IOAState&>(e->getDestination());
-			outfile << s.stateLabel << "-," << e->getLabel().second << "->" << s2.stateLabel;
+			const auto s2 = dynamic_cast<IOAStateRef>(e->getDestination());
+			outfile << s.stateLabel << "-," << e->getLabel().second << "->" << s2->stateLabel;
 			ioa->removeEdge(*e);
 
 			i++;
@@ -729,13 +729,13 @@ namespace MaxPlus::SMPLS {
 				//ioa->removeState(dynamic_cast<IOAState*>(e->getDestination()));
 			}
 
-			if (finalStates.count(s2.getId())>0)
+			if (finalStates.count(s2)>0)
 			{
 				outfile << " f\n";
 			}
 			else {
 				outfile << "\n";
-				determinizeUtil(s2, visited, finalStates, errMsg, outfile);
+				determinizeUtil(*s2, visited, finalStates, errMsg, outfile);
 			}
 		}
 		else // we have an input action
@@ -758,17 +758,17 @@ namespace MaxPlus::SMPLS {
 					// only allow edges with the outcome of the same event
 					if (this->findEventByOutcome(input) == ev)
 					{
-						const auto& s2 = dynamic_cast<const IOAState&>(e->getDestination());
-						outfile << s.stateLabel << "-" << e->getLabel().first << "," << e->getLabel().second << "->" << s2.stateLabel;
+						const auto s2 = dynamic_cast<IOAStateRef>(e->getDestination());
+						outfile << s.stateLabel << "-" << e->getLabel().first << "," << e->getLabel().second << "->" << s2->stateLabel;
 
 						ioa->removeEdge(*e);
-						if (finalStates.count(s2.getId())>0)
+						if (finalStates.count(s2)>0)
 						{
 							outfile << " f\n";
 						}
 						else {
 							outfile << "\n";
-							determinizeUtil(s2, visited, finalStates, errMsg, outfile);
+							determinizeUtil(*s2, visited, finalStates, errMsg, outfile);
 						}
 					}
 					else

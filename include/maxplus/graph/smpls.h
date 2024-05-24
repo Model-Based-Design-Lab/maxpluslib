@@ -161,7 +161,7 @@ private:
 
     void determinizeUtil(const IOAState &s,
                          IOASetOfStateRefs& visited,
-                         const IOASetOfStates &finalStates,
+                         const IOASetOfStateRefs &finalStates,
                          CString &errMsg,
                          std::ofstream &outfile);
 
