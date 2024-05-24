@@ -169,6 +169,10 @@ class SetOfStates : public std::map<CId, std::shared_ptr<State>> {
 public:
     void remove(const State &s) { this->erase(s.getId()); }
     virtual ~SetOfStates() = default;
+    void addState(const std::shared_ptr<State> &s) {
+        this->insert(std::make_pair(s->getId(), s));
+    }
+
     State& withId(const CId id) {
         return *this->at(id);
     }
@@ -384,6 +388,7 @@ public:
     }
 
     void addState(std::shared_ptr<State<StateLabelType, EdgeLabelType>>& s) {
+        Abstract::SetOfStates::addState(std::dynamic_pointer_cast<Abstract::State>(s));
         this->addToStateIndex(s->getLabel(), s);
     }
 
