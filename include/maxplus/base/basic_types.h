@@ -39,8 +39,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_BASIC_TYPES_H_INCLUDED
-#define BASE_BASIC_TYPES_H_INCLUDED
+#ifndef MAXPLUS_BASE_BASIC_TYPES_H_INCLUDED
+#define MAXPLUS_BASE_BASIC_TYPES_H_INCLUDED
 
 #include <cassert>
 #include <cfloat>

@@ -39,8 +39,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_BASE_H_INCLUDED
-#define BASE_BASE_H_INCLUDED
+#ifndef MAXPLUS_BASE_BASE_H_INCLUDED
+#define MAXPLUS_BASE_BASE_H_INCLUDED
 
 /* Exception and assertion */
 #include "exception/exception.h"

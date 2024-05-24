@@ -38,8 +38,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_STRING_CSTRING_H
-#define BASE_STRING_CSTRING_H
+#ifndef MAXPLUS_BASE_STRING_CSTRING_H
+#define MAXPLUS_BASE_STRING_CSTRING_H
 
 #include "../basic_types.h"
 #include <regex>

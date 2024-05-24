@@ -41,8 +41,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_MAXPLUS_MPTYPE_H_INCLUDED
-#define BASE_MAXPLUS_MPTYPE_H_INCLUDED
+#ifndef MAXPLUS_ALGEBRA_MPTYPE_H
+#define MAXPLUS_ALGEBRA_MPTYPE_H
 
 #include "maxplus/base/basic_types.h"
 #include "maxplus/base/string/cstring.h"

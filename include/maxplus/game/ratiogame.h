@@ -38,8 +38,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_MAXPLUS_GAME_RATIOGAME_H
-#define BASE_MAXPLUS_GAME_RATIOGAME_H
+#ifndef MAXPLUS_BASE_MAXPLUS_GAME_RATIOGAME_H
+#define MAXPLUS_BASE_MAXPLUS_GAME_RATIOGAME_H
 
 #include "maxplus/graph/doubleweightedgraph.h"
 #include <set>

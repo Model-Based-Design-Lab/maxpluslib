@@ -38,8 +38,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_FRACTION_FRACTION_H
-#define BASE_FRACTION_FRACTION_H
+#ifndef MAXPLUS_BASE_FRACTION_FRACTION_H
+#define MAXPLUS_BASE_FRACTION_FRACTION_H
 
 #include "../basic_types.h"
 #include "../math/cmath.h"

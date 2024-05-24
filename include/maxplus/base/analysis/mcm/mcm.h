@@ -42,8 +42,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_ANALYSIS_MCM_MCM_H_INCLUDED
-#define BASE_ANALYSIS_MCM_MCM_H_INCLUDED
+#ifndef MAXPLUS_BASE_ANALYSIS_MCM_MCM_H_INCLUDED
+#define MAXPLUS_BASE_ANALYSIS_MCM_MCM_H_INCLUDED
 
 #include "maxplus/base/analysis/mcm/mcmgraph.h"
 

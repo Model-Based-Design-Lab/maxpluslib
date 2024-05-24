@@ -38,8 +38,8 @@
  *  SOFTWARE.
  */
 
-#ifndef BASE_MATH_CMATH_H
-#define BASE_MATH_CMATH_H
+#ifndef MAXPLUS_BASE_MATH_CMATH_H
+#define MAXPLUS_BASE_MATH_CMATH_H
 
 #include <cmath>
 
