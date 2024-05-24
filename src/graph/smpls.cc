@@ -473,7 +473,7 @@ namespace MaxPlus::SMPLS {
 					throw MPException("mode " + output + " not found in dissected matrices!");
 				}
 
-				sMatrix = disSm->core.begin()->second->createCopy();
+				sMatrix = disSm->core.begin()->second->createCopyPtr();
 
 				// look if it has any events to emit
 				if (!disSm->eventRows.empty())

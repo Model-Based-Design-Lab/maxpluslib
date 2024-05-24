@@ -171,7 +171,8 @@ public:
 
     void pasteRowVector(unsigned int top_row, unsigned int left_column, const Vector *pastedVector);
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix> createCopy() const;
+    [[nodiscard]] virtual std::shared_ptr<Matrix> createCopyPtr() const;
+    [[nodiscard]] virtual Matrix createCopy() const;
 
     [[nodiscard]] virtual std::shared_ptr<Matrix> getTransposedCopy() const;
 

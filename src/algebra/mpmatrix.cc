@@ -573,14 +573,26 @@ Matrix Matrix::mp_power(const unsigned int p) const {
 }
 
 /**
-    * Matrix copy.
-    */
-std::shared_ptr<Matrix> Matrix::createCopy() const
+ * Matrix copy.
+ */
+std::shared_ptr<Matrix> Matrix::createCopyPtr() const
 {
     std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(this->getRows(), this->getCols());
     unsigned int nEls = this->getRows() * this->getCols();
     for (unsigned int pos = 0; pos < nEls; pos++) {
         newMatrix->table[pos] = this->table[pos];
+    }
+    return newMatrix;
+}
+/**
+ * Matrix copy.
+ */
+Matrix Matrix::createCopy() const
+{
+    Matrix newMatrix(this->getRows(), this->getCols());
+    unsigned int nEls = this->getRows() * this->getCols();
+    for (unsigned int pos = 0; pos < nEls; pos++) {
+        newMatrix.table[pos] = this->table[pos];
     }
     return newMatrix;
 }
