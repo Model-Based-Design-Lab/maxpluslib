@@ -66,13 +66,13 @@ public:
         CDoubleToFraction(v, INFINITY);
     };
 
-    explicit CFraction(CString &f) {
-        if (f.find('/') == CString::npos) {
+    explicit CFraction(MPString &f) {
+        if (f.find('/') == MPString::npos) {
             num = std::int64_t(f);
             den = 1;
         } else {
-            num = std::int64_t(CString(f.substr(0, f.find('/'))));
-            den = std::int64_t(CString(f.substr(f.find('/') + 1)));
+            num = std::int64_t(MPString(f.substr(0, f.find('/'))));
+            den = std::int64_t(MPString(f.substr(f.find('/') + 1)));
         }
         val = static_cast<CDouble>(num) / static_cast<CDouble>(den);
     };

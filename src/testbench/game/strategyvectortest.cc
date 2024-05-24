@@ -27,10 +27,10 @@ void StrategyVectorTest::testSimpleTest() {
     MPARStateRef s2 = mpa.addState(makeMPAStateLabel(fsm_s0, 1));
     MPARStateRef s3 = mpa.addState(makeMPAStateLabel(fsm_s0, 2));
 
-    mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s2);
-    mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), CString("A"), 1.0), *s3);
-    mpa.addEdge(*s2, makeRewardEdgeLabel(MPDelay(1.0), CString("A"), 1.0), *s1);
-    mpa.addEdge(*s3, makeRewardEdgeLabel(MPDelay(7.0), CString("A"), 1.0), *s1);
+    mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), MPString("A"), 1.0), *s2);
+    mpa.addEdge(*s1, makeRewardEdgeLabel(MPDelay(3.0), MPString("A"), 1.0), *s3);
+    mpa.addEdge(*s2, makeRewardEdgeLabel(MPDelay(1.0), MPString("A"), 1.0), *s1);
+    mpa.addEdge(*s3, makeRewardEdgeLabel(MPDelay(7.0), MPString("A"), 1.0), *s1);
     mpa.addV0(s1);
     mpa.addV1(s2);
     mpa.addV1(s3);

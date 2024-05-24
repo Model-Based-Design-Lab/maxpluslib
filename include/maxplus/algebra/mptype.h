@@ -57,14 +57,14 @@ namespace MaxPlus {
 using MPThroughput = CDouble;
 
 class MPTime;
-CString timeToString(MPTime val);
+MPString timeToString(MPTime val);
 
 class MPTime {
 public:
     explicit MPTime(CDouble val = MPTIME_MAXVAL) : myVal(val) {}
 
     explicit operator CDouble() const { return myVal; }
-    explicit operator CString() const { return timeToString(*this); }
+    explicit operator MPString() const { return timeToString(*this); }
     MPTime &operator-();
     MPTime &operator+=(MPTime a);
     MPTime &operator-=(MPTime a);
@@ -206,26 +206,26 @@ inline MPTime MPTime::fabs() const { return MPTime(std::fabs(this->myVal)); }
 // toString
 //==============================
 
-inline CString timeToString(MPTime val) {
+inline MPString timeToString(MPTime val) {
     // We intentionally dont use isMinusInfinity() here,
     // so that we can expose the unwanted "impure" infinities here.
     //
     if (static_cast<CDouble>(val) == MPTIME_MIN_INF_VAL) {
-        return CString("-mp_inf");
+        return MPString("-mp_inf");
     }
-    return CString(static_cast<CDouble>(val));
+    return MPString(static_cast<CDouble>(val));
 }
-inline CString timeToMatlabString(MPTime val) {
+inline MPString timeToMatlabString(MPTime val) {
     if (val.isMinusInfinity()) {
-        return CString("-Inf");
+        return MPString("-Inf");
     }
-    return CString(static_cast<CDouble>(val));
+    return MPString(static_cast<CDouble>(val));
 }
-inline CString timeToLaTeXString(MPTime val) {
+inline MPString timeToLaTeXString(MPTime val) {
     if (val.isMinusInfinity()) {
-        return CString("-\\infty{}");
+        return MPString("-\\infty{}");
     }
-    return CString(static_cast<CDouble>(val));
+    return MPString(static_cast<CDouble>(val));
 }
 
 } // namespace MaxPlus

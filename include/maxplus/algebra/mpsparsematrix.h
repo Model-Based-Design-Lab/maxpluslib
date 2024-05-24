@@ -44,7 +44,7 @@
 #include "mptype.h"
 #include <vector>
 
-class CString;
+class MPString;
 
 namespace MaxPlus {
 
@@ -87,7 +87,7 @@ public:
     void putAll(unsigned int startRow, unsigned int endRow, MPTime value);
     void insertVector(unsigned int startRow, const SparseVector &v);
 
-    void toString(CString &outString, CDouble scale = 1.0) const;
+    void toString(MPString &outString, CDouble scale = 1.0) const;
 
     SparseVector &operator=(const SparseVector &);
 
@@ -188,7 +188,7 @@ public:
 
     void compress();
 
-    void toString(CString &outString, CDouble scale = 1.0) const;
+    void toString(MPString &outString, CDouble scale = 1.0) const;
 
     MPTime mpEigenvalue();
 

@@ -48,39 +48,39 @@
 namespace MaxPlus {
 
 /*
- * CException
- * CException container class.
+ * MPException
+ * MPException container class.
  */
-class CException : std::exception {
+class MPException : std::exception {
 private:
-    CString message;
-    CString cause;
+    MPString message;
+    MPString cause;
 
 public:
     // Constructor
-    explicit CException(const CString &message) : message(message) {}
+    explicit MPException(const MPString &message) : message(message) {}
 
-    CException(const CString &message, CException &e) : message(message) {
+    MPException(const MPString &message, MPException &e) : message(message) {
         cause = "    caused by: " + e.getMessage();
         if (!e.getCause().empty()) {
             cause += "\n" + e.getCause();
         }
     }
 
-    CException(const CException &e) : message(e.getMessage()), cause(e.getCause()) {}
+    MPException(const MPException &e) : message(e.getMessage()), cause(e.getCause()) {}
 
     // Destructor
-    ~CException() override = default;
+    ~MPException() override = default;
 
-    CException &operator=(const CException &other) = delete;
-    CException(CException &&) = delete;
-    CException &operator=(CException &&) = delete;
+    MPException &operator=(const MPException &other) = delete;
+    MPException(MPException &&) = delete;
+    MPException &operator=(MPException &&) = delete;
 
     // Message
-    [[nodiscard]] CString getMessage() const { return message; }
+    [[nodiscard]] MPString getMessage() const { return message; }
 
     // Cause
-    [[nodiscard]] CString getCause() const { return cause; }
+    [[nodiscard]] MPString getCause() const { return cause; }
 
     // Report
     std::ostream &report(std::ostream &stream) const {
@@ -94,7 +94,7 @@ public:
         return stream;
     }
 
-    friend std::ostream &operator<<(std::ostream &stream, const CException &e);
+    friend std::ostream &operator<<(std::ostream &stream, const MPException &e);
 };
 
 } // namespace MaxPlus
@@ -102,15 +102,15 @@ public:
 #define ASSERT(condition, msg)                                                                     \
     {                                                                                              \
         if (!(condition))                                                                          \
-            throw MaxPlus::CException(MaxPlus::CString(__FILE__) + MaxPlus::CString(":") + MaxPlus::CString(__LINE__) + MaxPlus::CString(": ")  \
-                             + MaxPlus::CString(msg));                                                      \
+            throw MaxPlus::MPException(MaxPlus::MPString(__FILE__) + MaxPlus::MPString(":") + MaxPlus::MPString(__LINE__) + MaxPlus::MPString(": ")  \
+                             + MaxPlus::MPString(msg));                                                      \
     }
 
 #define EXCEPTION(msg, ...)                                                                        \
     {                                                                                              \
         char buf[1024];                                                                            \
         sprintf(&buf[0], msg, __VA_ARGS__);                                                        \
-        throw CException(buf);                                                                     \
+        throw MPException(buf);                                                                     \
     }
 
 #endif

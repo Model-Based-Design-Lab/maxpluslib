@@ -125,7 +125,7 @@ SparseVector::SparseVector(const unsigned int size,
 
 SparseVector::SparseVector(const Vector &v, const Sizes &sz) {
     if (v.getSize() != sz.size()) {
-        throw CException("Incompatible sizes");
+        throw MPException("Incompatible sizes");
     }
     this->size = 0;
     for (unsigned int i = 0; i < v.getSize(); i++) {
@@ -141,7 +141,7 @@ SparseVector &SparseVector::operator=(const SparseVector &other) {
     // check self assignment
     if (this != &other) {
         if (this->getSize() != other.getSize()) {
-            throw CException("Vectors of different size in"
+            throw MPException("Vectors of different size in"
                              "SparseVector::operator=");
         }
         this->table = other.table;
@@ -161,7 +161,7 @@ SparseVector SparseVector::UnitVector(unsigned int size, unsigned int n) {
 void SparseVector::negate() {
     for (auto &e : this->table) {
         if (e.second == MP_MINUS_INFINITY) {
-            throw CException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
+            throw MPException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
                              "SparseVector::negate");
         }
         e.second = -e.second;
@@ -186,7 +186,7 @@ MPTime SparseVector::normalize() {
     MPTime maxEl = this->norm();
 
     if (maxEl.isMinusInfinity()) {
-        throw CException("Cannot normalize vector with norm MP_MINUS_INFINITY"
+        throw MPException("Cannot normalize vector with norm MP_MINUS_INFINITY"
                          "SparseVector::normalize");
     }
     for (auto &e : this->table) {
@@ -357,7 +357,7 @@ void SparseVector::putAll(unsigned int startRow, unsigned int endRow, MPTime val
     auto insertStart = this->find(startRow);
     auto insertEnd = this->find(endRow);
     if (insertEnd.first >= this->table.size() && insertEnd.second > 0) {
-        throw CException("Range exceeds vector size in SparseVector::putAll");
+        throw MPException("Range exceeds vector size in SparseVector::putAll");
     }
     // we have found the spot in the list
     MPTime oldValPre = this->table[insertStart.first].second;
@@ -394,7 +394,7 @@ void SparseVector::insertVector(unsigned int startRow, const SparseVector &v) {
     auto insertStart = this->find(startRow);
     auto insertEnd = this->find(endRow);
     if (insertEnd.first >= this->table.size() && insertEnd.second > 0) {
-        throw CException("Range exceeds vector size in SparseVector::putAll");
+        throw MPException("Range exceeds vector size in SparseVector::putAll");
     }
     // we have found the spot in the list
     MPTime oldValPre = this->table[insertStart.first].second;
@@ -437,13 +437,13 @@ MPTime SparseVector::get(unsigned int row) const {
 /**
  * String representation of vector
  */
-void SparseVector::toString(CString &outString, CDouble scale) const {
+void SparseVector::toString(MPString &outString, CDouble scale) const {
     outString = "[";
     for (auto k = this->table.begin(); k < this->table.end(); k++) {
         if (k != this->table.begin()) {
             outString += "; ";
         }
-        outString += CString((*k).first) + " * " + timeToString(scale * (*k).second) + " ";
+        outString += MPString((*k).first) + " * " + timeToString(scale * (*k).second) + " ";
     }
     outString += "]";
 }
@@ -469,7 +469,7 @@ SparseVector SparseVector::operator+=(MPTime increase) const { return this->add(
 
 SparseVector SparseVector::operator-=(MPTime decrease) const {
     if (decrease.isMinusInfinity()) {
-        throw CException("Cannot subtract minus infinity in"
+        throw MPException("Cannot subtract minus infinity in"
                          "SparseVector::operator-=");
     }
     return this->add(-decrease);
@@ -649,7 +649,7 @@ SparseMatrix &SparseMatrix::operator=(const SparseMatrix &other) {
     if (this != &other) {
         if (this->getRowSize() != other.getRowSize()
             || this->getColumnSize() != other.getColumnSize()) {
-            throw CException("Matrices of different size in"
+            throw MPException("Matrices of different size in"
                              "SparseMatrix::operator=");
         }
         this->table = other.table;
@@ -715,7 +715,7 @@ void SparseMatrix::putAll(unsigned int startRow,
     auto insertStart = this->find(sc);
     auto insertEnd = this->find(ec);
     if (insertEnd.first >= this->table.size() && insertEnd.second > 0) {
-        throw CException("Range exceeds matrix size in SparseMatrix::putAll");
+        throw MPException("Range exceeds matrix size in SparseMatrix::putAll");
     }
     // we have found the spot in the list
     SparseVector oldValPre = this->table[insertStart.first].second;
@@ -778,7 +778,7 @@ void SparseMatrix::insertMatrix(unsigned int startRow,
     auto insertStart = this->find(sc);
     auto insertEnd = this->find(ec);
     if (insertEnd.first >= this->table.size() && insertEnd.second > 0) {
-        throw CException("Range exceeds matrix size in SparseMatrix::putAll");
+        throw MPException("Range exceeds matrix size in SparseMatrix::putAll");
     }
     // we have found the spot in the list
     SparseVector oldValPre = this->table[insertStart.first].second;
@@ -908,7 +908,7 @@ void SparseMatrix::compress() {
 /**
  * String representation of matrix
  */
-void SparseMatrix::toString(CString &outString, CDouble scale) const {
+void SparseMatrix::toString(MPString &outString, CDouble scale) const {
     outString = "";
     if (this->isTransposed) {
         outString += "Transposed of ";
@@ -917,9 +917,9 @@ void SparseMatrix::toString(CString &outString, CDouble scale) const {
         if (e != *this->table.begin()) {
             outString += "\n";
         }
-        CString s;
+        MPString s;
         e.second.toString(s, scale);
-        outString += CString(e.first) + " * " + s;
+        outString += MPString(e.first) + " * " + s;
     }
 }
 

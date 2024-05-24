@@ -50,7 +50,7 @@
 
 namespace MaxPlus {
 
-class CString;
+class MPString;
 
 using namespace Graphs;
 
@@ -76,7 +76,7 @@ public:
 
     void put(unsigned int row, MPTime value);
 
-    void toString(CString &outString, CDouble scale = 1.0) const;
+    void toString(MPString &outString, CDouble scale = 1.0) const;
 
     Vector(const Vector &);
 
@@ -206,9 +206,9 @@ public:
      */
     void addCols(uint n);
 
-    void toString(CString &outString, CDouble scale = 1.0) const;
-    void toMatlabString(CString &outString, CDouble scale = 1.0) const;
-    void toLaTeXString(CString &outString, CDouble scale = 1.0) const;
+    void toString(MPString &outString, CDouble scale = 1.0) const;
+    void toMatlabString(MPString &outString, CDouble scale = 1.0) const;
+    void toLaTeXString(MPString &outString, CDouble scale = 1.0) const;
 
     // Algebraic operations.
     [[nodiscard]] Matrix add(MPTime increase) const;
@@ -310,7 +310,7 @@ public:
 
     void grow(); // append one vector place
 
-    void toString(CString &outString, CDouble scale = 1.0) const;
+    void toString(MPString &outString, CDouble scale = 1.0) const;
 
     // bool findSimilar(const Vector& vec, CDouble threshold) const;
     //  similar - differs by a constant within a threshold

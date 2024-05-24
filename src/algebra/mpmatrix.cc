@@ -90,7 +90,7 @@ Vector &Vector::operator=(const Vector &other) {
     // self assignment check
     if (this != &other) {
         if (this->getSize() != other.getSize()) {
-            throw CException("Vectors of different size in"
+            throw MPException("Vectors of different size in"
                              "Vector::operator=");
         }
         for (unsigned int row = 0; row < this->getSize(); row++) {
@@ -106,7 +106,7 @@ Vector &Vector::operator=(const Vector &other) {
 void Vector::negate() {
     for (unsigned int row = 0; row < this->getSize(); row++) {
         if (this->get(row) == MP_MINUS_INFINITY) {
-            throw CException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
+            throw MPException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
                              "Vector::negate");
         }
         this->put(row, -this->get(row));
@@ -131,7 +131,7 @@ MPTime Vector::normalize() {
     MPTime maxEl = this->norm();
 
     if (maxEl == MP_MINUS_INFINITY) {
-        throw CException("Cannot normalize vector with norm MP_MINUS_INFINITY"
+        throw MPException("Cannot normalize vector with norm MP_MINUS_INFINITY"
                          "Vector::normalize");
     }
     for (unsigned int row = 0; row < this->getSize(); row++) {
@@ -196,7 +196,7 @@ void Vector::put(unsigned int row, MPTime value) {
 /**
  * String representation of vector
  */
-void Vector::toString(CString &outString, CDouble scale) const {
+void Vector::toString(MPString &outString, CDouble scale) const {
     outString = "";
     for (unsigned int row = 0; row < this->getSize(); row++) {
         outString += timeToString(scale * this->get(row)) + " ";
@@ -389,7 +389,7 @@ unsigned int Matrix::getSize() const {
  */
 MPTime Matrix::get(unsigned int row, unsigned int column) const {
     if ((row >= this->getRows()) || (column >= this->getCols())) {
-        throw CException("Index out of bounds in"
+        throw MPException("Index out of bounds in"
                          "Matrix::get");
     }
     return this->table[row * this->getCols() + column];
@@ -413,7 +413,7 @@ Vector Matrix::getRowVector(unsigned int row) const {
  */
 void Matrix::put(unsigned int row, unsigned int column, MPTime value) {
     if ((row >= this->getRows()) || (column >= this->getCols())) {
-        throw CException("Index out of bounds in"
+        throw MPException("Index out of bounds in"
                          "Matrix::put");
     }
     this->table[row * this->getCols() + column] = value;
@@ -461,7 +461,7 @@ void Matrix::pasteRowVector(unsigned int top_row,
 Vector Matrix::mp_multiply(const Vector &v) const {
     // Check size of the matrix and vector
     if (this->getCols() != v.getSize()) {
-        throw CException("Matrix and vector are of unequal size in "
+        throw MPException("Matrix and vector are of unequal size in "
                          "Matrix::mp_multiply");
     }
 
@@ -486,7 +486,7 @@ Vector Matrix::mp_multiply(const Vector &v) const {
 Matrix Matrix::mp_multiply(const Matrix &m) const {
     // Check sizes of the matrices
     if (this->getCols() != m.getRows()) {
-        throw CException("Matrices are of incompatible size in"
+        throw MPException("Matrices are of incompatible size in"
                          "Matrix::mp_multiply(Matrix)");
     }
 
@@ -513,7 +513,7 @@ Matrix Matrix::mp_multiply(const Matrix &m) const {
 Matrix Matrix::mp_sub(const Matrix &m) const {
     // Check sizes of the matrices
     if ((m.getRows() != this->getRows()) || (m.getCols() != this->getCols())) {
-        throw CException("Matrices are of different size in"
+        throw MPException("Matrices are of different size in"
                          "Matrix::mp_sub(Matrix&");
     }
 
@@ -536,7 +536,7 @@ Matrix Matrix::mp_sub(const Matrix &m) const {
 Matrix Matrix::mp_maximum(const Matrix &m) const {
     // Check sizes of the matrices
     if ((m.getRows() != this->getRows()) || (m.getCols() != this->getCols())) {
-        throw CException("Matrices are of different size in"
+        throw MPException("Matrices are of different size in"
                          "Matrix::maximum(Matrix*, Matrix*");
     }
 
@@ -733,7 +733,7 @@ void Matrix::add(MPTime increase, Matrix &result) const {
     unsigned int MR = this->getRows();
     unsigned int MC = this->getCols();
     if ((MR != result.getRows()) || (MC != result.getCols())) {
-        throw CException("Matrices are of different size in"
+        throw MPException("Matrices are of different size in"
                          "Matrix::add(Matrix*, MPTime, Matrix*");
     }
     for (unsigned int r = 0; r < MR; r++) {
@@ -751,7 +751,7 @@ void Matrix::maximum(const Matrix &matB, Matrix &result) const {
     unsigned int MC = this->getCols();
     if ((matB.getRows() != MR) || (matB.getCols() != MC) || (result.getRows() != MR)
         || (result.getCols() != MC)) {
-        throw CException("Matrices are of different size in"
+        throw MPException("Matrices are of different size in"
                          "Matrix::maximum(Matrix*, Matrix*, Matrix*");
     }
 
@@ -765,7 +765,7 @@ void Matrix::maximum(const Matrix &matB, Matrix &result) const {
 /**
  * Matrix to string.
  */
-void Matrix::toString(CString &outString, CDouble scale) const {
+void Matrix::toString(MPString &outString, CDouble scale) const {
     outString = "";
     unsigned int MR = this->getRows();
     unsigned int MC = this->getCols();
@@ -780,7 +780,7 @@ void Matrix::toString(CString &outString, CDouble scale) const {
 /**
  * Matrix to string.
  */
-void Matrix::toMatlabString(CString &outString, CDouble scale) const {
+void Matrix::toMatlabString(MPString &outString, CDouble scale) const {
     outString = "";
     unsigned int MR = this->getRows();
     unsigned int MC = this->getCols();
@@ -801,7 +801,7 @@ void Matrix::toMatlabString(CString &outString, CDouble scale) const {
 /**
  * Matrix to LaTex string.
  */
-void Matrix::toLaTeXString(CString &outString, CDouble scale) const {
+void Matrix::toLaTeXString(MPString &outString, CDouble scale) const {
     outString = "";
     unsigned int MR = this->getRows();
     unsigned int MC = this->getCols();
@@ -905,7 +905,7 @@ Matrix Matrix::starClosureMatrix(MPTime posCycleThreshold) const {
 Matrix Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold, bool implyZeroSelfEdges) const {
     // Floyd-Warshall algorithm
     if (this->getRows() != this->getCols()) {
-        throw CException("Matrix must be square in Matrix::allPaiLongestPathMatrix.");
+        throw MPException("Matrix must be square in Matrix::allPaiLongestPathMatrix.");
     }
     unsigned int N = this->getRows();
 
@@ -931,10 +931,10 @@ Matrix Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold, bool implyZero
 
     for (unsigned int k = 0; k < N; k++) {
         if (distMat.get(k, k) > posCycleThreshold) {
-            CString tmp;
+            MPString tmp;
             distMat.toString(tmp, DEFAULT_SCALE);
             std::cout << tmp << std::endl;
-            throw CException("Positive cycle!");
+            throw MPException("Positive cycle!");
         }
     }
 
@@ -951,12 +951,12 @@ bool Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold,
                                       Matrix &res) const {
     // Floyd-Warshall algorithm
     if (this->getRows() != this->getCols()) {
-        throw CException("Matrix must be square in Matrix::allPaiLongestPathMatrix.");
+        throw MPException("Matrix must be square in Matrix::allPaiLongestPathMatrix.");
     }
     unsigned int N = this->getRows();
 
     if ((N != res.getRows()) || (N != res.getCols())) {
-        throw CException("The matrix of the longest paths "
+        throw MPException("The matrix of the longest paths "
                          "should have the same size as the given matrix.");
     }
 
@@ -1001,10 +1001,10 @@ bool Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold,
 /**
  * VectorList::toString()
  */
-void VectorList::toString(CString &outString, CDouble scale) const {
+void VectorList::toString(MPString &outString, CDouble scale) const {
     outString = "";
     for (unsigned int i = 0; i < this->getSize(); i++) {
-        CString vec_str;
+        MPString vec_str;
         const Vector *v = &vectorRefAt(i);
         assert(v->getSize() == this->oneVectorSize);
         v->toString(vec_str, scale);
@@ -1016,7 +1016,7 @@ void VectorList::toString(CString &outString, CDouble scale) const {
 CDouble Matrix::mp_eigenvalue() const {
     // check if matrix is square.
     if (this->getRows() != this->getCols()) {
-        throw CException("Matrix is not square in Matrix::mp_eigenvalue().");
+        throw MPException("Matrix is not square in Matrix::mp_eigenvalue().");
     }
 
     uint sz = this->getRows();
@@ -1072,7 +1072,7 @@ CDouble Matrix::mp_eigenvalue() const {
 MPTime Matrix::getMaxOfRow(uint rowNumber) const
 {
     if (rowNumber > this->getRows()) {
-        throw CException("Matrix getMaxOfRow input index out of bounds.");
+        throw MPException("Matrix getMaxOfRow input index out of bounds.");
     }
     MPTime largestEl = MP_MINUS_INFINITY;
     unsigned int MC = this->getCols();
@@ -1086,7 +1086,7 @@ MPTime Matrix::getMaxOfRow(uint rowNumber) const
 MCMgraph Matrix::mpMatrixToPrecedenceGraph() const {
     // check if matrix is square.
     if (this->getRows() != this->getCols()) {
-        throw CException("Matrix is not square in Matrix::mpMatrixToPrecedenceGraph().");
+        throw MPException("Matrix is not square in Matrix::mpMatrixToPrecedenceGraph().");
     }
 
     uint sz = this->getRows();
@@ -1134,7 +1134,7 @@ std::pair<Matrix::EigenvectorList, Matrix::GeneralizedEigenvectorList>
 Matrix::mp_generalized_eigenvectors() const {
     // check if matrix is square.
     if (this->getRows() != this->getCols()) {
-        throw CException("Matrix is not square in Matrix::mp_eigenvector().");
+        throw MPException("Matrix is not square in Matrix::mp_eigenvector().");
     }
 
     // gr = mpMatrixToPrecedenceGraph(M)

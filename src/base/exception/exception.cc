@@ -43,7 +43,7 @@
 namespace MaxPlus {
 
 // Prototype
-std::ostream &operator<<(std::ostream &stream, const CException &e) {
+std::ostream &operator<<(std::ostream &stream, const MPException &e) {
     e.report(stream);
 
     return stream;

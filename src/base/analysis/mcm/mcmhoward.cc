@@ -392,18 +392,18 @@ private:
 
         for (int i = 0; i < nr_nodes; i++) {
             if (u[i] == 0) {
-                throw CException("Failed check on rows in Howard's MCM algorithm.");
+                throw MPException("Failed check on rows in Howard's MCM algorithm.");
             }
         }
     }
 
     void Safety_Check() {
         if (nr_nodes < 1) {
-            throw CException("Howard: number of nodes must be a positive integer.");
+            throw MPException("Howard: number of nodes must be a positive integer.");
         }
 
         if (narcs < 1) {
-            throw CException("Howard: number of arcs must be a positive integer.");
+            throw MPException("Howard: number of arcs must be a positive integer.");
         }
 
         Check_Rows();
@@ -419,7 +419,7 @@ private:
 
     void End_Message() {
         if (*NIterations == MAX_NIterations) {
-            throw CException("Howard: exceeded maximum number of iterations.");
+            throw MPException("Howard: exceeded maximum number of iterations.");
         }
     }
 };

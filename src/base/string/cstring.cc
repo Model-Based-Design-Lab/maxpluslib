@@ -48,116 +48,116 @@
 namespace MaxPlus {
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString() = default;
+MPString::MPString() = default;
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const char s) : std::string(1, s) {}
+MPString::MPString(const char s) : std::string(1, s) {}
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const char *s) : std::string(s) {}
+MPString::MPString(const char *s) : std::string(s) {}
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const std::string &s) : std::string(s) {}
+MPString::MPString(const std::string &s) : std::string(s) {}
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const CString &s) = default;
+MPString::MPString(const MPString &s) = default;
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const int n) {
+MPString::MPString(const int n) {
     char str[32];
     snprintf(&str[0], 32, "%i", n);
     append(std::string(str));
 }
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const unsigned int n) {
+MPString::MPString(const unsigned int n) {
     char str[32];
     snprintf(&str[0], 32, "%u", n);
     append(std::string(str));
 }
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const long int n) {
+MPString::MPString(const long int n) {
     char str[32];
     snprintf(&str[0], 32, "%ld", n);
     append(std::string(str));
 }
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const unsigned long int n) {
+MPString::MPString(const unsigned long int n) {
     char str[32];
     snprintf(&str[0], 32, "%ld", n);
     append(std::string(str));
 }
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const long long int n) {
+MPString::MPString(const long long int n) {
     char str[32];
     snprintf(&str[0], 32, "%lld", n);
     append(std::string(str));
 }
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const unsigned long long int n) {
+MPString::MPString(const unsigned long long int n) {
     char str[32];
     snprintf(&str[0], 32, "%lld", n);
     append(std::string(str));
 }
 
 /**
- * CString ()
+ * MPString ()
  * Constructor.
  */
-CString::CString(const CDouble n) {
+MPString::MPString(const CDouble n) {
     char str[32];
     snprintf(&str[0], 32, "%g", n);
     append(std::string(str));
 }
 
 /**
- * ~CString ()
+ * ~MPString ()
  * Destructor.
  */
-CString::~CString() = default;
+MPString::~MPString() = default;
 
 /**
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const CString &s) {
+MPString &MPString::operator+=(const MPString &s) {
     append(s);
     return *this;
 }
@@ -166,7 +166,7 @@ CString &CString::operator+=(const CString &s) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const char c) {
+MPString &MPString::operator+=(const char c) {
     push_back(c);
     return *this;
 }
@@ -175,8 +175,8 @@ CString &CString::operator+=(const char c) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const int n) {
-    CString str(n);
+MPString &MPString::operator+=(const int n) {
+    MPString str(n);
     append(str);
 
     return *this;
@@ -186,8 +186,8 @@ CString &CString::operator+=(const int n) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const unsigned int n) {
-    CString str(n);
+MPString &MPString::operator+=(const unsigned int n) {
+    MPString str(n);
     append(str);
 
     return *this;
@@ -197,8 +197,8 @@ CString &CString::operator+=(const unsigned int n) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const long int n) {
-    CString str(n);
+MPString &MPString::operator+=(const long int n) {
+    MPString str(n);
     append(str);
 
     return *this;
@@ -208,8 +208,8 @@ CString &CString::operator+=(const long int n) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const unsigned long int n) {
-    CString str(n);
+MPString &MPString::operator+=(const unsigned long int n) {
+    MPString str(n);
     append(str);
 
     return *this;
@@ -219,8 +219,8 @@ CString &CString::operator+=(const unsigned long int n) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const long long int n) {
-    CString str(n);
+MPString &MPString::operator+=(const long long int n) {
+    MPString str(n);
     append(str);
 
     return *this;
@@ -230,8 +230,8 @@ CString &CString::operator+=(const long long int n) {
  * operator+= ()
  * Addition to string
  */
-CString &CString::operator+=(const CDouble n) {
-    CString str(n);
+MPString &MPString::operator+=(const CDouble n) {
+    MPString str(n);
     append(str);
 
     return *this;
@@ -241,43 +241,43 @@ CString &CString::operator+=(const CDouble n) {
  * operator const char* ()
  * Type conversion to constant character pointer.
  */
-CString::operator const char *() const { return c_str(); }
+MPString::operator const char *() const { return c_str(); }
 
 /**
  * operator int ()
  * Type conversion to integer.
  */
-CString::operator int() const { return strtol(c_str(), nullptr, 0); }
+MPString::operator int() const { return strtol(c_str(), nullptr, 0); }
 
 /**
  * operator uint ()
  * Type conversion to unsigned integer.
  */
-CString::operator uint() const { return strtoul(c_str(), nullptr, 0); }
+MPString::operator uint() const { return strtoul(c_str(), nullptr, 0); }
 
 /**
  * operator CDouble ()
  * Type conversion to CDouble.
  */
-CString::operator CDouble() const { return strtod(c_str(), nullptr); }
+MPString::operator CDouble() const { return strtod(c_str(), nullptr); }
 
 /**
  * operator long ()
  * Type conversion to long.
  */
-CString::operator long() const { return strtol(c_str(), nullptr, 0); }
+MPString::operator long() const { return strtol(c_str(), nullptr, 0); }
 
 /**
  * operator unsigned long ()
  * Type conversion to unsigned long.
  */
-CString::operator unsigned long() const { return strtoul(c_str(), nullptr, 0); }
+MPString::operator unsigned long() const { return strtoul(c_str(), nullptr, 0); }
 
 /**
  * operator long long ()
  * Type conversion to long long.
  */
-CString::operator long long() const {
+MPString::operator long long() const {
 #ifdef _MSC_VER
     return _strtoi64(c_str(), nullptr, 0);
 #else
@@ -290,7 +290,7 @@ CString::operator long long() const {
  * Type conversion to unsigned long long.
  */
 
-CString::operator unsigned long long() const {
+MPString::operator unsigned long long() const {
 #ifdef _MSC_VER
     return _strtoui64(c_str(), nullptr, 0);
 #else
@@ -302,7 +302,7 @@ CString::operator unsigned long long() const {
  * trim ()
  * Remove whitespace from left-hand and right-hand side of string.
  */
-CString &CString::trim() {
+MPString &MPString::trim() {
     ltrim();
     rtrim();
 
@@ -313,9 +313,9 @@ CString &CString::trim() {
  * ltrim ()
  * Remove whitespace from left-hand side of string.
  */
-CString &CString::ltrim() {
+MPString &MPString::ltrim() {
 
-    CString::size_type startPos = 0;
+    MPString::size_type startPos = 0;
 
     // Find first non-whitespace character in the string (from left)
     while (startPos < length() && (isspace(at(startPos)) != 0)) {
@@ -334,8 +334,8 @@ CString &CString::ltrim() {
  * rtrim ()
  * Remove whitespace from right-hand side of string.
  */
-CString &CString::rtrim() {
-    CString::size_type endPos = length() - 1;
+MPString &MPString::rtrim() {
+    MPString::size_type endPos = length() - 1;
 
     // Find first non-whitespace character in the string (from right)
     while (endPos < length() && (isspace(at(endPos)) != 0)) {
@@ -355,10 +355,10 @@ CString &CString::rtrim() {
  * split ()
  * Split the string on all occurrences of delim character
  */
-CStrings CString::split(const char delim) const {
-    CStrings strings;
-    CString::size_type curDelim = 0;
-    CString::size_type nextDelim = 0;
+MPStrings MPString::split(const char delim) const {
+    MPStrings strings;
+    MPString::size_type curDelim = 0;
+    MPString::size_type nextDelim = 0;
 
     do {
         // Position the delimiters
@@ -367,14 +367,14 @@ CStrings CString::split(const char delim) const {
 
         // Add substring to list
         if (nextDelim >= curDelim && curDelim != length()) {
-            strings.push_back(CString(substr(curDelim, (nextDelim - curDelim))));
+            strings.push_back(MPString(substr(curDelim, (nextDelim - curDelim))));
         }
 
         // Advance nextDelim position to always make progress
-        if (nextDelim != CString::npos) {
+        if (nextDelim != MPString::npos) {
             nextDelim++;
         }
-    } while (nextDelim != CString::npos);
+    } while (nextDelim != MPString::npos);
 
     return strings;
 }
@@ -383,9 +383,9 @@ CStrings CString::split(const char delim) const {
  * join ()
  * Join the list of strings delimited with delim character
  */
-CString CString::join(const CStrings &strl, const char delim) {
-    CString res = "";
-    CStrings::const_iterator si;
+MPString MPString::join(const MPStrings &strl, const char delim) {
+    MPString res = "";
+    MPStrings::const_iterator si;
     bool first = true;
     for (si = strl.begin(); si != strl.end(); si++) {
         if (!first) {
@@ -401,9 +401,9 @@ CString CString::join(const CStrings &strl, const char delim) {
  * join ()
  * Join the list of strings delimited with delim character
  */
-CString CString::join(const CStrings &strl, const CString &delim) {
-    CString res = "";
-    CStrings::const_iterator si;
+MPString MPString::join(const MPStrings &strl, const MPString &delim) {
+    MPString res = "";
+    MPStrings::const_iterator si;
     bool first = true;
     for (si = strl.begin(); si != strl.end(); si++) {
         if (!first) {
@@ -420,12 +420,12 @@ CString CString::join(const CStrings &strl, const CString &delim) {
  * Replace first n occurrences of string s1 with string s2 starting from
  * position sPos. If n is equal to zero, all occurrences are replaced
  */
-CString &
-CString::replace(const CString &s1, const CString &s2, const size_type sPos, const uint n) {
+MPString &
+MPString::replace(const MPString &s1, const MPString &s2, const size_type sPos, const uint n) {
     size_type pos = sPos;
     uint nrReplaced = 0;
 
-    for (pos = find(s1, pos); pos != CString::npos; pos = find(s1, pos + s2.length())) {
+    for (pos = find(s1, pos); pos != MPString::npos; pos = find(s1, pos + s2.length())) {
         std::string::replace(pos, s1.size(), s2.c_str());
         nrReplaced++;
 
@@ -448,7 +448,7 @@ bool isTok(const char c, const char *tok) { return (strchr(tok, c) != nullptr); 
  * stringTok ()
  * Split a string into tokens using the given token delimiter.
  */
-void stringTok(CStrings &l, CString &str, const char *tok) {
+void stringTok(MPStrings &l, MPString &str, const char *tok) {
     const int S = static_cast<int>(str.size());
     int i = 0;
 
@@ -472,7 +472,7 @@ void stringTok(CStrings &l, CString &str, const char *tok) {
         }
 
         // add word
-        l.push_back(CString(str.substr(i, j - i)));
+        l.push_back(MPString(str.substr(i, j - i)));
 
         // set up for next loop
         i = j + 1;
@@ -483,8 +483,8 @@ void stringTok(CStrings &l, CString &str, const char *tok) {
  * toLower ()
  * The function converts the string to lower-case.
  */
-CString &CString::toLower() {
-    CString s = *this;
+MPString &MPString::toLower() {
+    MPString s = *this;
     std::transform(s.begin(), s.end(), s.begin(), static_cast<int (*)(int)>(std::tolower));
     assign(s);
 
@@ -495,8 +495,8 @@ CString &CString::toLower() {
  * toUpper ()
  * The function converts the string to upper-case.
  */
-CString &CString::toUpper() {
-    CString s = *this;
+MPString &MPString::toUpper() {
+    MPString s = *this;
     std::transform(s.begin(), s.end(), s.begin(), static_cast<int (*)(int)>(std::toupper));
     assign(s);
 
@@ -508,11 +508,11 @@ CString &CString::toUpper() {
  * Check if the string represents a non-negative integer number (leading + is not allowed)
  */
 
-bool CString::isNNInteger() {
+bool MPString::isNNInteger() {
     // naive implementation, check if the string includes a decimal separator
     // todo: replace with something smarter
 
-    CString::size_type pos = 0;
+    MPString::size_type pos = 0;
 
     // Find first non-whitespace and non-digit character in the string
     while (pos < length() && ((isspace(at(pos)) != 0) || (isdigit(at(pos)) != 0))) {
@@ -526,15 +526,15 @@ bool CString::isNNInteger() {
 /**
  * regexReplace()
  */
-CString CString::regexReplace(const CString &regex, const CString &replace) {
+MPString MPString::regexReplace(const MPString &regex, const MPString &replace) {
     try {
         std::regex pattern(regex);
-        CString res = CString(regex_replace(*this, pattern, std::string(replace)));
+        MPString res = MPString(regex_replace(*this, pattern, std::string(replace)));
         return res;
     } catch (std::runtime_error &e) {
-        /// @todo add CExceptions to string class?
+        /// @todo add MPExceptions to string class?
         std::cout << "Failed regex: " << e.what() << std::endl;
-        //      throw CException(CString("Failed to compile and execute regex
+        //      throw MPException(MPString("Failed to compile and execute regex
         //      expression.")+e.what());
         return *this;
     }
@@ -543,7 +543,7 @@ CString CString::regexReplace(const CString &regex, const CString &replace) {
 /**
  * regexReplaceMultiline()
  */
-CString CString::regexReplaceMultiLine(const CString &regex, const CString &replace) {
+MPString MPString::regexReplaceMultiLine(const MPString &regex, const MPString &replace) {
     try {
         std::regex pattern(regex);
 
@@ -556,11 +556,11 @@ CString CString::regexReplaceMultiLine(const CString &regex, const CString &repl
             result << res << '\n';
         }
 
-        return CString(result.str());
+        return MPString(result.str());
     } catch (std::runtime_error &e) {
-        /// @todo add CExceptions to string class?
+        /// @todo add MPExceptions to string class?
         std::cout << "Failed regex: " << e.what() << std::endl;
-        //      throw CException(CString("Failed to compile and execute regex
+        //      throw MPException(MPString("Failed to compile and execute regex
         //      expression.")+e.what());
         return *this;
     }

@@ -34,10 +34,10 @@ void MPAutomatonTest::testCreateFSM() {
     MPARStateRef s2 = mpa.addState(makeMPAStateLabel(0, 1));
     MPARStateRef s3 = mpa.addState(makeMPAStateLabel(0, 2));
 
-    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s2);
-    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s3);
-    mpa.addEdge(*s2, makeRewardEdgeLabel(MPTime(1.0), CString("A"), 1.0), *s1);
-    mpa.addEdge(*s3, makeRewardEdgeLabel(MPTime(7.0), CString("A"), 1.0), *s1);
+    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0), *s2);
+    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0), *s3);
+    mpa.addEdge(*s2, makeRewardEdgeLabel(MPTime(1.0), MPString("A"), 1.0), *s1);
+    mpa.addEdge(*s3, makeRewardEdgeLabel(MPTime(7.0), MPString("A"), 1.0), *s1);
 
     auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(s1->getOutgoingEdges());
     for (const auto &i : es) {
@@ -52,7 +52,7 @@ void MPAutomatonTest::testCreateFSM() {
     ASSERT_THROW(s != nullptr);
 
     auto e = mpa.findEdge(makeMPAStateLabel(0, 0),
-                          makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0),
+                          makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0),
                           makeMPAStateLabel(0, 1));
     ASSERT_THROW(e != nullptr);
 
@@ -70,13 +70,13 @@ void MPAutomatonTest::testDeterminizeFSM() {
     MPARStateRef s3 = mpa.addState(makeMPAStateLabel(0, 2));
 
     // s1 -- (3,A,1) -> s2
-    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s2);
+    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0), *s2);
     // s1 -- (3,A,1) -> s3
-    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), CString("A"), 1.0), *s3);
+    mpa.addEdge(*s1, makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0), *s3);
     // s2 -- (1,B,1) -> s1
-    mpa.addEdge(*s2, makeRewardEdgeLabel(MPTime(1.0), CString("B"), 1.0), *s1);
+    mpa.addEdge(*s2, makeRewardEdgeLabel(MPTime(1.0), MPString("B"), 1.0), *s1);
     // s3 -- (7,A,1) -> s1
-    mpa.addEdge(*s3, makeRewardEdgeLabel(MPTime(7.0), CString("A"), 1.0), *s1);
+    mpa.addEdge(*s3, makeRewardEdgeLabel(MPTime(7.0), MPString("A"), 1.0), *s1);
 
     auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(s1->getOutgoingEdges());
     for (const auto &i : es) {

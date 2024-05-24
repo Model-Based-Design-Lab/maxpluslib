@@ -48,49 +48,49 @@
 namespace MaxPlus {
 
 // Forward class definition
-class CString;
+class MPString;
 
 // Types
-using CStrings = std::list<CString>;
-using CStringsIter = CStrings::iterator;
+using MPStrings = std::list<MPString>;
+using MPStringsIter = MPStrings::iterator;
 
 /**
- * CString
+ * MPString
  * String container class.
  * Derived from STL library class string.
  */
-class CString : public std::string {
+class MPString : public std::string {
 public:
     // Constructor
-    CString();
-    CString(const char *s);
-    explicit CString(char s);
-    explicit CString(const std::string &s);
-    CString(const CString &s);
+    MPString();
+    MPString(const char *s);
+    explicit MPString(char s);
+    explicit MPString(const std::string &s);
+    MPString(const MPString &s);
 
     // Constructor (integer number)
-    explicit CString(int n);
-    explicit CString(unsigned int n);
-    explicit CString(long int n);
-    explicit CString(unsigned long int n);
-    explicit CString(long long int n);
-    explicit CString(unsigned long long int n);
+    explicit MPString(int n);
+    explicit MPString(unsigned int n);
+    explicit MPString(long int n);
+    explicit MPString(unsigned long int n);
+    explicit MPString(long long int n);
+    explicit MPString(unsigned long long int n);
 
     // Constructor (floating number)
-    explicit CString(CDouble n);
+    explicit MPString(CDouble n);
 
     // Destructor
-    ~CString();
+    ~MPString();
 
     // Assignment
-    CString &operator+=(const CString &s);
-    CString &operator+=(char c);
-    CString &operator+=(int n);
-    CString &operator+=(unsigned int n);
-    CString &operator+=(long int n);
-    CString &operator+=(unsigned long int n);
-    CString &operator+=(long long int n);
-    CString &operator+=(CDouble n);
+    MPString &operator+=(const MPString &s);
+    MPString &operator+=(char c);
+    MPString &operator+=(int n);
+    MPString &operator+=(unsigned int n);
+    MPString &operator+=(long int n);
+    MPString &operator+=(unsigned long int n);
+    MPString &operator+=(long long int n);
+    MPString &operator+=(CDouble n);
 
     // Character access
     char operator[](int n) { return (c_str())[n]; };
@@ -106,25 +106,25 @@ public:
     explicit operator unsigned long long() const;
 
     // Whitespace
-    CString &trim();
-    CString &ltrim(); // left-hand side
-    CString &rtrim(); // right-hand side
+    MPString &trim();
+    MPString &ltrim(); // left-hand side
+    MPString &rtrim(); // right-hand side
 
     // Regex
-    CString regexReplace(const CString &regex, const CString &replace);
-    CString regexReplaceMultiLine(const CString &regex, const CString &replace);
+    MPString regexReplace(const MPString &regex, const MPString &replace);
+    MPString regexReplaceMultiLine(const MPString &regex, const MPString &replace);
 
     // Split
-    [[nodiscard]] CStrings split(char delim) const;
-    static CString join(const CStrings &strl, char delim);
-    static CString join(const CStrings &strl, const CString &delim);
+    [[nodiscard]] MPStrings split(char delim) const;
+    static MPString join(const MPStrings &strl, char delim);
+    static MPString join(const MPStrings &strl, const MPString &delim);
 
     // Replacement
-    CString &replace(const CString &s1, const CString &s2, size_type sPos = 0, uint n = 0);
+    MPString &replace(const MPString &s1, const MPString &s2, size_type sPos = 0, uint n = 0);
 
     // Case
-    CString &toLower();
-    CString &toUpper();
+    MPString &toLower();
+    MPString &toUpper();
 
     // TEsting
     bool isNNInteger();
@@ -132,40 +132,40 @@ public:
 
 /**
  * operator+
- * Append operator for CString class.
+ * Append operator for MPString class.
  */
-inline CString operator+(const CString &lhs, const CString &rhs) {
-    CString str(lhs);
+inline MPString operator+(const MPString &lhs, const MPString &rhs) {
+    MPString str(lhs);
     str.append(rhs);
     return str;
 }
 
-inline CString operator+(const CString &lhs, const std::string &rhs) {
-    CString str(lhs);
+inline MPString operator+(const MPString &lhs, const std::string &rhs) {
+    MPString str(lhs);
     str.append(rhs);
     return str;
 }
 
-inline CString operator+(const CString &lhs, const char *rhs) {
-    CString str(lhs);
+inline MPString operator+(const MPString &lhs, const char *rhs) {
+    MPString str(lhs);
     str.append(rhs);
     return str;
 }
 
-inline CString operator+(const std::string &lhs, const CString &rhs) {
-    CString str(lhs);
+inline MPString operator+(const std::string &lhs, const MPString &rhs) {
+    MPString str(lhs);
     str.append(rhs);
     return str;
 }
 
-inline CString operator+(const char *lhs, const CString &rhs) {
-    CString str(lhs);
+inline MPString operator+(const char *lhs, const MPString &rhs) {
+    MPString str(lhs);
     str.append(rhs);
     return str;
 }
 
 // Tokenize a string
-void stringTok(CStrings &l, const CString &str, const char *tok = " \t\n");
+void stringTok(MPStrings &l, const MPString &str, const char *tok = " \t\n");
 
 } // namespace MaxPlus
 

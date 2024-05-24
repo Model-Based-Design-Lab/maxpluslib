@@ -86,8 +86,8 @@ inline bool operator<(const MPAStateLabel &s, const MPAStateLabel &t) {
     return s.tokenNr < t.tokenNr;
 }
 
-inline CString toString(const MPAStateLabel &l) {
-    return "(id: " + CString(l.id) + ", tokenNr: " + CString(l.tokenNr) + ")";
+inline MPString toString(const MPAStateLabel &l) {
+    return "(id: " + MPString(l.id) + ", tokenNr: " + MPString(l.tokenNr) + ")";
 };
 
 /**
@@ -95,7 +95,7 @@ inline CString toString(const MPAStateLabel &l) {
  */
 using MPAEdgeLabel = struct MPAEdgeLabel {
     MPDelay delay;
-    CString mode;
+    MPString mode;
 };
 
 /**
@@ -103,7 +103,7 @@ using MPAEdgeLabel = struct MPAEdgeLabel {
     * @param stateId FSM state id
     * @param tokenId token number
     */
-inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const CString& mode) {
+inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const MPString& mode) {
     MPAEdgeLabel el;
     el.delay = delay;
     el.mode = mode;
@@ -135,7 +135,7 @@ inline bool operator<(const MPAEdgeLabel &s, const MPAEdgeLabel &t) {
  * @param stateId FSM state id
  * @param tokenId token number
  */
-inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, CString &mode) {
+inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, MPString &mode) {
     MPAEdgeLabel el;
     el.delay = delay;
     el.mode = mode;
@@ -164,14 +164,14 @@ public:
  */
 using MPAREdgeLabel = struct MPAREdgeLabel {
     MPDelay delay;
-    const CString mode;
+    const MPString mode;
     CDouble reward{0.0};
 };
 
 /**
  * Support for easy construction of a edge label with rewards.
  */
-inline MPAREdgeLabel makeRewardEdgeLabel(MPDelay d, const CString &sc, CDouble r) {
+inline MPAREdgeLabel makeRewardEdgeLabel(MPDelay d, const MPString &sc, CDouble r) {
     MPAREdgeLabel el = {d, sc, r};
     return el;
 }
@@ -205,9 +205,9 @@ inline bool operator<(const MPAREdgeLabel &s, const MPAREdgeLabel &t) {
     return s.reward < t.reward;
 }
 
-inline CString toString(const MPAREdgeLabel &l) {
-    return "(delay: " + CString(l.delay) + ", mode: " + CString(l.mode)
-           + ", reward: " + CString(l.reward) + ")";
+inline MPString toString(const MPAREdgeLabel &l) {
+    return "(delay: " + MPString(l.delay) + ", mode: " + MPString(l.mode)
+           + ", reward: " + MPString(l.reward) + ")";
 };
 
 // Types of states, edges, sets and cycle of an MPA with rewards.

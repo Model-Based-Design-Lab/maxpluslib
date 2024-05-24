@@ -54,9 +54,9 @@
 
 namespace MaxPlus::SMPLS {
 
-using ModeMatrices = std::map<CString, std::shared_ptr<MaxPlus::Matrix>>;
+using ModeMatrices = std::map<MPString, std::shared_ptr<MaxPlus::Matrix>>;
 
-class EdgeLabeledModeFSM : public ::FSM::Labeled::FiniteStateMachine<CId, CString> {
+class EdgeLabeledModeFSM : public ::FSM::Labeled::FiniteStateMachine<CId, MPString> {
 public:
     // put the destructor deliberately into the cc sourc to ensure the class vtable is accessible
     // see: <https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable>
@@ -90,7 +90,7 @@ public:
 using Mode = InputAction;
 using Event = OutputAction;
 using EventList = std::list<Event>;
-using EventOutcome = CString;
+using EventOutcome = MPString;
 
 using ModeEventPair = std::pair<Mode,Event>;
 using EventOutcomePair = std::pair<Event, EventOutcome>;
@@ -111,7 +111,7 @@ public:
      */
     bool isConsistent();
 
-    void saveDeterminizedIOAtoFile(const CString& file);
+    void saveDeterminizedIOAtoFile(const MPString& file);
 
     /**
      * creates a max-plus automaton from SMPLS with events
@@ -148,7 +148,7 @@ private:
                          std::multiset<Event>& eventList,
                          IOASetOfEdgeRefs& visitedEdges);
 
-    std::shared_ptr<DissectedModeMatrix> findDissectedModeMatrix(const CString& sName);
+    std::shared_ptr<DissectedModeMatrix> findDissectedModeMatrix(const MPString& sName);
 
     /**
      * recursive part of isConsistent
@@ -156,13 +156,13 @@ private:
     void isConsistentUtil(const IOAState &s,
                           EventList &eventList,
                           const IOASetOfStates &finalStates,
-                          CString &errMsg,
+                          MPString &errMsg,
                           std::map<IOAStateRef,EventList> &visited);
 
     void determinizeUtil(const IOAState &s,
                          IOASetOfStateRefs& visited,
                          const IOASetOfStateRefs &finalStates,
-                         CString &errMsg,
+                         MPString &errMsg,
                          std::ofstream &outfile);
 
     static bool compareEventLists(EventList& l1, EventList& l2);

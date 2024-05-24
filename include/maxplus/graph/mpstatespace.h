@@ -48,16 +48,16 @@
 
 namespace MaxPlus {
 
-using ELSState = ::FSM::Labeled::State<CId, CString>;
-using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
-using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, CString>;
-using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
-using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, CString>;
+using ELSState = ::FSM::Labeled::State<CId, MPString>;
+using ELSEdge = ::FSM::Labeled::Edge<CId, MPString>;
+using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, MPString>;
+using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MPString>;
+using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, MPString>;
 
 // /**
 //  * Edge labeled scenario FSM.
 //  */
-// class EdgeLabeledScenarioFSM : public ::FSM::Labeled::FiniteStateMachine<CId, CString> {
+// class EdgeLabeledScenarioFSM : public ::FSM::Labeled::FiniteStateMachine<CId, MPString> {
 // public:
 //     virtual ~EdgeLabeledScenarioFSM() {};
 // };

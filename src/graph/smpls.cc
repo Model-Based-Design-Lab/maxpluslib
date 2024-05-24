@@ -8,11 +8,11 @@
 using namespace FSM;
 using namespace MaxPlus;
 
-using ELSEdge = ::FSM::Labeled::Edge<CId, CString>;
-using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, CString>;
-using ELSState = ::FSM::Labeled::State<CId, CString>;
-using ELSStateRef = ::FSM::Labeled::StateRef<CId, CString>;
-using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, CString>;
+using ELSEdge = ::FSM::Labeled::Edge<CId, MPString>;
+using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, MPString>;
+using ELSState = ::FSM::Labeled::State<CId, MPString>;
+using ELSStateRef = ::FSM::Labeled::StateRef<CId, MPString>;
+using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MPString>;
 using ELSSetOfEdges = ::FSM::Abstract::SetOfEdges;
 using ELSSetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
 using ELSSetOfStateRefs = ::FSM::Abstract::SetOfStateRefs;
@@ -102,10 +102,10 @@ namespace MaxPlus::SMPLS {
 	MPTime getMaxOfRowUntilCol(Matrix& M, uint rowNumber, uint colNumber)
 	{
 		if (rowNumber > M.getRows()) {
-			throw CException("Matrix getMaxOfRow input row index out of bounds.");
+			throw MPException("Matrix getMaxOfRow input row index out of bounds.");
 		}
 		if (colNumber > M.getCols()) {
-			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
+			throw MPException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
 		}
     	MPTime largestEl = MP_MINUS_INFINITY;
 		for (unsigned int c = 0; c < colNumber; c++) {
@@ -120,10 +120,10 @@ namespace MaxPlus::SMPLS {
 	MPTime getMaxOfColUntilRow(Matrix& M, uint colNumber, uint rowNumber)
 	{
 		if (rowNumber > M.getRows()) {
-			throw CException("Matrix getMaxOfRow input row index out of bounds.");
+			throw MPException("Matrix getMaxOfRow input row index out of bounds.");
 		}
 		if (colNumber > M.getCols()) {
-			throw CException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
+			throw MPException("Matrix getMaxOfRowUntilCol input col index out of bounds.");
 		}
     	MPTime largestEl = MP_MINUS_INFINITY;
 		for (unsigned int r = 0; r < rowNumber; r++) {
@@ -178,7 +178,7 @@ namespace MaxPlus::SMPLS {
 			unsigned int nrTokens = 0;
 			if (! e.empty())
 			{
-				CString label = (dynamic_cast<ELSEdgeRef>(*e.begin()))->getLabel();
+				MPString label = (dynamic_cast<ELSEdgeRef>(*e.begin()))->getLabel();
 
 				for (const auto& smIt: this->sm)
 				{
@@ -222,7 +222,7 @@ namespace MaxPlus::SMPLS {
 			for (unsigned int k = 0; k < nrTokens; k++)
 			{
 				MPAStateRef s = mpa->addState(makeMPAStateLabel(qId, k));
-				//std::cout << "DEBUG adding state to mpa id: " << (CString)(s->getLabel().id) << ", tkn: " <<  (s->getLabel().tokenNr)<< std::endl;
+				//std::cout << "DEBUG adding state to mpa id: " << (MPString)(s->getLabel().id) << ", tkn: " <<  (s->getLabel().tokenNr)<< std::endl;
 				if (isInitial) {
 					mpa->addInitialState(*s);
 				}
@@ -248,7 +248,7 @@ namespace MaxPlus::SMPLS {
 			{
 				const auto *tr = dynamic_cast<ELSEdgeRef>(e);
 				CId q2Id = dynamic_cast<ELSStateRef>(tr->getDestination())->getLabel();
-				CString sc = tr->getLabel();
+				MPString sc = tr->getLabel();
 				std::shared_ptr<Matrix> Ms = this->sm.at(sc);
 				size_t r = Ms->getRows();
 				size_t c = Ms->getCols();
@@ -265,7 +265,7 @@ namespace MaxPlus::SMPLS {
 							MPAStateRef src = mpa->getStateLabeled(makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
 							MPAStateRef dst = mpa->getStateLabeled(makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
 							MPAEdgeLabel el = makeMPAEdgeLabel(d, sc);
-							el.mode = CString(tr->getLabel());
+							el.mode = MPString(tr->getLabel());
 							mpa->addEdge(*src, el, *dst);
 						}
 					}
@@ -279,7 +279,7 @@ namespace MaxPlus::SMPLS {
 	/* this is not fully functional for now. you can use the version that it prints out
 	* it also does not check for input actions that don't belong to the same event, which it should.
 	*/
-	void SMPLSwithEvents::saveDeterminizedIOAtoFile(const CString& file)
+	void SMPLSwithEvents::saveDeterminizedIOAtoFile(const MPString& file)
 	{
 		/**
 		 * Deterministic IOA is defined with:
@@ -289,7 +289,7 @@ namespace MaxPlus::SMPLS {
 		 */
 
 		if (this->ioa == nullptr) {
-			throw CException("The automaton of smpls is not loaded!");
+			throw MPException("The automaton of smpls is not loaded!");
 		}
 
 		std::ofstream outfile(file);
@@ -298,7 +298,7 @@ namespace MaxPlus::SMPLS {
 
 		const auto& finalStates = dynamic_cast<const IOASetOfStateRefs&>(this->ioa->getFinalStates());
 
-		CString errMsg = "";
+		MPString errMsg = "";
 		auto i = I.begin();
 		auto& s = dynamic_cast<const IOAState&>(*(*i));
 		i++;
@@ -320,7 +320,7 @@ namespace MaxPlus::SMPLS {
 	bool SMPLSwithEvents::isConsistent()
 	{
 		if (this->ioa == nullptr) {
-			throw CException("The automaton of smpls is not loaded!");
+			throw MPException("The automaton of smpls is not loaded!");
 		}
 		EventList eventList;
 
@@ -329,7 +329,7 @@ namespace MaxPlus::SMPLS {
 		const auto& finalStates = dynamic_cast<const IOASetOfStates&>(this->ioa->getFinalStates());
 
 		std::map<IOAStateRef,EventList> visited;
-		CString errMsg = "";
+		MPString errMsg = "";
 		for (const auto& i: I)
 		{
 			isConsistentUtil((dynamic_cast<IOAState&>(*(i.second))), eventList, finalStates, errMsg, visited);
@@ -410,7 +410,7 @@ namespace MaxPlus::SMPLS {
 				return (EventOutcomePair(gammaIterator)).first;
 			}
 		}
-		throw CException("Event of outcome " + outcome + " not found!");
+		throw MPException("Event of outcome " + outcome + " not found!");
 	}
 
 	/*
@@ -426,7 +426,7 @@ namespace MaxPlus::SMPLS {
 				return (ModeEventPair(sigmaIterator)).second;
 			}
 		}
-		throw CException("Event of mode " + mode + " not found!");
+		throw MPException("Event of mode " + mode + " not found!");
 	}
 
 	/**
@@ -445,7 +445,7 @@ namespace MaxPlus::SMPLS {
 			}
 
 			//create a unique label for the new edge. this name will also be the mode name for sm
-			CString modeName = CString(s.getId());
+			MPString modeName = MPString(s.getId());
 			modeName += ",";
 			modeName += e->getLabel().first + "," + e->getLabel().second;
 
@@ -461,7 +461,7 @@ namespace MaxPlus::SMPLS {
 
 			auto disSm = std::make_shared<DissectedModeMatrix>();
 			std::shared_ptr<Matrix> sMatrix; //matrix to be generated and assigned to this edge
-			CString outputActionEventName = "";
+			MPString outputActionEventName = "";
 			int emittingEventIndex = -1;
 			int processingEventIndex = -1;
 			int eventIndexCounter = 0;
@@ -470,7 +470,7 @@ namespace MaxPlus::SMPLS {
 				// find the dissected matrix structure needed for this edge
 				disSm = findDissectedModeMatrix(output);
 				if (disSm == nullptr){
-					throw CException("mode " + output + " not found in dissected matrices!");
+					throw MPException("mode " + output + " not found in dissected matrices!");
 				}
 
 				sMatrix = disSm->core.begin()->second->createCopy();
@@ -508,7 +508,7 @@ namespace MaxPlus::SMPLS {
 
 			if (! eList.empty())
 			{
-				CString eventToBeRemoved;
+				MPString eventToBeRemoved;
 				std::multiset<Event> eTempList(eList);
 				std::multiset<Event>::iterator eventIter;
 				for (eventIter = eTempList.begin(); eventIter != eTempList.end(); eventIter++)
@@ -591,7 +591,7 @@ namespace MaxPlus::SMPLS {
 		}
 	}
 
-	std::shared_ptr<DissectedModeMatrix> SMPLSwithEvents::findDissectedModeMatrix(const CString& sName)
+	std::shared_ptr<DissectedModeMatrix> SMPLSwithEvents::findDissectedModeMatrix(const MPString& sName)
 	{
 		std::shared_ptr<DissectedModeMatrix> dis = nullptr;
 		for (const auto& i: this->disMatrices) {
@@ -607,14 +607,14 @@ namespace MaxPlus::SMPLS {
 	/**
 		 * recursive part of isConsistent
 		 */
-	void SMPLSwithEvents::isConsistentUtil(const IOAState& s, EventList& eventList, const IOASetOfStates& finalStates, CString& errMsg, std::map<IOAStateRef, EventList> &visited)
+	void SMPLSwithEvents::isConsistentUtil(const IOAState& s, EventList& eventList, const IOASetOfStates& finalStates, MPString& errMsg, std::map<IOAStateRef, EventList> &visited)
 	{
 		auto it = visited.find(&s);
 		if (it != visited.end()) // we have already visited this state but we must check for inconsistency before leaving the state
 		{
 			if (!compareEventLists(it->second, eventList))
 			{
-				errMsg = CString("Different paths leading to different events at state " + std::to_string(s.getLabel()));
+				errMsg = MPString("Different paths leading to different events at state " + std::to_string(s.getLabel()));
 			}
 			// we have checked for inconsistency, no need to go further down this state
 			return;
@@ -666,7 +666,7 @@ namespace MaxPlus::SMPLS {
 					if (!eventFound)
 					{
 						// we are processing a non-emitted event
-						errMsg = CString("on edge: " + std::to_string(s.getLabel()) + " - " + std::string(input + "," + output + ", Processing event outcome : " + input + " where the event is not emitted yet.\r\n"));
+						errMsg = MPString("on edge: " + std::to_string(s.getLabel()) + " - " + std::string(input + "," + output + ", Processing event outcome : " + input + " where the event is not emitted yet.\r\n"));
 						return;
 					}
 				}
@@ -694,7 +694,7 @@ namespace MaxPlus::SMPLS {
 	/**
 		 * recursive part of determinize
 		 */
-	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs& visited, const IOASetOfStateRefs& finalStates, CString& errMsg, std::ofstream& outfile)
+	void SMPLSwithEvents::determinizeUtil(const IOAState& s, IOASetOfStateRefs& visited, const IOASetOfStateRefs& finalStates, MPString& errMsg, std::ofstream& outfile)
 	{
 		/**
 		 * Deterministic IOA is defined with:

@@ -50,20 +50,20 @@ CId FSM::Abstract::WithUniqueID::nextID = 0;
 
 namespace StateStringLabeled {
 
-void FiniteStateMachine::addStateLabeled(const CString &sl) { this->addState(sl); }
+void FiniteStateMachine::addStateLabeled(const MPString &sl) { this->addState(sl); }
 
-void FiniteStateMachine::addEdgeLabeled(const CString &src, const CString &dst) {
-    const Labeled::StateRef<CString, char> s_src = this->getStateLabeled(src);
-    const Labeled::StateRef<CString, char> s_dst = this->getStateLabeled(dst);
-    Labeled::FiniteStateMachine<CString, char>::addEdge(*s_src, 'X', *s_dst);
+void FiniteStateMachine::addEdgeLabeled(const MPString &src, const MPString &dst) {
+    const Labeled::StateRef<MPString, char> s_src = this->getStateLabeled(src);
+    const Labeled::StateRef<MPString, char> s_dst = this->getStateLabeled(dst);
+    Labeled::FiniteStateMachine<MPString, char>::addEdge(*s_src, 'X', *s_dst);
 }
 
 std::shared_ptr<Abstract::SetOfStateRefs> FiniteStateMachine::reachableStates() {
     return std::static_pointer_cast<Abstract::SetOfStateRefs>(
-            Labeled::FiniteStateMachine<CString, char>::reachableStates());
+            Labeled::FiniteStateMachine<MPString, char>::reachableStates());
 }
 
-void FiniteStateMachine::setInitialStateLabeled(const CString &sl) { this->setInitialState(sl); }
+void FiniteStateMachine::setInitialStateLabeled(const MPString &sl) { this->setInitialState(sl); }
 
 } // namespace StateStringLabeled
 
