@@ -22,6 +22,7 @@ void MPAutomatonTest::Run() {
     testCreateFSM();
     testDeterminizeFSM();
     testMinimizeFSM();
+    testDetectCycleFSM();
 }
 
 void MPAutomatonTest::testCreateFSM() {
@@ -103,13 +104,13 @@ void MPAutomatonTest::testDeterminizeFSM() {
 
 void MPAutomatonTest::testMinimizeFSM() {
 
-    std::cout << "Running test: MinimizeFSM" << std::endl;
+    std::cout << "Running test: MinimizeFSM\n";
 
     FSM::Labeled::FiniteStateMachine<int, int> fsa;
 
-    auto s0 = fsa.addState(3);
-    auto s1 = fsa.addState(5);
-    auto s2 = fsa.addState(5);
+    const auto *s0 = fsa.addState(3);
+    const auto *s1 = fsa.addState(5);
+    const auto *s2 = fsa.addState(5);
 
     fsa.addEdge(*s0, 2, *s1);
     fsa.addEdge(*s1, 2, *s2);
@@ -117,7 +118,7 @@ void MPAutomatonTest::testMinimizeFSM() {
 
     fsa.setInitialState(*s0);
 
-    std::shared_ptr<FSM::Labeled::FiniteStateMachine<int, int>> fsaMin =
+    const auto fsaMin =
             std::dynamic_pointer_cast<FSM::Labeled::FiniteStateMachine<int, int>>(
                     fsa.minimizeEdgeLabels());
 
@@ -126,4 +127,48 @@ void MPAutomatonTest::testMinimizeFSM() {
 
     ASSERT_EQUAL(fsaMin->getStates().size(), 2);
     ASSERT_EQUAL(fsaMin->getEdges().size(), 2);
+}
+
+void MPAutomatonTest::testDetectCycleFSM() {
+
+    std::cout << "Running test: DetectCycles\n";
+
+    {
+        FSM::Labeled::FiniteStateMachine<int, int> fsa;
+
+        const auto *s0 = fsa.addState(3);
+        const auto *s1 = fsa.addState(5);
+        const auto *s2 = fsa.addState(5);
+        const auto *s3 = fsa.addState(4);
+
+        fsa.addEdge(*s3, 2, *s1);
+        fsa.addEdge(*s1, 2, *s2);
+        fsa.addEdge(*s2, 2, *s0);
+        fsa.addEdge(*s3, 2, *s2);
+        fsa.addEdge(*s1, 2, *s0);
+
+        FSM::Abstract::DetectCycle DC(fsa);
+        bool hasCycle = DC.checkForCycles();
+
+        ASSERT(! hasCycle);
+    }
+
+    {
+        FSM::Labeled::FiniteStateMachine<int, int> fsa;
+
+        const auto *s2 = fsa.addState(5);
+        const auto *s3 = fsa.addState(4);
+        const auto *s0 = fsa.addState(3);
+        const auto *s1 = fsa.addState(5);
+
+        fsa.addEdge(*s0, 2, *s1);
+        fsa.addEdge(*s1, 2, *s2);
+        fsa.addEdge(*s2, 2, *s3);
+        fsa.addEdge(*s3, 2, *s1);
+
+        FSM::Abstract::DetectCycle DC(fsa);
+        bool hasCycle = DC.checkForCycles();
+
+        ASSERT(hasCycle);
+    }
 }

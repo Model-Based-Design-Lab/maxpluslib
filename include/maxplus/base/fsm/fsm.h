@@ -41,6 +41,7 @@
 #ifndef MAXPLUS_BASE_FSM_FSM_H
 #define MAXPLUS_BASE_FSM_FSM_H
 
+#include "base/fsm/fsm.h"
 #include "maxplus/base/basic_types.h"
 #include "maxplus/base/exception/exception.h"
 #include "maxplus/base/string/cstring.h"
@@ -150,6 +151,11 @@ public:
         return this->outgoingEdges;
     }
 
+    // as a reference
+    [[nodiscard]] virtual const StateRef getReference() const {
+        return this;
+    }
+
     void insertOutgoingEdge(Edge &e) { this->outgoingEdges.insert(&e); }
 
     void removeOutgoingEdge(EdgeRef e) { this->outgoingEdges.erase(e); }
@@ -174,11 +180,18 @@ struct StateRefCompareLessThan {
 };
 
 // A set of references to states
-class SetOfStateRefs : public std::set<const State *, StateRefCompareLessThan> {
+class SetOfStateRefs : public std::set<StateRef, StateRefCompareLessThan> {
 public:
-    using CIter = SetOfEdgeRefs::const_iterator;
+    using CIter = SetOfStateRefs::const_iterator;
     bool includesState(const State *s) { return this->find(s) != this->end(); }
     virtual ~SetOfStateRefs() = default;
+};
+
+// A list of references to states
+class ListOfStateRefs : public std::list<StateRef> {
+public:
+    using CIter = ListOfStateRefs::const_iterator;
+    virtual ~ListOfStateRefs() = default;
 };
 
 // forward declaration of reachable states strategy
@@ -199,7 +212,9 @@ public:
     [[nodiscard]] virtual StateRef getInitialState() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getInitialStates() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getFinalStates() const = 0;
+    [[nodiscard]] virtual const SetOfStates &getStates() const = 0;
 };
+
 
 //
 // A generic DFS strategy on the target FSM
@@ -223,9 +238,9 @@ public:
         };
 
         // access state
-        inline const StateRef getState() { return this->state; }
+        StateRef getState() { return this->state; }
 
-        inline SetOfEdgeRefs::CIter getIter() { return this->iter; }
+        SetOfEdgeRefs::CIter getIter() { return this->iter; }
 
         // test if all outgoing edges have been done
         bool atEnd() { return this->iter == this->state->getOutgoingEdges().end(); }
@@ -238,7 +253,7 @@ public:
         SetOfEdgeRefs::CIter iter;
     };
 
-private:
+protected:
     using DfsStack = std::list<DFSStackItem>;
     DfsStack dfsStack;
 
@@ -257,12 +272,14 @@ public:
     explicit DepthFirstSearch(FiniteStateMachine &targetFsm) : fsm(targetFsm){};
 
     // Execute the depth first search
-    void DoDepthFirstSearch(bool fullDFS = false) {
+    void DoDepthFirstSearch(const StateRef &startingState, bool fullDFS = false) {
         // store visited states
         SetOfStateRefs visitedStates;
+        SetOfStateRefs statesOnStack;
 
         // put initial state on the stack
-        dfsStack.emplace_back(this->fsm.getInitialState());
+        dfsStack.emplace_back(startingState);
+        this->onEnterState(startingState);
 
         while (!(dfsStack.empty())) {
             DFSStackItem &si = dfsStack.back();
@@ -271,33 +288,96 @@ public:
             if (si.atEnd()) {
                 // pop it from stack
                 this->onLeaveState(si.getState());
+                const auto *const s = si.getState();
+                statesOnStack.erase(s);
                 if (fullDFS) {
-                    const auto s = si.getState();
                     assert(visitedStates.includesState(s));
                     visitedStates.erase(s);
                 }
                 dfsStack.pop_back();
             } else {
                 // goto next edge
-                auto *e = *(si.getIter());
+                const auto *e = *(si.getIter());
                 si.advance();
-                bool revisit = visitedStates.includesState(e->getDestination());
+                StateRef dest = e->getDestination();
+                bool revisit = statesOnStack.includesState(dest);
                 if (revisit) {
-                    // if target state not visited before
-                    dfsStack.emplace_back(e->getDestination());
-                    this->onTransition(*e);
-                    this->onEnterState(e->getDestination());
-                    visitedStates.insert(e->getDestination());
-                } else {
                     // cycle found
                     this->onSimpleCycle(dfsStack);
+                } else {
+                    // if target state not visited before
+                    dfsStack.emplace_back(dest);
+                    this->onTransition(*e);
+                    this->onEnterState(dest);
+                    visitedStates.insert(dest);
+                    statesOnStack.insert(dest);
                 }
             }
         }
     }
 
-private:
+    // Execute the depth first search
+    void DoDepthFirstSearch(bool fullDFS = false) {
+        this->DoDepthFirstSearch(this->fsm.getInitialState(), fullDFS);
+    }
+
+protected:
     FiniteStateMachine &fsm;
+};
+
+// Check for cycles
+class DetectCycle : public DepthFirstSearch {
+public:
+    bool hasCycle = false;
+
+    explicit DetectCycle(FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){};
+
+    ~DetectCycle() override = default;
+
+    DetectCycle(const DetectCycle &) = delete;
+    DetectCycle &operator=(const DetectCycle &other) = delete;
+    DetectCycle(DetectCycle &&) = delete;
+    DetectCycle &operator=(DetectCycle &&) = delete;
+
+    bool checkForCycles() {
+        return this->checkForCycles(nullptr);
+    }
+
+    bool checkForCycles(ListOfStateRefs *cycle) {
+        this->visitedStates.clear();
+        this->cycle = cycle;
+        const SetOfStates &states = this->fsm.getStates();
+        auto nextStartingState = states.begin();
+        while (nextStartingState != states.end()) {
+            this->DoDepthFirstSearch((*nextStartingState).second->getReference());
+            if (this->hasCycle) {
+                return true;
+            }
+            while (nextStartingState != states.end() && this->visitedStates.includesState((*nextStartingState).second->getReference())) {
+                nextStartingState++;
+            }
+        }
+        return false;
+    }
+
+private:
+    SetOfStateRefs visitedStates;
+    ListOfStateRefs *cycle = nullptr;
+
+    void onEnterState(StateRef s) override {
+        this->visitedStates.insert(s);
+    }
+
+    void onSimpleCycle(DfsStack &stack) override {
+        if (!this->hasCycle) {
+            if (this->cycle != nullptr) {
+                for (auto si : stack) {
+                    this->cycle->push_back(si.getState());
+                }
+            }
+            this->hasCycle = true;
+        }
+    }
 };
 
 // Reachable states strategy based on DFS
@@ -573,7 +653,7 @@ public:
         return false;
     };
 
-    [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const {
+    [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const override {
         return this->states;
     };
     Abstract::SetOfStateRefs getStateRefs() {
@@ -871,7 +951,7 @@ public:
             const auto *s = *(cli->begin());
             auto es = s->getOutgoingEdges();
             // for every outgoing edge
-            for (auto *edi : es) {
+            for (const auto *edi : es) {
                 auto ed = dynamic_cast<EdgeRef<StateLabelType, EdgeLabelType>>(edi);
                 result->addEdge(*(newStateMap[cli]),
                                 ed->getLabel(),
@@ -883,6 +963,11 @@ public:
         result->setInitialState(*(newStateMap[eqMap[this->getInitialState()]]));
 
         return result;
+    }
+
+    bool hasDirectedCycle() {
+        FSM::Abstract::DetectCycle DC(*this);
+        return DC.checkForCycles(nullptr);
     }
 
 private:
