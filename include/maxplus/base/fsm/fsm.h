@@ -41,7 +41,6 @@
 #ifndef MAXPLUS_BASE_FSM_FSM_H
 #define MAXPLUS_BASE_FSM_FSM_H
 
-#include "base/fsm/fsm.h"
 #include "maxplus/base/basic_types.h"
 #include "maxplus/base/exception/exception.h"
 #include "maxplus/base/string/cstring.h"
