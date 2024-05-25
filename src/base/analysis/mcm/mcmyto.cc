@@ -53,6 +53,7 @@
 #include <cfloat>
 #include <cstdint>
 #include <memory>
+#include <cassert>
 
 namespace Graphs {
 
@@ -470,7 +471,8 @@ public:
 
         while (true) {
             min_a_ptr = GetMin();
-            ASSERT(min_a_ptr != NILA, "No element on heap!");
+            // should be element on heap
+            assert((min_a_ptr != NILA));
 
             *lambda = min_a_ptr->key;
             if (*lambda >= infty) {
@@ -757,7 +759,8 @@ public:
 
         while (true) {
             min_a_ptr = GetMin();
-            ASSERT(min_a_ptr != NILA, "No element on heap!");
+            // there must be an element on the heap
+            assert(min_a_ptr != NILA);
 
             *lambda = min_a_ptr->key;
             if (*lambda >= infty) {

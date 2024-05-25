@@ -42,8 +42,13 @@
 #include "base/analysis/mcm/mcmgraph.h"
 #include "base/analysis/mcm/mcm.h"
 #include "base/analysis/mcm/mcmyto.h"
-#include "base/base.h"
+#include <cassert>
+#include <map>
 #include <memory>
+#include <set>
+#include <vector>
+
+
 
 namespace Graphs {
 /**
@@ -278,6 +283,8 @@ void addLongestDelayEdgesToMCMgraph(MCMgraph &g) {
     }
 }
 
+namespace {
+
 /**
  * getAdjacentNodes ()
  * The function returns a list with nodes directly reachable from
@@ -285,7 +292,7 @@ void addLongestDelayEdgesToMCMgraph(MCMgraph &g) {
  * graph is transposed and the function returns a list with nodes
  * which are directly reachable from a in the transposed graph.
  */
-static MCMnodeRefs getAdjacentNodes(const MCMnode &a, bool transpose) {
+MCMnodeRefs getAdjacentNodes(const MCMnode &a, bool transpose) {
     MCMnodeRefs node_refs;
 
     if (!transpose) {
@@ -311,7 +318,7 @@ static MCMnodeRefs getAdjacentNodes(const MCMnode &a, bool transpose) {
  * order. Its order is set to -1. If all nodes have order -1, a nullptr pointer is
  * returned.
  */
-static const MCMnode *getNextNode(MCMnodes &nodes, v_int &order) {
+const MCMnode *getNextNode(MCMnodes &nodes, v_int &order) {
     const MCMnode *a = nullptr;
     int orderA = -1;
 
@@ -335,7 +342,7 @@ static const MCMnode *getNextNode(MCMnodes &nodes, v_int &order) {
  * dfsVisit ()
  * The visitor function of the DFS algorithm.
  */
-static void dfsVisit(const MCMnode &u,
+void dfsVisit(const MCMnode &u,
                      int &time,
                      v_int &color,
                      v_int &d,
@@ -366,6 +373,8 @@ static void dfsVisit(const MCMnode &u,
     time++;
     f[u.id] = time;
 }
+
+} // namespace
 
 /**
  * dfsMCMgraph ()
@@ -470,7 +479,8 @@ treeVisitChildren(MCMgraph &g, std::vector<const MCMnode *> &pi, MCMnode *u, MCM
                     break;
                 }
             }
-            ASSERT(v != nullptr, "There must always be a node v.");
+            // There must always be a node v.
+            assert((v != nullptr));
 
             // Add node v to the component
             v->visible = true;

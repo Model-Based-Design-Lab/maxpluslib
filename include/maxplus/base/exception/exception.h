@@ -99,18 +99,4 @@ public:
 
 } // namespace MaxPlus
 
-#define ASSERT(condition, msg)                                                                     \
-    {                                                                                              \
-        if (!(condition))                                                                          \
-            throw MaxPlus::MPException(MaxPlus::MPString(__FILE__) + MaxPlus::MPString(":") + MaxPlus::MPString(__LINE__) + MaxPlus::MPString(": ")  \
-                             + MaxPlus::MPString(msg));                                                      \
-    }
-
-#define EXCEPTION(msg, ...)                                                                        \
-    {                                                                                              \
-        char buf[1024];                                                                            \
-        sprintf(&buf[0], msg, __VA_ARGS__);                                                        \
-        throw MPException(buf);                                                                     \
-    }
-
 #endif
