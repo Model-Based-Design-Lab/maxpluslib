@@ -41,8 +41,8 @@
 #ifndef MAXPLUS_BASE_FSM_FSM_H
 #define MAXPLUS_BASE_FSM_FSM_H
 
-#include "maxplus/base/exception/exception.h"
 #include "maxplus/base/basic_types.h"
+#include "maxplus/base/exception/exception.h"
 #include "maxplus/base/string/cstring.h"
 #include <list>
 #include <map>
@@ -71,7 +71,7 @@ private:
 
 // forward declaration of FSM state class
 class State;
-using StateRef = const State*;
+using StateRef = const State *;
 
 // Edge of an FSM
 class Edge : public WithUniqueID {
@@ -112,7 +112,7 @@ public:
     void remove(const Edge &e) { this->erase(e.getId()); }
 };
 
-using EdgeRef = const Edge*;
+using EdgeRef = const Edge *;
 
 struct EdgeRefCompareLessThan {
     bool operator()(EdgeRef lhs, EdgeRef rhs) const { return lhs->lessThan(*rhs); };
@@ -136,7 +136,7 @@ public:
 
     State(const State &) = default;
     State &operator=(const State &other) = delete;
-    State(State &&)  noexcept = default;
+    State(State &&) noexcept = default;
     State &operator=(State &&) = delete;
 
     // add an outgoing edge to the state
@@ -152,15 +152,11 @@ public:
 
     void insertOutgoingEdge(Edge &e) { this->outgoingEdges.insert(&e); }
 
-void removeOutgoingEdge(EdgeRef e) {
-    this->outgoingEdges.erase(e);
-}
+    void removeOutgoingEdge(EdgeRef e) { this->outgoingEdges.erase(e); }
 
 private:
     SetOfEdgeRefs outgoingEdges;
-
 };
-
 
 // A set of states
 // the set is assumed to have unique ownership of the states
@@ -168,13 +164,9 @@ class SetOfStates : public std::map<CId, std::shared_ptr<State>> {
 public:
     void remove(const State &s) { this->erase(s.getId()); }
     virtual ~SetOfStates() = default;
-    void addState(const std::shared_ptr<State> &s) {
-        this->insert(std::make_pair(s->getId(), s));
-    }
+    void addState(const std::shared_ptr<State> &s) { this->insert(std::make_pair(s->getId(), s)); }
 
-    State& withId(const CId id) {
-        return *this->at(id);
-    }
+    State &withId(const CId id) { return *this->at(id); }
 };
 
 struct StateRefCompareLessThan {
@@ -207,7 +199,6 @@ public:
     [[nodiscard]] virtual StateRef getInitialState() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getInitialStates() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getFinalStates() const = 0;
-
 };
 
 //
@@ -347,7 +338,8 @@ private:
     EdgeLabelType label;
 };
 
-template <typename StateLabelType, typename EdgeLabelType> using EdgeRef = const Edge<StateLabelType, EdgeLabelType>*;
+template <typename StateLabelType, typename EdgeLabelType>
+using EdgeRef = const Edge<StateLabelType, EdgeLabelType> *;
 
 template <typename StateLabelType, typename EdgeLabelType>
 class SetOfEdges : public Abstract::SetOfEdges {
@@ -355,8 +347,8 @@ public:
     using CIter = typename Abstract::SetOfEdges::const_iterator;
 };
 
-template <typename StateLabelType, typename EdgeLabelType> using StateRef = const State<StateLabelType,EdgeLabelType>*;
-
+template <typename StateLabelType, typename EdgeLabelType>
+using StateRef = const State<StateLabelType, EdgeLabelType> *;
 
 // template <typename StateLabelType, typename EdgeLabelType>
 // class SetOfEdgeRefs : public Abstract::SetOfEdgeRefs {
@@ -369,13 +361,13 @@ class SetOfStates : public Abstract::SetOfStates {
 private:
     std::map<StateLabelType, std::shared_ptr<State<StateLabelType, EdgeLabelType>>> labelIndex;
 
-    void addToStateIndex(StateLabelType l, std::shared_ptr<State<StateLabelType, EdgeLabelType>> s) {
+    void addToStateIndex(StateLabelType l,
+                         std::shared_ptr<State<StateLabelType, EdgeLabelType>> s) {
         this->labelIndex[l] = s;
     }
 
 public:
-
-    State<StateLabelType, EdgeLabelType>& withLabel(StateLabelType l) {
+    State<StateLabelType, EdgeLabelType> &withLabel(StateLabelType l) {
         if (this->labelIndex.find(l) != this->labelIndex.end()) {
             return *this->labelIndex[l];
         }
@@ -386,11 +378,10 @@ public:
         return this->labelIndex.find(l) != this->labelIndex.end();
     }
 
-    void addState(std::shared_ptr<State<StateLabelType, EdgeLabelType>>& s) {
+    void addState(std::shared_ptr<State<StateLabelType, EdgeLabelType>> &s) {
         Abstract::SetOfStates::addState(std::dynamic_pointer_cast<Abstract::State>(s));
         this->addToStateIndex(s->getLabel(), s);
     }
-
 };
 
 template <typename StateLabelType, typename EdgeLabelType>
@@ -447,17 +438,16 @@ private:
     SetOfStateRefs<StateLabelType, EdgeLabelType> initialStates;
     SetOfStateRefs<StateLabelType, EdgeLabelType> finalStates;
 
-    State<StateLabelType, EdgeLabelType>& _getStateLabeled(const StateLabelType &s) {
+    State<StateLabelType, EdgeLabelType> &_getStateLabeled(const StateLabelType &s) {
         return this->states.withLabel(s);
     };
 
-    State<StateLabelType, EdgeLabelType>& _getState(const State<StateLabelType, EdgeLabelType> &s) {
-        return dynamic_cast<State<StateLabelType, EdgeLabelType>&>(this->states.withId(s.getId()));
+    State<StateLabelType, EdgeLabelType> &_getState(const State<StateLabelType, EdgeLabelType> &s) {
+        return dynamic_cast<State<StateLabelType, EdgeLabelType> &>(this->states.withId(s.getId()));
     };
 
-
 public:
-    FiniteStateMachine() : Abstract::FiniteStateMachine() {};
+    FiniteStateMachine() : Abstract::FiniteStateMachine(){};
 
     ~FiniteStateMachine() override = default;
 
@@ -483,10 +473,10 @@ public:
                                                  EdgeLabelType lbl,
                                                  const State<StateLabelType, EdgeLabelType> &dst) {
         // lookup state again to drop const qualifier
-        auto &mySrc =
-                dynamic_cast<State<StateLabelType, EdgeLabelType> &>(this->states.withId(src.getId()));
-        auto &myDst =
-                dynamic_cast<State<StateLabelType, EdgeLabelType> &>(this->states.withId(dst.getId()));
+        auto &mySrc = dynamic_cast<State<StateLabelType, EdgeLabelType> &>(
+                this->states.withId(src.getId()));
+        auto &myDst = dynamic_cast<State<StateLabelType, EdgeLabelType> &>(
+                this->states.withId(dst.getId()));
         bool added = false;
         auto ep = std::make_shared<Edge<StateLabelType, EdgeLabelType>>(mySrc, lbl, myDst);
         auto &e = *ep;
@@ -498,7 +488,7 @@ public:
     void removeEdge(const Edge<StateLabelType, EdgeLabelType> &e) {
         auto csrc = dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(e.getSource());
         // get a non-const version of the state
-        auto& src = this->_getState(*csrc);
+        auto &src = this->_getState(*csrc);
         src.removeOutgoingEdge(&e);
         this->edges.remove(e);
     }
@@ -540,7 +530,6 @@ public:
         // we are assuming s is one of our states
         this->finalStates.insert(&s);
     };
-
 
     [[nodiscard]] StateRef<StateLabelType, EdgeLabelType> getInitialState() const override {
         if (this->initialStates.empty()) {
@@ -584,7 +573,9 @@ public:
         return false;
     };
 
-    [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const { return this->states; };
+    [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const {
+        return this->states;
+    };
     Abstract::SetOfStateRefs getStateRefs() {
         Abstract::SetOfStateRefs result;
         for (auto i : this->states) {
@@ -643,7 +634,8 @@ public:
 
                 for (const auto &it : outgoingEdges) {
                     auto e = dynamic_cast<const Edge<StateLabelType, EdgeLabelType> *>(it);
-                    auto dstState = dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(e->getDestination());
+                    auto dstState = dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(
+                            e->getDestination());
                     if (e->getLabel() == lbl && dstState->getLabel() == dst) {
                         return e;
                     }
@@ -957,7 +949,8 @@ namespace StateStringLabeled {
 
 class State : public Labeled::State<MaxPlus::MPString, char> {
 public:
-    explicit State(const MaxPlus::MPString &withLabel) : Labeled::State<MaxPlus::MPString, char>(withLabel) {}
+    explicit State(const MaxPlus::MPString &withLabel) :
+        Labeled::State<MaxPlus::MPString, char>(withLabel) {}
 
     const Abstract::SetOfEdgeRefs &getOutgoingEdges() {
         return dynamic_cast<const Abstract::SetOfEdgeRefs &>(
@@ -968,7 +961,8 @@ public:
 class FiniteStateMachine : public Labeled::FiniteStateMachine<MaxPlus::MPString, char> {
 public:
     [[nodiscard]] Labeled::StateRef<MaxPlus::MPString, char> getInitialState() const override {
-        return dynamic_cast<Labeled::StateRef<MaxPlus::MPString, char>>(Labeled::FiniteStateMachine<MaxPlus::MPString, char>::getInitialState());
+        return dynamic_cast<Labeled::StateRef<MaxPlus::MPString, char>>(
+                Labeled::FiniteStateMachine<MaxPlus::MPString, char>::getInitialState());
     };
 
     void setInitialStateLabeled(const MaxPlus::MPString &sl);

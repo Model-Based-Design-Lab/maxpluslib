@@ -44,7 +44,6 @@
 #include "../string/cstring.h"
 #include <exception>
 
-
 namespace MaxPlus {
 
 /*

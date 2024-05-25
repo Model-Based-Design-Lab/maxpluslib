@@ -99,11 +99,11 @@ using MPAEdgeLabel = struct MPAEdgeLabel {
 };
 
 /**
-    * Create a new edge label
-    * @param stateId FSM state id
-    * @param tokenId token number
-    */
-inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const MPString& mode) {
+ * Create a new edge label
+ * @param stateId FSM state id
+ * @param tokenId token number
+ */
+inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, const MPString &mode) {
     MPAEdgeLabel el;
     el.delay = delay;
     el.mode = mode;

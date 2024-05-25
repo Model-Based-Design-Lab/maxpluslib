@@ -47,7 +47,6 @@
 #include <unordered_set>
 #include <vector>
 
-
 namespace MaxPlus {
 
 class MPString;
@@ -192,10 +191,10 @@ public:
 
     [[nodiscard]] Matrix getSubMatrixNonSquare(const std::list<unsigned int> &indices) const;
 
-    [[nodiscard]] Matrix getSubMatrixNonSquareRows(const std::list<unsigned int>& rowIndices) const;
+    [[nodiscard]] Matrix getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
 
     [[nodiscard]] virtual std::shared_ptr<Matrix>
-    getSubMatrixNonSquareRowsPtr(const std::list<unsigned int>& rowIndices) const;
+    getSubMatrixNonSquareRowsPtr(const std::list<unsigned int> &rowIndices) const;
 
     /**
      * Increases the number of rows of the matrix by n and fills the new elements with -\infty.
