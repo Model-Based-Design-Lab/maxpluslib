@@ -48,8 +48,6 @@
 #include <set>
 #include <vector>
 
-
-
 namespace Graphs {
 /**
  * ~MCMgraph
@@ -343,12 +341,12 @@ const MCMnode *getNextNode(MCMnodes &nodes, v_int &order) {
  * The visitor function of the DFS algorithm.
  */
 void dfsVisit(const MCMnode &u,
-                     int &time,
-                     v_int &color,
-                     v_int &d,
-                     v_int &f,
-                     std::vector<const MCMnode *> &pi,
-                     bool transpose) {
+              int &time,
+              v_int &color,
+              v_int &d,
+              v_int &f,
+              std::vector<const MCMnode *> &pi,
+              bool transpose) {
     // color[u] <- gray
     color[u.id] = 1;
 

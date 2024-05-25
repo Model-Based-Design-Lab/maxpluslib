@@ -91,7 +91,7 @@ Vector &Vector::operator=(const Vector &other) {
     if (this != &other) {
         if (this->getSize() != other.getSize()) {
             throw MPException("Vectors of different size in"
-                             "Vector::operator=");
+                              "Vector::operator=");
         }
         for (unsigned int row = 0; row < this->getSize(); row++) {
             this->table[row] = other.table[row];
@@ -107,7 +107,7 @@ void Vector::negate() {
     for (unsigned int row = 0; row < this->getSize(); row++) {
         if (this->get(row) == MP_MINUS_INFINITY) {
             throw MPException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
-                             "Vector::negate");
+                              "Vector::negate");
         }
         this->put(row, -this->get(row));
     }
@@ -132,7 +132,7 @@ MPTime Vector::normalize() {
 
     if (maxEl == MP_MINUS_INFINITY) {
         throw MPException("Cannot normalize vector with norm MP_MINUS_INFINITY"
-                         "Vector::normalize");
+                          "Vector::normalize");
     }
     for (unsigned int row = 0; row < this->getSize(); row++) {
         MPTime x_i = this->get(row); // MPTime handles -INF correctly
@@ -355,26 +355,22 @@ void Matrix::addRows(uint n) {
 }
 
 /**
-* Increases the number of cols of the matrix by n and fills the new elements with -\infty.
-*/
-void Matrix::addCols(uint n)
-{
+ * Increases the number of cols of the matrix by n and fills the new elements with -\infty.
+ */
+void Matrix::addCols(uint n) {
     unsigned int rows = this->getRows();
     unsigned int cols = this->getCols();
     this->szCols = this->szCols + n;
     auto it = this->table.begin() + cols;
-    for (unsigned int r = 0; r < rows; r++)
-    {
-        for (unsigned int c = 0; c < n; c++)
-        {
-            it= this->table.insert(it, MP_MINUS_INFINITY);
+    for (unsigned int r = 0; r < rows; r++) {
+        for (unsigned int c = 0; c < n; c++) {
+            it = this->table.insert(it, MP_MINUS_INFINITY);
         }
         if (r < rows - 1) {
-            advance(it, cols+n);
+            advance(it, cols + n);
         }
     }
 }
-
 
 /**
  * Get size of a square matrix
@@ -390,7 +386,7 @@ unsigned int Matrix::getSize() const {
 MPTime Matrix::get(unsigned int row, unsigned int column) const {
     if ((row >= this->getRows()) || (column >= this->getCols())) {
         throw MPException("Index out of bounds in"
-                         "Matrix::get");
+                          "Matrix::get");
     }
     return this->table[row * this->getCols() + column];
 }
@@ -414,7 +410,7 @@ Vector Matrix::getRowVector(unsigned int row) const {
 void Matrix::put(unsigned int row, unsigned int column, MPTime value) {
     if ((row >= this->getRows()) || (column >= this->getCols())) {
         throw MPException("Index out of bounds in"
-                         "Matrix::put");
+                          "Matrix::put");
     }
     this->table[row * this->getCols() + column] = value;
 }
@@ -462,7 +458,7 @@ Vector Matrix::mp_multiply(const Vector &v) const {
     // Check size of the matrix and vector
     if (this->getCols() != v.getSize()) {
         throw MPException("Matrix and vector are of unequal size in "
-                         "Matrix::mp_multiply");
+                          "Matrix::mp_multiply");
     }
 
     // Allocate space of the resulting vector
@@ -487,7 +483,7 @@ Matrix Matrix::mp_multiply(const Matrix &m) const {
     // Check sizes of the matrices
     if (this->getCols() != m.getRows()) {
         throw MPException("Matrices are of incompatible size in"
-                         "Matrix::mp_multiply(Matrix)");
+                          "Matrix::mp_multiply(Matrix)");
     }
 
     // Allocate space of the resulting matrix
@@ -514,7 +510,7 @@ Matrix Matrix::mp_sub(const Matrix &m) const {
     // Check sizes of the matrices
     if ((m.getRows() != this->getRows()) || (m.getCols() != this->getCols())) {
         throw MPException("Matrices are of different size in"
-                         "Matrix::mp_sub(Matrix&");
+                          "Matrix::mp_sub(Matrix&");
     }
 
     // Allocate space of the resulting matrix
@@ -537,7 +533,7 @@ Matrix Matrix::mp_maximum(const Matrix &m) const {
     // Check sizes of the matrices
     if ((m.getRows() != this->getRows()) || (m.getCols() != this->getCols())) {
         throw MPException("Matrices are of different size in"
-                         "Matrix::maximum(Matrix*, Matrix*");
+                          "Matrix::maximum(Matrix*, Matrix*");
     }
 
     // Allocate space of the resulting matrix
@@ -575,8 +571,7 @@ Matrix Matrix::mp_power(const unsigned int p) const {
 /**
  * Matrix copy.
  */
-std::shared_ptr<Matrix> Matrix::createCopyPtr() const
-{
+std::shared_ptr<Matrix> Matrix::createCopyPtr() const {
     std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(this->getRows(), this->getCols());
     unsigned int nEls = this->getRows() * this->getCols();
     for (unsigned int pos = 0; pos < nEls; pos++) {
@@ -587,8 +582,7 @@ std::shared_ptr<Matrix> Matrix::createCopyPtr() const
 /**
  * Matrix copy.
  */
-Matrix Matrix::createCopy() const
-{
+Matrix Matrix::createCopy() const {
     Matrix newMatrix(this->getRows(), this->getCols());
     unsigned int nEls = this->getRows() * this->getCols();
     for (unsigned int pos = 0; pos < nEls; pos++) {
@@ -598,22 +592,20 @@ Matrix Matrix::createCopy() const
 }
 
 /**
-    * Matrix transposed copy.
-    */
+ * Matrix transposed copy.
+ */
 std::shared_ptr<Matrix> Matrix::getTransposedCopy() const {
     unsigned int MR = this->getCols();
     unsigned int MC = this->getRows();
     std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(MR, MC);
-    for (unsigned int col = 0; col < MC; col++)
-    {
-        for (unsigned int row = 0; row < MR; row++)
-        {
-            newMatrix->put(row, col, this->get(col, row)); // NOLINT(readability-suspicious-call-argument)
+    for (unsigned int col = 0; col < MC; col++) {
+        for (unsigned int row = 0; row < MR; row++) {
+            newMatrix->put(
+                    row, col, this->get(col, row)); // NOLINT(readability-suspicious-call-argument)
         }
     }
     return newMatrix;
 }
-
 
 Matrix Matrix::transpose() const {
     unsigned int MR = this->getCols();
@@ -621,7 +613,8 @@ Matrix Matrix::transpose() const {
     Matrix newMatrix(MR, MC);
     for (unsigned int col = 0; col < MC; col++) {
         for (unsigned int row = 0; row < MR; row++) {
-            newMatrix.put(row, col, this->get(col, row)); // NOLINT(readability-suspicious-call-argument)
+            newMatrix.put(
+                    row, col, this->get(col, row)); // NOLINT(readability-suspicious-call-argument)
         }
     }
     return newMatrix;
@@ -697,8 +690,7 @@ Matrix Matrix::getSubMatrixNonSquare(const std::list<unsigned int> &colIndices) 
     return newMatrix;
 }
 
-
-Matrix Matrix::getSubMatrixNonSquareRows(const std::list<unsigned int>& rowIndices) const {
+Matrix Matrix::getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const {
     auto NR = static_cast<unsigned int>(rowIndices.size());
     Matrix newMatrix(NR, this->getCols());
 
@@ -712,7 +704,8 @@ Matrix Matrix::getSubMatrixNonSquareRows(const std::list<unsigned int>& rowIndic
     return newMatrix;
 }
 
-std::shared_ptr<Matrix> Matrix::getSubMatrixNonSquareRowsPtr(const std::list<unsigned int>& rowIndices) const {
+std::shared_ptr<Matrix>
+Matrix::getSubMatrixNonSquareRowsPtr(const std::list<unsigned int> &rowIndices) const {
     auto NR = static_cast<unsigned int>(rowIndices.size());
     auto newMatrix = std::make_shared<Matrix>(NR, this->getCols());
 
@@ -746,7 +739,7 @@ void Matrix::add(MPTime increase, Matrix &result) const {
     unsigned int MC = this->getCols();
     if ((MR != result.getRows()) || (MC != result.getCols())) {
         throw MPException("Matrices are of different size in"
-                         "Matrix::add(Matrix*, MPTime, Matrix*");
+                          "Matrix::add(Matrix*, MPTime, Matrix*");
     }
     for (unsigned int r = 0; r < MR; r++) {
         for (unsigned int c = 0; c < MC; c++) {
@@ -764,7 +757,7 @@ void Matrix::maximum(const Matrix &matB, Matrix &result) const {
     if ((matB.getRows() != MR) || (matB.getCols() != MC) || (result.getRows() != MR)
         || (result.getCols() != MC)) {
         throw MPException("Matrices are of different size in"
-                         "Matrix::maximum(Matrix*, Matrix*, Matrix*");
+                          "Matrix::maximum(Matrix*, Matrix*, Matrix*");
     }
 
     for (unsigned int r = 0; r < MR; r++) {
@@ -969,7 +962,7 @@ bool Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold,
 
     if ((N != res.getRows()) || (N != res.getCols())) {
         throw MPException("The matrix of the longest paths "
-                         "should have the same size as the given matrix.");
+                          "should have the same size as the given matrix.");
     }
 
     // TODO(mgeilen): make / use copy operation
@@ -1081,8 +1074,7 @@ CDouble Matrix::mp_eigenvalue() const {
 /**
  * returns the largest element of a row
  */
-MPTime Matrix::getMaxOfRow(uint rowNumber) const
-{
+MPTime Matrix::getMaxOfRow(uint rowNumber) const {
     if (rowNumber > this->getRows()) {
         throw MPException("Matrix getMaxOfRow input index out of bounds.");
     }
@@ -1252,7 +1244,7 @@ Matrix::mp_generalized_eigenvectors() const {
                 CId n = length.first;
                 MPTime value =
                         ((MPTime(length.second)) <= MP_MINUS_INFINITY ? MP_MINUS_INFINITY
-                                                                     : MPTime(length.second));
+                                                                      : MPTime(length.second));
                 v.put(static_cast<unsigned int>(n), value);
             }
 

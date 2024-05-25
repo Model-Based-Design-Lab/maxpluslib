@@ -142,7 +142,7 @@ SparseVector &SparseVector::operator=(const SparseVector &other) {
     if (this != &other) {
         if (this->getSize() != other.getSize()) {
             throw MPException("Vectors of different size in"
-                             "SparseVector::operator=");
+                              "SparseVector::operator=");
         }
         this->table = other.table;
     }
@@ -162,7 +162,7 @@ void SparseVector::negate() {
     for (auto &e : this->table) {
         if (e.second == MP_MINUS_INFINITY) {
             throw MPException("Cannot negate vectors with MP_MINUS_INFINITY elements in"
-                             "SparseVector::negate");
+                              "SparseVector::negate");
         }
         e.second = -e.second;
     }
@@ -187,7 +187,7 @@ MPTime SparseVector::normalize() {
 
     if (maxEl.isMinusInfinity()) {
         throw MPException("Cannot normalize vector with norm MP_MINUS_INFINITY"
-                         "SparseVector::normalize");
+                          "SparseVector::normalize");
     }
     for (auto &e : this->table) {
         MPTime x_i = e.second; // MPTime handles -INF correctly
@@ -470,7 +470,7 @@ SparseVector SparseVector::operator+=(MPTime increase) const { return this->add(
 SparseVector SparseVector::operator-=(MPTime decrease) const {
     if (decrease.isMinusInfinity()) {
         throw MPException("Cannot subtract minus infinity in"
-                         "SparseVector::operator-=");
+                          "SparseVector::operator-=");
     }
     return this->add(-decrease);
 }
@@ -650,7 +650,7 @@ SparseMatrix &SparseMatrix::operator=(const SparseMatrix &other) {
         if (this->getRowSize() != other.getRowSize()
             || this->getColumnSize() != other.getColumnSize()) {
             throw MPException("Matrices of different size in"
-                             "SparseMatrix::operator=");
+                              "SparseMatrix::operator=");
         }
         this->table = other.table;
         this->isTransposed = other.isTransposed;

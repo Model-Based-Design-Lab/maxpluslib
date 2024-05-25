@@ -36,9 +36,9 @@ namespace testing {
         }                                                                                          \
     }
 
-#define ASSERT_MP_MINUS_INFINITY(x)                                                                 \
+#define ASSERT_MP_MINUS_INFINITY(x)                                                                \
     {                                                                                              \
-        if (!MP_IS_MINUS_INFINITY(x)) {                                                              \
+        if (!MP_IS_MINUS_INFINITY(x)) {                                                            \
             throw std::runtime_error(                                                              \
                     std::string("Asserted equality to minus infinity violated.")                   \
                     + std::string("\nIn:") + std::string(__FILE__) + std::string(":")              \

@@ -50,10 +50,10 @@
 #include "base/analysis/mcm/mcmgraph.h"
 #include "base/exception/exception.h"
 #include "base/math/cmath.h"
+#include <cassert>
 #include <cfloat>
 #include <cstdint>
 #include <memory>
-#include <cassert>
 
 namespace Graphs {
 
