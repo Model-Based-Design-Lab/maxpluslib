@@ -152,9 +152,7 @@ public:
     }
 
     // as a reference
-    [[nodiscard]] virtual const StateRef getReference() const {
-        return this;
-    }
+    [[nodiscard]] virtual const StateRef getReference() const { return this; }
 
     void insertOutgoingEdge(Edge &e) { this->outgoingEdges.insert(&e); }
 
@@ -214,7 +212,6 @@ public:
     [[nodiscard]] virtual const SetOfStateRefs &getFinalStates() const = 0;
     [[nodiscard]] virtual const SetOfStates &getStates() const = 0;
 };
-
 
 //
 // A generic DFS strategy on the target FSM
@@ -339,9 +336,7 @@ public:
     DetectCycle(DetectCycle &&) = delete;
     DetectCycle &operator=(DetectCycle &&) = delete;
 
-    bool checkForCycles() {
-        return this->checkForCycles(nullptr);
-    }
+    bool checkForCycles() { return this->checkForCycles(nullptr); }
 
     bool checkForCycles(ListOfStateRefs *cycle) {
         this->visitedStates.clear();
@@ -353,7 +348,9 @@ public:
             if (this->hasCycle) {
                 return true;
             }
-            while (nextStartingState != states.end() && this->visitedStates.includesState((*nextStartingState).second->getReference())) {
+            while (nextStartingState != states.end()
+                   && this->visitedStates.includesState(
+                           (*nextStartingState).second->getReference())) {
                 nextStartingState++;
             }
         }
@@ -364,9 +361,7 @@ private:
     SetOfStateRefs visitedStates;
     ListOfStateRefs *cycle = nullptr;
 
-    void onEnterState(StateRef s) override {
-        this->visitedStates.insert(s);
-    }
+    void onEnterState(StateRef s) override { this->visitedStates.insert(s); }
 
     void onSimpleCycle(DfsStack &stack) override {
         if (!this->hasCycle) {

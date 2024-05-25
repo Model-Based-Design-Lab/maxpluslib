@@ -118,9 +118,8 @@ void MPAutomatonTest::testMinimizeFSM() {
 
     fsa.setInitialState(*s0);
 
-    const auto fsaMin =
-            std::dynamic_pointer_cast<FSM::Labeled::FiniteStateMachine<int, int>>(
-                    fsa.minimizeEdgeLabels());
+    const auto fsaMin = std::dynamic_pointer_cast<FSM::Labeled::FiniteStateMachine<int, int>>(
+            fsa.minimizeEdgeLabels());
 
     std::cout << "Nr states: " << fsaMin->getStates().size() << std::endl;
     std::cout << "Nr edges: " << fsaMin->getEdges().size() << std::endl;
@@ -150,7 +149,7 @@ void MPAutomatonTest::testDetectCycleFSM() {
         FSM::Abstract::DetectCycle DC(fsa);
         bool hasCycle = DC.checkForCycles();
 
-        ASSERT(! hasCycle);
+        ASSERT(!hasCycle);
     }
 
     {
