@@ -959,7 +959,7 @@ public:
         return result;
     }
 
-    bool hasDirectedCycle() {
+    [[nodiscard]] bool hasDirectedCycle() const {
         FSM::Abstract::DetectCycle DC(*this);
         return DC.checkForCycles(nullptr);
     }
