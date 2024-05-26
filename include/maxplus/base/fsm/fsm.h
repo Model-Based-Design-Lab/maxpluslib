@@ -266,7 +266,7 @@ public:
 
     virtual void onSimpleCycle(DfsStack &stack){};
 
-    explicit DepthFirstSearch(FiniteStateMachine &targetFsm) : fsm(targetFsm){};
+    explicit DepthFirstSearch(const FiniteStateMachine &targetFsm) : fsm(targetFsm){};
 
     // Execute the depth first search
     void DoDepthFirstSearch(const StateRef &startingState, bool fullDFS = false) {
@@ -319,7 +319,7 @@ public:
     }
 
 protected:
-    FiniteStateMachine &fsm;
+    const FiniteStateMachine &fsm;
 };
 
 // Check for cycles
@@ -327,7 +327,7 @@ class DetectCycle : public DepthFirstSearch {
 public:
     bool hasCycle = false;
 
-    explicit DetectCycle(FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){};
+    explicit DetectCycle(const FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){};
 
     ~DetectCycle() override = default;
 
