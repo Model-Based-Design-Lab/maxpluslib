@@ -210,6 +210,7 @@ public:
     [[nodiscard]] virtual const SetOfStateRefs &getInitialStates() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getFinalStates() const = 0;
     [[nodiscard]] virtual const SetOfStates &getStates() const = 0;
+    [[nodiscard]] virtual const SetOfEdges &getEdges() const = 0;
 };
 
 //
@@ -507,7 +508,7 @@ class FiniteStateMachine : public Abstract::FiniteStateMachine {
 
 private:
     SetOfStates<StateLabelType, EdgeLabelType> states;
-    Abstract::SetOfEdges edges;
+    SetOfEdges<StateLabelType, EdgeLabelType> edges;
     // State<StateLabelType, EdgeLabelType> *initialState;
     SetOfStateRefs<StateLabelType, EdgeLabelType> initialStates;
     SetOfStateRefs<StateLabelType, EdgeLabelType> finalStates;
@@ -650,6 +651,11 @@ public:
     [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const override {
         return this->states;
     };
+
+     [[nodiscard]] const SetOfEdges<StateLabelType, EdgeLabelType> &getEdges() const override {
+        return this->edges;
+    };
+
     Abstract::SetOfStateRefs getStateRefs() {
         Abstract::SetOfStateRefs result;
         for (auto i : this->states) {
@@ -658,7 +664,13 @@ public:
         return result;
     };
 
-    Abstract::SetOfEdges &getEdges() { return this->edges; };
+    Abstract::SetOfEdgeRefs getEdgeRefs() {
+        Abstract::SetOfEdgeRefs result;
+        for (auto i : this->edges) {
+            result.insert(&(*(i.second)));
+        }
+        return result;
+    };
 
     EdgeRef<StateLabelType, EdgeLabelType>
     getEdge(const State<StateLabelType, EdgeLabelType> &source,

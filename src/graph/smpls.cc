@@ -33,7 +33,7 @@ void EdgeLabeledModeFSM::removeDanglingStates() {
     ELSSetOfStateRefs statesToBeRemoved;
 
     // const ELSSetOfStates& elsStates = this->getStates();
-    auto &elsEdges = dynamic_cast<ELSSetOfEdges &>(this->getEdges());
+    auto &elsEdges = dynamic_cast<const ELSSetOfEdges &>(this->getEdges());
 
     /*go through all edges and find all edges that end in
     dangling states. Also store dangling states.*/
@@ -71,11 +71,11 @@ void EdgeLabeledModeFSM::removeDanglingStates() {
         statesToBeRemoved.clear();
 
         // elsStates = this->getStates();
-        elsEdges = this->getEdges();
+        const ELSSetOfEdges &elsEdges2 = this->getEdges();
 
         /*go through all edges and find all edges that end in
         dangling states. Also store dangling states.*/
-        for (const auto &it : elsEdges) {
+        for (const auto &it : elsEdges2) {
 
             auto e = dynamic_cast<ELSEdgeRef>(&(*(it.second)));
             const auto s = dynamic_cast<ELSStateRef>(e->getDestination());
