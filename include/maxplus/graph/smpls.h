@@ -68,7 +68,7 @@ public:
     EdgeLabeledModeFSM elsFSM;
 
     // the mode matrices
-    ModeMatrices sm;
+    ModeMatrices mm;
 
     [[nodiscard]] std::shared_ptr<MaxPlusAutomaton> convertToMaxPlusAutomaton() const;
 

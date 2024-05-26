@@ -55,13 +55,6 @@ using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, MPString>;
 using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MPString>;
 using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, MPString>;
 
-// /**
-//  * Edge labeled scenario FSM.
-//  */
-// class EdgeLabeledScenarioFSM : public ::FSM::Labeled::FiniteStateMachine<CId, MPString> {
-// public:
-//     virtual ~EdgeLabeledScenarioFSM() {};
-// };
 
 using MLSEdgeLabel = struct MLSEdgeLabel {
     Matrix *mat;
@@ -73,10 +66,6 @@ using MLSEdge = ::FSM::Labeled::Edge<CId, MLSEdgeLabel>;
 using MLSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MLSEdgeLabel>;
 using MLSSetOfEdges = ::FSM::Abstract::SetOfEdges;
 
-/**
- * Matrix and reward labeled scenario FSM.
- */
-class MatrixLabeledScenarioFSM : public ::FSM::Labeled::FiniteStateMachine<CId, MLSEdgeLabel> {};
 
 } // namespace MaxPlus
 

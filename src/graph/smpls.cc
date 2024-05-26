@@ -122,31 +122,6 @@ MPTime getMaxOfColUntilRow(Matrix &M, uint colNumber, uint rowNumber) {
     return largestEl;
 }
 
-/*
- * Loads an entity from its starting '{' to the corresponding '}'
- */
-std::string loadEntity(std::ifstream &stream, std::string line) {
-    std::string out = line;
-    size_t openBracketCount = 0;
-    size_t closeBracketCount = 0;
-    openBracketCount += std::count(line.begin(), line.end(), '{');
-    closeBracketCount += std::count(line.begin(), line.end(), '}');
-
-    // get the whole activity {} into a string
-    while (getline(stream, line)) {
-
-        openBracketCount += std::count(line.begin(), line.end(), '{');
-        closeBracketCount += std::count(line.begin(), line.end(), '}');
-        out += line;
-
-        if (openBracketCount == closeBracketCount) {
-            openBracketCount = 0;
-            closeBracketCount = 0;
-            break;
-        }
-    }
-    return out;
-}
 std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
     auto mpa = std::make_shared<MaxPlusAutomaton>();
     // transposeMatrices();
@@ -163,14 +138,14 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
         if (!e.empty()) {
             MPString label = (dynamic_cast<ELSEdgeRef>(*e.begin()))->getLabel();
 
-            for (const auto &smIt : this->sm) {
+            for (const auto &smIt : this->mm) {
                 if ((smIt).first == label) {
                     nrTokens = (smIt).second->getCols();
                     break;
                 }
             }
         } else {
-            nrTokens = (*this->sm.begin()).second->getCols();
+            nrTokens = (*this->mm.begin()).second->getCols();
         }
         // create a state for (q, k)
         const CId qId = (dynamic_cast<ELSState &>(qq)).getLabel();
@@ -222,7 +197,7 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
             const auto *tr = dynamic_cast<ELSEdgeRef>(e);
             CId q2Id = dynamic_cast<ELSStateRef>(tr->getDestination())->getLabel();
             MPString sc = tr->getLabel();
-            std::shared_ptr<Matrix> Ms = this->sm.at(sc);
+            std::shared_ptr<Matrix> Ms = this->mm.at(sc);
             size_t r = Ms->getRows();
             size_t c = Ms->getCols();
 
@@ -347,7 +322,7 @@ std::shared_ptr<MaxPlusAutomaton> SMPLSwithEvents::convertToMaxPlusAutomaton() {
  * all square (to the size of the biggest matrix) by adding rows and cols of -infty
  */
 void SMPLSwithEvents::makeMatricesSquare() {
-    for (const auto &it : this->sm) {
+    for (const auto &it : this->mm) {
         std::shared_ptr<Matrix> m = it.second;
         m->addCols(biggestMatrixSize - m->getCols());
         m->addRows(biggestMatrixSize - m->getRows());
@@ -356,7 +331,7 @@ void SMPLSwithEvents::makeMatricesSquare() {
 
 // transposes all matrices of the SMPLS
 void SMPLS::transposeMatrices() {
-    for (auto &it : this->sm) {
+    for (auto &it : this->mm) {
         it.second = it.second->getTransposedCopy();
     }
 }
@@ -548,7 +523,7 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
             eList.insert(outputActionEventName);
         }
 
-        this->sm[modeName] = sMatrix;
+        this->mm[modeName] = sMatrix;
         visitedEdges.insert(e);
 
         // we need this later to make all matrices square
@@ -762,7 +737,7 @@ bool SMPLSwithEvents::compareEventLists(EventList &l1, EventList &l2) {
 
 void SMPLSwithEvents::dissectModeMatrices() {
     ModeMatrices::iterator s;
-    for (const auto &s : this->sm) {
+    for (const auto &s : this->mm) {
         numberOfResources = 0;
         std::shared_ptr<DissectedModeMatrix> dis = std::make_shared<DissectedModeMatrix>();
         dis->core.insert(s);
