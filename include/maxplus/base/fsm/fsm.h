@@ -423,6 +423,12 @@ public:
 };
 
 template <typename StateLabelType, typename EdgeLabelType>
+class SetOfEdgeRefs : public Abstract::SetOfEdgeRefs {
+public:
+};
+
+
+template <typename StateLabelType, typename EdgeLabelType>
 using StateRef = const State<StateLabelType, EdgeLabelType> *;
 
 // template <typename StateLabelType, typename EdgeLabelType>

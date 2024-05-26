@@ -150,8 +150,8 @@ using MPAEdgeRef = ::FSM::Labeled::EdgeRef<MPAStateLabel, MPAEdgeLabel>;
 using MPAPath = std::list<MPAEdgeRef>;
 using MPASetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAEdgeLabel>;
 using MPASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<MPAStateLabel, MPAEdgeLabel>;
-using MPASetOfEdges = ::FSM::Abstract::SetOfEdges;
-using MPASetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
+using MPASetOfEdges = ::FSM::Labeled::SetOfEdges<MPAStateLabel, MPAEdgeLabel>;
+using MPASetOfEdgeRefs = ::FSM::Labeled::SetOfEdgeRefs<MPAStateLabel, MPAEdgeLabel>;
 
 /**
  * A max-plus automaton
