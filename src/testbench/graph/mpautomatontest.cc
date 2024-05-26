@@ -163,7 +163,9 @@ void MPAutomatonTest::testDetectCycleFSM() {
         fsa.addEdge(*s0, 2, *s1);
         fsa.addEdge(*s1, 2, *s2);
         fsa.addEdge(*s2, 2, *s3);
-        fsa.addEdge(*s3, 2, *s1);
+        auto e = fsa.addEdge(*s3, 2, *s1);
+
+        fsa.setEdgeLabel(e, 5);
 
         FSM::Abstract::DetectCycle DC(fsa);
         bool hasCycle = DC.checkForCycles();

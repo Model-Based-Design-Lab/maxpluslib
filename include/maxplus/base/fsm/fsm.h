@@ -687,6 +687,11 @@ public:
         return nullptr;
     };
 
+    void setEdgeLabel(const EdgeRef<StateLabelType, EdgeLabelType>& e, const EdgeLabelType& l) {
+        auto ee = std::dynamic_pointer_cast<Edge<StateLabelType, EdgeLabelType>>((*this->edges.find(e->getId())).second);
+        ee->setLabel(l);
+    }
+
     StateRef<StateLabelType, EdgeLabelType> checkStateLabeled(const StateLabelType &l) {
         if (this->states.hasStateWithLabel(l)) {
             return &(this->states.withLabel(l));
