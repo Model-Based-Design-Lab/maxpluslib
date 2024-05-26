@@ -55,7 +55,6 @@ using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, MPString>;
 using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MPString>;
 using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, MPString>;
 
-
 using MLSEdgeLabel = struct MLSEdgeLabel {
     Matrix *mat;
     CDouble rew;
@@ -65,7 +64,6 @@ using MLSState = ::FSM::Labeled::State<CId, MLSEdgeLabel>;
 using MLSEdge = ::FSM::Labeled::Edge<CId, MLSEdgeLabel>;
 using MLSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MLSEdgeLabel>;
 using MLSSetOfEdges = ::FSM::Abstract::SetOfEdges;
-
 
 } // namespace MaxPlus
 

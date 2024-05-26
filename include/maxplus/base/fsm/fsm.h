@@ -427,7 +427,6 @@ class SetOfEdgeRefs : public Abstract::SetOfEdgeRefs {
 public:
 };
 
-
 template <typename StateLabelType, typename EdgeLabelType>
 using StateRef = const State<StateLabelType, EdgeLabelType> *;
 
@@ -658,7 +657,7 @@ public:
         return this->states;
     };
 
-     [[nodiscard]] const SetOfEdges<StateLabelType, EdgeLabelType> &getEdges() const override {
+    [[nodiscard]] const SetOfEdges<StateLabelType, EdgeLabelType> &getEdges() const override {
         return this->edges;
     };
 
@@ -693,8 +692,9 @@ public:
         return nullptr;
     };
 
-    void setEdgeLabel(const EdgeRef<StateLabelType, EdgeLabelType>& e, const EdgeLabelType& l) {
-        auto ee = std::dynamic_pointer_cast<Edge<StateLabelType, EdgeLabelType>>((*this->edges.find(e->getId())).second);
+    void setEdgeLabel(const EdgeRef<StateLabelType, EdgeLabelType> &e, const EdgeLabelType &l) {
+        auto ee = std::dynamic_pointer_cast<Edge<StateLabelType, EdgeLabelType>>(
+                (*this->edges.find(e->getId())).second);
         ee->setLabel(l);
     }
 
