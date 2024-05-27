@@ -243,7 +243,7 @@ void SMPLSwithEvents::saveDeterminizedIOAtoFile(const MPString &file) {
     outfile << "ioautomaton statespace{ \r\n";
     const auto &I = this->ioa->getInitialStates();
 
-    const auto &finalStates = dynamic_cast<const IOASetOfStateRefs &>(this->ioa->getFinalStates());
+    const auto &finalStates = this->ioa->getFinalStates();
 
     MPString errMsg = "";
     auto i = I.begin();
@@ -269,15 +269,15 @@ bool SMPLSwithEvents::isConsistent() {
     }
     EventList eventList;
 
-    const auto &I = dynamic_cast<const IOASetOfStates &>(this->ioa->getInitialStates());
+    const auto &I = this->ioa->getInitialStates();
 
-    const auto &finalStates = dynamic_cast<const IOASetOfStates &>(this->ioa->getFinalStates());
+    const auto &finalStates = this->ioa->getFinalStates();
 
     std::map<IOAStateRef, EventList> visited;
     MPString errMsg = "";
     for (const auto &i : I) {
         isConsistentUtil(
-                (dynamic_cast<IOAState &>(*(i.second))), eventList, finalStates, errMsg, visited);
+                *dynamic_cast<IOAStateRef>(i), eventList, finalStates, errMsg, visited);
     }
 
     if (!errMsg.empty()) {
@@ -302,17 +302,20 @@ std::shared_ptr<MaxPlusAutomaton> SMPLSwithEvents::convertToMaxPlusAutomaton() {
     // search
     const auto &I = dynamic_cast<const IOASetOfStates &>(this->ioa->getStates());
     for (const auto &i : I) {
-        this->elsFSM.addState(dynamic_cast<ELSState &>(*(i.second)).getLabel());
+        this->elsFSM.addState(dynamic_cast<IOAState &>(*(i.second)).getLabel());
     }
 
-    const auto &I2 = dynamic_cast<const IOASetOfStates &>(this->ioa->getInitialStates());
+    const auto &I2 = this->ioa->getInitialStates();
     for (const auto &i : I2) {
-        prepareMatrices((dynamic_cast<IOAState &>(*(i.second))), eventList, visitedEdges);
-        this->elsFSM.addInitialState((dynamic_cast<ELSState &>(*(i.second))));
+        auto s = dynamic_cast<IOAStateRef>(i);
+        prepareMatrices(*s, eventList, visitedEdges);
+        auto sr = this->elsFSM.getStateLabeled(s->getLabel());
+        this->elsFSM.addInitialState(*sr);
     }
-    const auto &I3 = dynamic_cast<const IOASetOfStates &>(this->ioa->getFinalStates());
+    const auto &I3 = this->ioa->getFinalStates();
     for (const auto &i : I3) {
-        this->elsFSM.addFinalState((dynamic_cast<ELSState &>(*(i.second))));
+        auto s = dynamic_cast<IOAStateRef>(i);
+        this->elsFSM.addFinalState(*this->elsFSM.getStateLabeled(s->getLabel()));
     }
     return SMPLS::convertToMaxPlusAutomaton();
 }
@@ -369,7 +372,7 @@ Event SMPLSwithEvents::findEventByMode(const Mode &mode) const {
 void SMPLSwithEvents::prepareMatrices(const IOAState &s,
                                       std::multiset<Event> &eventList,
                                       IOASetOfEdgeRefs &visitedEdges) {
-    const auto &adj = dynamic_cast<const IOASetOfEdgeRefs &>(s.getOutgoingEdges());
+    const auto &adj = s.getOutgoingEdges();
     for (const auto *i : adj) {
         const auto *e = dynamic_cast<IOAEdgeRef>(i);
         if (visitedEdges.count(e) > 0) {
@@ -551,7 +554,7 @@ SMPLSwithEvents::findDissectedModeMatrix(const MPString &sName) {
  */
 void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
                                        EventList &eventList,
-                                       const IOASetOfStates &finalStates,
+                                       const FSM::Abstract::SetOfStateRefs &finalStates,
                                        MPString &errMsg,
                                        std::map<IOAStateRef, EventList> &visited) {
     auto it = visited.find(&s);
@@ -567,7 +570,7 @@ void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
     }
     visited.emplace(&s, eventList);
 
-    if (finalStates.count(s.getLabel()) > 0) {
+    if (finalStates.count(&s) > 0) {
         if (!eventList.empty()) {
             errMsg = "Event " + (*eventList.begin())
                      + " has not been processed by the end of the word.\r\n";
@@ -575,7 +578,7 @@ void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
         }
     } else // If current state is not final
     {
-        const auto &adj = dynamic_cast<const IOASetOfEdgeRefs &>(s.getOutgoingEdges());
+        const auto &adj = s.getOutgoingEdges();
         for (const auto *i : adj) {
             // make a copy so that child node can not modify the parent nodes list
             // only adds and removes and passes it to its children
@@ -637,7 +640,7 @@ void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
  */
 void SMPLSwithEvents::determinizeUtil(const IOAState &s,
                                       IOASetOfStateRefs &visited,
-                                      const IOASetOfStateRefs &finalStates,
+                                      const FSM::Abstract::SetOfStateRefs &finalStates,
                                       MPString &errMsg,
                                       std::ofstream &outfile) {
     /**

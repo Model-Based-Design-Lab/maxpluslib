@@ -153,13 +153,13 @@ private:
      */
     void isConsistentUtil(const IOAState &s,
                           EventList &eventList,
-                          const IOASetOfStates &finalStates,
+                          const ::FSM::Abstract::SetOfStateRefs &finalStates,
                           MPString &errMsg,
                           std::map<IOAStateRef, EventList> &visited);
 
     void determinizeUtil(const IOAState &s,
                          IOASetOfStateRefs &visited,
-                         const IOASetOfStateRefs &finalStates,
+                         const FSM::Abstract::SetOfStateRefs &finalStates,
                          MPString &errMsg,
                          std::ofstream &outfile);
 
