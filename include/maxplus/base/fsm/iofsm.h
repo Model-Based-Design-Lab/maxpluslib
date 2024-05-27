@@ -14,10 +14,10 @@ using IOAState = ::FSM::Labeled::State<CId, IOAEdgeLabel>;
 using IOAStateRef = const IOAState *;
 using IOAEdge = ::FSM::Labeled::Edge<CId, IOAEdgeLabel>;
 using IOAEdgeRef = ::FSM::Labeled::EdgeRef<CId, IOAEdgeLabel>;
-using IOASetOfStates = ::FSM::Labeled::SetOfStates<CId, MaxPlus::MPString>;
-using IOASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<CId, MaxPlus::MPString>;
-using IOASetOfEdges = ::FSM::Labeled::SetOfEdges<CId, MaxPlus::MPString>;
-using IOASetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
+using IOASetOfStates = ::FSM::Labeled::SetOfStates<CId, IOAEdgeLabel>;
+using IOASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<CId, IOAEdgeLabel>;
+using IOASetOfEdges = ::FSM::Labeled::SetOfEdges<CId, IOAEdgeLabel>;
+using IOASetOfEdgeRefs = ::FSM::Labeled::SetOfEdgeRefs<CId, IOAEdgeLabel>;
 
 namespace FSM::Labeled {
 
