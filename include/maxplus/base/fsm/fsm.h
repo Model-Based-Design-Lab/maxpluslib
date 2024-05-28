@@ -210,6 +210,7 @@ public:
     [[nodiscard]] virtual const SetOfStateRefs &getInitialStates() const = 0;
     [[nodiscard]] virtual const SetOfStateRefs &getFinalStates() const = 0;
     [[nodiscard]] virtual const SetOfStates &getStates() const = 0;
+    [[nodiscard]] virtual SetOfStateRefs getStateRefs() const = 0;
     [[nodiscard]] virtual const SetOfEdges &getEdges() const = 0;
 };
 
@@ -266,19 +267,29 @@ public:
 
     virtual void onSimpleCycle(DfsStack &stack){};
 
-    explicit DepthFirstSearch(const FiniteStateMachine &targetFsm) : fsm(targetFsm){};
+    const FiniteStateMachine& getFSM(){
+        return this->fsm;
+    }
+
+    explicit DepthFirstSearch(const FiniteStateMachine &targetFsm) :
+        fsm(targetFsm)
+    {};
 
     // Execute the depth first search
-    void DoDepthFirstSearch(const StateRef &startingState, bool fullDFS = false) {
+    void DoDepthFirstSearch(const SetOfStateRefs &startingStates, bool fullDFS = false) {
         // store visited states
         SetOfStateRefs visitedStates;
         SetOfStateRefs statesOnStack;
 
-        // put initial state on the stack
-        dfsStack.emplace_back(startingState);
-        this->onEnterState(startingState);
+        this->_abort = false;
 
-        while (!(dfsStack.empty())) {
+        // put initial state on the stack
+        for (const auto& s: startingStates) {
+            dfsStack.emplace_back(s);
+            this->onEnterState(s);
+        }
+
+        while (!this->_abort && !(dfsStack.empty())) {
             DFSStackItem &si = dfsStack.back();
 
             // current item complete?
@@ -313,13 +324,25 @@ public:
         }
     }
 
-    // Execute the depth first search
-    void DoDepthFirstSearch(bool fullDFS = false) {
-        this->DoDepthFirstSearch(this->fsm.getInitialState(), fullDFS);
+    void DoDepthFirstSearch(const StateRef &startingState, bool fullDFS = false){
+        SetOfStateRefs stateSet;
+        stateSet.insert(startingState);
+        return this->DoDepthFirstSearch(stateSet, fullDFS);
     }
 
-protected:
+    // Execute the depth first search
+    void DoDepthFirstSearch(bool fullDFS = false) {
+        this->DoDepthFirstSearch(this->fsm.getInitialStates(), fullDFS);
+    }
+
+    void abortDFS() {
+        this->_abort = true;
+    }
+
+private:
     const FiniteStateMachine &fsm;
+    bool _abort{};
+
 };
 
 // Check for cycles
@@ -327,7 +350,8 @@ class DetectCycle : public DepthFirstSearch {
 public:
     bool hasCycle = false;
 
-    explicit DetectCycle(const FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){};
+    explicit DetectCycle(const FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){
+    };
 
     ~DetectCycle() override = default;
 
@@ -339,29 +363,14 @@ public:
     bool checkForCycles() { return this->checkForCycles(nullptr); }
 
     bool checkForCycles(ListOfStateRefs *cycle) {
-        this->visitedStates.clear();
         this->cycle = cycle;
-        const SetOfStates &states = this->fsm.getStates();
-        auto nextStartingState = states.begin();
-        while (nextStartingState != states.end()) {
-            this->DoDepthFirstSearch((*nextStartingState).second->getReference());
-            if (this->hasCycle) {
-                return true;
-            }
-            while (nextStartingState != states.end()
-                   && this->visitedStates.includesState(
-                           (*nextStartingState).second->getReference())) {
-                nextStartingState++;
-            }
-        }
-        return false;
+        const SetOfStateRefs states = this->getFSM().getStateRefs();
+        this->DoDepthFirstSearch(states);
+        return this->hasCycle;
     }
 
 private:
-    SetOfStateRefs visitedStates;
     ListOfStateRefs *cycle = nullptr;
-
-    void onEnterState(StateRef s) override { this->visitedStates.insert(s); }
 
     void onSimpleCycle(DfsStack &stack) override {
         if (!this->hasCycle) {
@@ -371,6 +380,7 @@ private:
                 }
             }
             this->hasCycle = true;
+            this->abortDFS();
         }
     }
 };
@@ -655,6 +665,14 @@ public:
 
     [[nodiscard]] const SetOfStates<StateLabelType, EdgeLabelType> &getStates() const override {
         return this->states;
+    };
+
+    [[nodiscard]] FSM::Abstract::SetOfStateRefs getStateRefs() const override {
+        FSM::Abstract::SetOfStateRefs result;
+        for (const auto& s: this->states) {
+            result.insert(s.second->getReference());
+        }
+        return result;
     };
 
     [[nodiscard]] const SetOfEdges<StateLabelType, EdgeLabelType> &getEdges() const override {
