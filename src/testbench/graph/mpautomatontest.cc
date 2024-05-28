@@ -22,6 +22,7 @@ void MPAutomatonTest::Run() {
     testCreateFSM();
     testDeterminizeFSM();
     testMinimizeFSM();
+    testDFSFSM();
     testDetectCycleFSM();
 }
 
@@ -126,6 +127,72 @@ void MPAutomatonTest::testMinimizeFSM() {
 
     ASSERT_EQUAL(fsaMin->getStates().size(), 2);
     ASSERT_EQUAL(fsaMin->getEdges().size(), 2);
+}
+
+void MPAutomatonTest::testDFSFSM() {
+
+    std::cout << "Running test: Depth-First Search FSM\n";
+
+    {
+        FSM::Labeled::FiniteStateMachine<int, int> fsa;
+
+        const auto *s0 = fsa.addState(0);
+        const auto *s1 = fsa.addState(1);
+        const auto *s2 = fsa.addState(2);
+        const auto *s3 = fsa.addState(3);
+        const auto *s4 = fsa.addState(4);
+
+        fsa.setInitialState(*s0);
+        fsa.addInitialState(*s2);
+
+        fsa.addEdge(*s0, 2, *s1);
+        fsa.addEdge(*s1, 2, *s1);
+        fsa.addEdge(*s2, 2, *s1);
+        fsa.addEdge(*s2, 2, *s3);
+        fsa.addEdge(*s3, 2, *s2);
+        fsa.addEdge(*s4, 2, *s3);
+
+        bool foundCycle = false;
+        FSM::Abstract::SetOfStateRefs statesFound;
+
+        FSM::Abstract::DepthFirstSearchLambda DFS(fsa);
+
+        DFS.setOnEnterLambda([&statesFound](FSM::Abstract::StateRef s) {
+            ASSERT(!statesFound.includesState(s));
+            statesFound.insert(s);
+        });
+        DFS.setOnSimpleCycleLambda(
+                [&foundCycle](const FSM::Abstract::DepthFirstSearch::DfsStack &) {
+                    foundCycle = true;
+                });
+
+        // from all initial states
+
+        DFS.DoDepthFirstSearch();
+        ASSERT(foundCycle);
+        ASSERT(statesFound.size() == 4);
+    }
+
+    {
+        FSM::Labeled::FiniteStateMachine<int, int> fsa;
+
+        const auto *s2 = fsa.addState(5);
+        const auto *s3 = fsa.addState(4);
+        const auto *s0 = fsa.addState(3);
+        const auto *s1 = fsa.addState(5);
+
+        fsa.addEdge(*s0, 2, *s1);
+        fsa.addEdge(*s1, 2, *s2);
+        fsa.addEdge(*s2, 2, *s3);
+        auto e = fsa.addEdge(*s3, 2, *s1);
+
+        fsa.setEdgeLabel(e, 5);
+
+        FSM::Abstract::DetectCycle DC(fsa);
+        bool hasCycle = DC.checkForCycles();
+
+        ASSERT(hasCycle);
+    }
 }
 
 void MPAutomatonTest::testDetectCycleFSM() {
