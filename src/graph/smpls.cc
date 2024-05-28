@@ -131,19 +131,16 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
     const auto &I = dynamic_cast<const ELSSetOfStateRefs &>(this->elsFSM.getInitialStates());
     const auto &F = dynamic_cast<const ELSSetOfStateRefs &>(this->elsFSM.getFinalStates());
     const auto &Q = dynamic_cast<const ELSSetOfStates &>(this->elsFSM.getStates());
+
     for (const auto &q : Q) {
         auto &qq = *(q.second);
         const auto &e = qq.getOutgoingEdges();
         unsigned int nrTokens = 0;
         if (!e.empty()) {
             MPString label = (dynamic_cast<ELSEdgeRef>(*e.begin()))->getLabel();
-
-            for (const auto &smIt : this->mm) {
-                if ((smIt).first == label) {
-                    nrTokens = (smIt).second->getCols();
-                    break;
-                }
-            }
+            auto it = this->mm.find(MPString(label));
+            assert(it != this->mm.end());
+            nrTokens = it->second->getCols();
         } else {
             nrTokens = (*this->mm.begin()).second->getCols();
         }
@@ -191,6 +188,8 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
         auto &q1 = dynamic_cast<ELSState &>(*(q.second));
         CId q1Id = q1.getLabel();
 
+        std::map<int, MPAStateRef> q1StateMap;
+
         // for every outgoing edge of the state
         const auto &t = dynamic_cast<const ELSSetOfEdgeRefs &>(q1.getOutgoingEdges());
         for (const auto *e : t) {
@@ -203,15 +202,20 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
 
             // for every entry in the mode matrix of that edge
             for (size_t row = 0; row < r; row++) {
+                MPAStateRef dst = mpa->getStateLabeled(
+                        makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
                 for (size_t col = 0; col < c; col++) {
                     const MPDelay d =
                             Ms->get(static_cast<unsigned int>(row), static_cast<unsigned int>(col));
-
                     if (!MP_IS_MINUS_INFINITY(d)) {
-                        MPAStateRef src = mpa->getStateLabeled(
-                                makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
-                        MPAStateRef dst = mpa->getStateLabeled(
-                                makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
+                        MPAStateRef src = nullptr;
+                        if (q1StateMap.find(col) != q1StateMap.end()) {
+                            src = q1StateMap.at(col);
+                        } else {
+                            src = mpa->getStateLabeled(
+                                    makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
+                            q1StateMap[col] = src;
+                        }
                         MPAEdgeLabel el = makeMPAEdgeLabel(d, sc);
                         el.mode = MPString(tr->getLabel());
                         mpa->addEdge(*src, el, *dst);
@@ -276,8 +280,7 @@ bool SMPLSwithEvents::isConsistent() {
     std::map<IOAStateRef, EventList> visited;
     MPString errMsg = "";
     for (const auto &i : I) {
-        isConsistentUtil(
-                *dynamic_cast<IOAStateRef>(i), eventList, finalStates, errMsg, visited);
+        isConsistentUtil(*dynamic_cast<IOAStateRef>(i), eventList, finalStates, errMsg, visited);
     }
 
     if (!errMsg.empty()) {
