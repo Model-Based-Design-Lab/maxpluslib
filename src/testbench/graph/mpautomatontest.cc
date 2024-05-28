@@ -184,14 +184,26 @@ void MPAutomatonTest::testDFSFSM() {
         fsa.addEdge(*s0, 2, *s1);
         fsa.addEdge(*s1, 2, *s2);
         fsa.addEdge(*s2, 2, *s3);
-        auto e = fsa.addEdge(*s3, 2, *s1);
 
-        fsa.setEdgeLabel(e, 5);
+        bool foundCycle = false;
+        FSM::Abstract::SetOfStateRefs statesFound;
 
-        FSM::Abstract::DetectCycle DC(fsa);
-        bool hasCycle = DC.checkForCycles();
+        FSM::Abstract::DepthFirstSearchLambda DFS(fsa);
 
-        ASSERT(hasCycle);
+        DFS.setOnEnterLambda([&statesFound](FSM::Abstract::StateRef s) {
+            ASSERT(!statesFound.includesState(s));
+            statesFound.insert(s);
+        });
+        DFS.setOnSimpleCycleLambda(
+                [&foundCycle](const FSM::Abstract::DepthFirstSearch::DfsStack &) {
+                    foundCycle = true;
+                });
+
+        // from all initial states
+
+        DFS.DoDepthFirstSearch(s2);
+        ASSERT(!foundCycle);
+        ASSERT(statesFound.size() == 2);
     }
 }
 
