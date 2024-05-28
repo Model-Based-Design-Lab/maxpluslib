@@ -19,4 +19,5 @@ public:
     void testDeterminizeFSM();
     void testMinimizeFSM();
     void testDetectCycleFSM();
+    void testDFSFSM();
 };
