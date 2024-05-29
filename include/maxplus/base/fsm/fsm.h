@@ -734,8 +734,8 @@ public:
         return this->states;
     };
 
-    [[nodiscard]] FSM::Abstract::SetOfStateRefs getStateRefs() const override {
-        FSM::Abstract::SetOfStateRefs result;
+    [[nodiscard]] ::FSM::Abstract::SetOfStateRefs getStateRefs() const override {
+        ::FSM::Abstract::SetOfStateRefs result;
         for (const auto &s : this->states) {
             result.insert(s.second->getReference());
         }
@@ -1068,7 +1068,7 @@ public:
     }
 
     [[nodiscard]] bool hasDirectedCycle() const {
-        FSM::Abstract::DetectCycle DC(*this);
+        ::FSM::Abstract::DetectCycle DC(*this);
         return DC.checkForCycles(nullptr);
     }
 
