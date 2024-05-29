@@ -22,8 +22,8 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCR() {
 
     CId eId = 0;
     for (const auto &s : this->getStates()) {
-        for (auto *e : (s.second)->getOutgoingEdges()) {
-            auto *mpae = dynamic_cast<MPAREdgeRef>(e);
+        for (const auto *e : (s.second)->getOutgoingEdges()) {
+            const auto *mpae = dynamic_cast<MPAREdgeRef>(e);
             g.addEdge(eId++,
                       *nodeMap[(mpae->getSource())],
                       *nodeMap[(mpae->getDestination())],
@@ -55,8 +55,8 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(
     std::map<const MCMedge *, MPAREdgeRef> edgeMap;
 
     for (const auto &s : this->getStates()) {
-        for (auto *e : (s.second)->getOutgoingEdges()) {
-            auto *mpae = dynamic_cast<MPAREdgeRef>(e);
+        for (const auto *e : (s.second)->getOutgoingEdges()) {
+            const auto *mpae = dynamic_cast<MPAREdgeRef>(e);
             g.addEdge(eId++,
                       *nodeMap[mpae->getSource()],
                       *nodeMap[mpae->getDestination()],

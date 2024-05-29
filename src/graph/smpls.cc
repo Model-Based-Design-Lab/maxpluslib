@@ -33,13 +33,13 @@ void EdgeLabeledModeFSM::removeDanglingStates() {
     ELSSetOfStateRefs statesToBeRemoved;
 
     // const ELSSetOfStates& elsStates = this->getStates();
-    auto &elsEdges = dynamic_cast<const ELSSetOfEdges &>(this->getEdges());
+    const auto &elsEdges = dynamic_cast<const ELSSetOfEdges &>(this->getEdges());
 
     /*go through all edges and find all edges that end in
     dangling states. Also store dangling states.*/
     for (const auto &it : elsEdges) {
 
-        auto e = dynamic_cast<ELSEdgeRef>(&(*it.second));
+        const auto *e = dynamic_cast<ELSEdgeRef>(&(*it.second));
         const auto &s = dynamic_cast<ELSStateRef>(e->getDestination());
         const auto &oEdges = dynamic_cast<const ELSSetOfEdges &>(s->getOutgoingEdges());
         if (oEdges.empty()) {
@@ -77,8 +77,8 @@ void EdgeLabeledModeFSM::removeDanglingStates() {
         dangling states. Also store dangling states.*/
         for (const auto &it : elsEdges2) {
 
-            auto e = dynamic_cast<ELSEdgeRef>(&(*(it.second)));
-            const auto s = dynamic_cast<ELSStateRef>(e->getDestination());
+            const auto *e = dynamic_cast<ELSEdgeRef>(&(*(it.second)));
+            const auto *const s = dynamic_cast<ELSStateRef>(e->getDestination());
             const auto &oEdges = dynamic_cast<const ELSSetOfEdges &>(s->getOutgoingEdges());
             if (oEdges.empty()) {
                 edgesToBeRemoved.insert(e);
@@ -188,7 +188,7 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
         auto &q1 = dynamic_cast<ELSState &>(*(q.second));
         CId q1Id = q1.getLabel();
 
-        std::map<int, MPAStateRef> q1StateMap;
+        std::map<size_t, MPAStateRef> q1StateMap;
 
         // for every outgoing edge of the state
         const auto &t = dynamic_cast<const ELSSetOfEdgeRefs &>(q1.getOutgoingEdges());
@@ -251,7 +251,7 @@ void SMPLSwithEvents::saveDeterminizedIOAtoFile(const MPString &file) {
 
     MPString errMsg = "";
     auto i = I.begin();
-    auto &s = dynamic_cast<const IOAState &>(*(*i));
+    const auto &s = dynamic_cast<const IOAState &>(*(*i));
     i++;
     // we remove the rest of the initial states since only one is allowed
     for (; i != I.end();) {
@@ -310,14 +310,14 @@ std::shared_ptr<MaxPlusAutomaton> SMPLSwithEvents::convertToMaxPlusAutomaton() {
 
     const auto &I2 = this->ioa->getInitialStates();
     for (const auto &i : I2) {
-        auto s = dynamic_cast<IOAStateRef>(i);
+        const auto *s = dynamic_cast<IOAStateRef>(i);
         prepareMatrices(*s, eventList, visitedEdges);
-        auto sr = this->elsFSM.getStateLabeled(s->getLabel());
+        const auto *sr = this->elsFSM.getStateLabeled(s->getLabel());
         this->elsFSM.addInitialState(*sr);
     }
     const auto &I3 = this->ioa->getFinalStates();
     for (const auto &i : I3) {
-        auto s = dynamic_cast<IOAStateRef>(i);
+        const auto *s = dynamic_cast<IOAStateRef>(i);
         this->elsFSM.addFinalState(*this->elsFSM.getStateLabeled(s->getLabel()));
     }
     return SMPLS::convertToMaxPlusAutomaton();
@@ -631,7 +631,7 @@ void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
                     }
                 }
             }
-            const auto s2 = dynamic_cast<IOAStateRef>(e->getDestination());
+            const auto *const s2 = dynamic_cast<IOAStateRef>(e->getDestination());
 
             isConsistentUtil(*s2, eList, finalStates, errMsg, visited);
         }
@@ -666,7 +666,7 @@ void SMPLSwithEvents::determinizeUtil(const IOAState &s,
     const auto *e = dynamic_cast<const IOAEdge *>(*i);
     InputAction input = e->getLabel().first;
     if (input.empty()) {
-        const auto s2 = dynamic_cast<IOAStateRef>(e->getDestination());
+        const auto *const s2 = dynamic_cast<IOAStateRef>(e->getDestination());
         outfile << s.stateLabel << "-," << e->getLabel().second << "->" << s2->stateLabel;
         ioa->removeEdge(*e);
 
@@ -702,7 +702,7 @@ void SMPLSwithEvents::determinizeUtil(const IOAState &s,
             } else {
                 // only allow edges with the outcome of the same event
                 if (this->findEventByOutcome(input) == ev) {
-                    const auto s2 = dynamic_cast<IOAStateRef>(e->getDestination());
+                    const auto *const s2 = dynamic_cast<IOAStateRef>(e->getDestination());
                     outfile << s.stateLabel << "-" << e->getLabel().first << ","
                             << e->getLabel().second << "->" << s2->stateLabel;
 
