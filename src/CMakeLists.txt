@@ -18,4 +18,5 @@ target_include_directories(maxplus PUBLIC
     ${MAXPLUSLIB_INCLUDE_DIR}/maxplus
 )
 
-
+target_compile_features(maxplus PUBLIC cxx_std_17)
+set_target_properties(maxplus PROPERTIES CXX_EXTENSIONS OFF)
