@@ -39,11 +39,9 @@
  */
 
 #include "base/string/cstring.h"
-#include <algorithm>
 #include <cctype>
 #include <cstdio>
-#include <regex>
-#include <sstream>
+#include <string.h>
 
 namespace MaxPlus {
 
