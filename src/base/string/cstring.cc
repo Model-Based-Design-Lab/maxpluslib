@@ -41,6 +41,7 @@
 #include "base/string/cstring.h"
 #include <cctype>
 #include <cstdio>
+#include <sstream>
 #include <string.h>
 
 namespace MaxPlus {
