@@ -42,7 +42,7 @@
 #include <cctype>
 #include <cstdio>
 #include <sstream>
-#include <string.h>
+#include <cstring>
 
 namespace MaxPlus {
 
