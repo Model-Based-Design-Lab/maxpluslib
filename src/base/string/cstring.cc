@@ -39,10 +39,18 @@
  */
 
 #include "base/string/cstring.h"
+#include "base/basic_types.h"
+#include <algorithm>
 #include <cctype>
 #include <cstdio>
-#include <sstream>
+#include <cstdlib>
 #include <cstring>
+#include <sstream>
+#include <string>
+
+constexpr size_t NUMBER_TO_STRING_BUFFER_SIZE = 32;
+
+// NOLINTBEGIN (*-c-arrays)
 
 namespace MaxPlus {
 
@@ -81,8 +89,8 @@ MPString::MPString(const MPString &s) = default;
  * Constructor.
  */
 MPString::MPString(const int n) {
-    char str[32];
-    snprintf(&str[0], 32, "%i", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%i", n);
     append(std::string(str));
 }
 
@@ -91,8 +99,8 @@ MPString::MPString(const int n) {
  * Constructor.
  */
 MPString::MPString(const unsigned int n) {
-    char str[32];
-    snprintf(&str[0], 32, "%u", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%u", n);
     append(std::string(str));
 }
 
@@ -101,8 +109,8 @@ MPString::MPString(const unsigned int n) {
  * Constructor.
  */
 MPString::MPString(const long int n) {
-    char str[32];
-    snprintf(&str[0], 32, "%ld", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%ld", n);
     append(std::string(str));
 }
 
@@ -111,8 +119,8 @@ MPString::MPString(const long int n) {
  * Constructor.
  */
 MPString::MPString(const unsigned long int n) {
-    char str[32];
-    snprintf(&str[0], 32, "%ld", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%ld", n);
     append(std::string(str));
 }
 
@@ -121,8 +129,8 @@ MPString::MPString(const unsigned long int n) {
  * Constructor.
  */
 MPString::MPString(const long long int n) {
-    char str[32];
-    snprintf(&str[0], 32, "%lld", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%lld", n);
     append(std::string(str));
 }
 
@@ -131,8 +139,8 @@ MPString::MPString(const long long int n) {
  * Constructor.
  */
 MPString::MPString(const unsigned long long int n) {
-    char str[32];
-    snprintf(&str[0], 32, "%lld", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%lld", n);
     append(std::string(str));
 }
 
@@ -141,8 +149,8 @@ MPString::MPString(const unsigned long long int n) {
  * Constructor.
  */
 MPString::MPString(const CDouble n) {
-    char str[32];
-    snprintf(&str[0], 32, "%g", n);
+    char str[NUMBER_TO_STRING_BUFFER_SIZE];
+    snprintf(&str[0], NUMBER_TO_STRING_BUFFER_SIZE, "%g", n);
     append(std::string(str));
 }
 
@@ -566,3 +574,5 @@ MPString MPString::regexReplaceMultiLine(const MPString &regex, const MPString &
 }
 
 } // namespace MaxPlus
+
+// NOLINTEND (*-c-arrays)
