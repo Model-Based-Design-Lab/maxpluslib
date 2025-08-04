@@ -54,7 +54,7 @@
 #include <cmath>
 #include <memory>
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 
 // assumes teh graph is strongly connected and assumes the node ids are 0...N-1,
 // where N is the number of nodes
@@ -145,4 +145,4 @@ CDouble mcmDG(MCMgraph &mcmGraph) {
     return mcm;
 }
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs

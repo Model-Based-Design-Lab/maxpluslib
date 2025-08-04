@@ -19,13 +19,13 @@ using IOASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<CId, IOAEdgeLabel>;
 using IOASetOfEdges = ::FSM::Labeled::SetOfEdges<CId, IOAEdgeLabel>;
 using IOASetOfEdgeRefs = ::FSM::Labeled::SetOfEdgeRefs<CId, IOAEdgeLabel>;
 
-namespace FSM::Labeled {
+namespace MaxPlus::FSM::Labeled {
 
 class IOAutomaton : public ::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel> {
 public:
     virtual ~IOAutomaton(){};
 };
 
-} // namespace FSM::Labeled
+} // namespace MaxPlus::FSM::Labeled
 
 #endif

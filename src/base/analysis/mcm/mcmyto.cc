@@ -55,7 +55,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 
 class AlgYTO {
 public:
@@ -1233,4 +1233,4 @@ CDouble minCycleRatioYoungTarjanOrlin(MCMgraph &mcmGraph) {
     return minCycleRatioAndCriticalCycleYoungTarjanOrlin(mcmGraph, nullptr);
 }
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs

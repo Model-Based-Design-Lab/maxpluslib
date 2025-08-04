@@ -51,7 +51,9 @@
 #include <set>
 #include <utility>
 
-namespace FSM {
+using namespace MaxPlus;
+
+namespace MaxPlus::FSM {
 
 // the abstract ancestor of FSM types
 namespace Abstract {
@@ -1205,6 +1207,6 @@ private:
 
 } // namespace Product
 
-} // namespace FSM
+} // namespace MaxPlus::FSM
 
 #endif

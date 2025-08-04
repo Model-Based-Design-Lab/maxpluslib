@@ -46,7 +46,9 @@
 #include <memory>
 #include <utility>
 
-namespace Graphs {
+using namespace MaxPlus;
+
+namespace MaxPlus::Graphs {
 class MCMnode;
 
 class MCMedge {
@@ -263,5 +265,5 @@ void relabelMCMgraph(MCMgraph &g);
  */
 void addLongestDelayEdgesToMCMgraph(MCMgraph &g);
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs
 #endif

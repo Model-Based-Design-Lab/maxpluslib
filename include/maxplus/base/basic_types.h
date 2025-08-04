@@ -47,6 +47,7 @@
 
 /* STL functionality */
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -55,16 +56,20 @@
 #include <set>
 #include <vector>
 
+namespace MaxPlus {
+
 /* basic types */
-using uint = unsigned int;
-using v_int = std::vector<int>;
-using v_uint = std::vector<uint>;
+using uint = uint32_t;
+using v_int = std::vector<int32_t>;
+using v_uint = std::vector<uint32_t>;
 
 /* Id */
-using CId = uint;
-using CSize = unsigned long long;
+using CId = uint32_t;
+using CSize = uint64_t;
 
 /* Doubles */
 using CDouble = double;
+
+} // namespace MaxPlus
 
 #endif

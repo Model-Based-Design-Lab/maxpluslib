@@ -48,7 +48,7 @@
 #include <set>
 #include <vector>
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 /**
  * ~MCMgraph
  * Constructor.
@@ -807,4 +807,4 @@ std::map<CId, CDouble> MCMgraph::normalizedLongestPaths(const CId rootNodeId,
     return result;
 }
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs

@@ -61,7 +61,7 @@
 
 using namespace MaxPlus;
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 /*
  * Howard terminates with an error if MAX_NIterations occur.
  */
@@ -594,4 +594,4 @@ CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode) {
     return mcm;
 }
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs

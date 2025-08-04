@@ -46,7 +46,7 @@
 
 namespace MaxPlus {
 
-using namespace ::FSM::Labeled;
+using namespace ::MaxPlus::FSM::Labeled;
 
 template <typename SL, typename EL> class RatioGame : virtual public DoubleWeightedGraph<SL, EL> {
 public:

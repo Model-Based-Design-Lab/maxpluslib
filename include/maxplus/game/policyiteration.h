@@ -51,7 +51,7 @@
 
 namespace MaxPlus {
 
-using namespace ::FSM::Labeled;
+using namespace ::MaxPlus::FSM::Labeled;
 
 /**
  * Policy Iteration Algorithm to solve ratio games.

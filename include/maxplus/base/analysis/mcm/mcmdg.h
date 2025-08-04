@@ -53,7 +53,7 @@
 
 #include "maxplus/base/analysis/mcm/mcmgraph.h"
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 
 /**
  * mcmDG ()
@@ -66,6 +66,6 @@ namespace Graphs {
  */
 CDouble mcmDG(MCMgraph &mcmGraph);
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs
 
 #endif

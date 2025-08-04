@@ -47,7 +47,7 @@
 
 #include "maxplus/base/analysis/mcm/mcmgraph.h"
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 
 /// <summary>
 ///		The function computes the maximum cycle mean of an MCMgraph using Karp's
@@ -101,5 +101,5 @@ v_uint mcmGetAdjacentActors(uint a,
                             const std::vector<v_uint> &graph,
                             uint nrNodes);
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs
 #endif

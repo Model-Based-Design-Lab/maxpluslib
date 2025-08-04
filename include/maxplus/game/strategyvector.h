@@ -47,7 +47,7 @@
 
 namespace MaxPlus {
 
-using namespace ::FSM::Labeled;
+using namespace ::MaxPlus::FSM::Labeled;
 
 /**
  * Vector that can store the strategy for both players in the graph. For any

@@ -46,7 +46,7 @@
 
 namespace MaxPlus {
 
-using namespace ::FSM::Labeled;
+using namespace ::MaxPlus::FSM::Labeled;
 
 /**
  * Double weighted graph.

@@ -44,7 +44,7 @@
 
 using namespace MaxPlus;
 
-namespace FSM {
+namespace MaxPlus::FSM {
 
 CId FSM::Abstract::WithUniqueID::nextID = 0;
 
@@ -92,4 +92,4 @@ const Abstract::SetOfEdges &State::getOutgoingEdges() {
 }
 } // namespace Product
 
-} // namespace FSM
+} // namespace MaxPlus::FSM

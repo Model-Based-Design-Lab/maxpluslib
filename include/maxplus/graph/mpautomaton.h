@@ -48,7 +48,7 @@
 
 namespace MaxPlus {
 
-using namespace ::FSM::Labeled;
+using namespace ::MaxPlus::FSM::Labeled;
 /**
  * MPA state is labeled with the FSM state ID, and the token number.
  */

@@ -53,7 +53,7 @@
 #include <memory>
 #include <vector>
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 
 using node = struct Node {
     // index into nodes array of graph structure is id - 1
@@ -186,6 +186,6 @@ void convertMCMgraphToYTOgraph(MCMgraph &g,
 
 void mmcycle(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle);
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs
 
 #endif

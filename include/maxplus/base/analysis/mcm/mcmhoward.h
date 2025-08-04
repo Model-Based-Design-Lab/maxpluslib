@@ -54,7 +54,7 @@
 
 #include "maxplus/base/analysis/mcm/mcmgraph.h"
 #include <memory>
-namespace Graphs {
+namespace MaxPlus::Graphs {
 /**
  * convertMCMgraphToMatrix ()
  * The function converts a weighted directed graph used in the MCM algorithms
@@ -125,5 +125,5 @@ CDouble maximumCycleMeanHoward(MCMgraph &g, MCMnode **criticalNode);
  */
 CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode);
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs
 #endif

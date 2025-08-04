@@ -40,7 +40,7 @@
 
 #include "base/analysis/mcm/mcm.h"
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 // #define __CALC_MCM_PER_CYCLE__
 
 #ifndef __CALC_MCM_PER_CYCLE__
@@ -71,4 +71,4 @@ v_uint mcmGetAdjacentActors(uint a,
 #else // __CALC_MCM_PER_CYCLE__
 
 #endif // __CALC_MCM_PER_CYCLE__
-} // namespace Graphs
+} // namespace MaxPlus::Graphs

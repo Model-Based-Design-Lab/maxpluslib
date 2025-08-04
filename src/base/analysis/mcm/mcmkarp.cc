@@ -44,7 +44,7 @@
 #include <climits>
 #include <cstdint>
 
-namespace Graphs {
+namespace MaxPlus::Graphs {
 /**
  * mcmKarp ()
  * The function computes the maximum cycle mean of an MCMgraph using Karp's
@@ -209,4 +209,4 @@ CDouble maximumCycleMeanKarpDoubleGeneral(MCMgraph &g, const MCMnode **criticalN
     return mcm;
 }
 
-} // namespace Graphs
+} // namespace MaxPlus::Graphs
