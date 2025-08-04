@@ -143,20 +143,20 @@ inline MPAEdgeLabel makeMPAEdgeLabel(MPDelay delay, MPString &mode) {
 }
 
 // Types for edges and states and sets.
-using MPAState = ::FSM::Labeled::State<MPAStateLabel, MPAEdgeLabel>;
-using MPAStateRef = ::FSM::Labeled::StateRef<MPAStateLabel, MPAEdgeLabel>;
-using MPAEdge = ::FSM::Labeled::Edge<MPAStateLabel, MPAEdgeLabel>;
-using MPAEdgeRef = ::FSM::Labeled::EdgeRef<MPAStateLabel, MPAEdgeLabel>;
+using MPAState = ::MaxPlus::FSM::Labeled::State<MPAStateLabel, MPAEdgeLabel>;
+using MPAStateRef = ::MaxPlus::FSM::Labeled::StateRef<MPAStateLabel, MPAEdgeLabel>;
+using MPAEdge = ::MaxPlus::FSM::Labeled::Edge<MPAStateLabel, MPAEdgeLabel>;
+using MPAEdgeRef = ::MaxPlus::FSM::Labeled::EdgeRef<MPAStateLabel, MPAEdgeLabel>;
 using MPAPath = std::list<MPAEdgeRef>;
-using MPASetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAEdgeLabel>;
-using MPASetOfStateRefs = ::FSM::Labeled::SetOfStateRefs<MPAStateLabel, MPAEdgeLabel>;
-using MPASetOfEdges = ::FSM::Labeled::SetOfEdges<MPAStateLabel, MPAEdgeLabel>;
-using MPASetOfEdgeRefs = ::FSM::Labeled::SetOfEdgeRefs<MPAStateLabel, MPAEdgeLabel>;
+using MPASetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<MPAStateLabel, MPAEdgeLabel>;
+using MPASetOfStateRefs = ::MaxPlus::FSM::Labeled::SetOfStateRefs<MPAStateLabel, MPAEdgeLabel>;
+using MPASetOfEdges = ::MaxPlus::FSM::Labeled::SetOfEdges<MPAStateLabel, MPAEdgeLabel>;
+using MPASetOfEdgeRefs = ::MaxPlus::FSM::Labeled::SetOfEdgeRefs<MPAStateLabel, MPAEdgeLabel>;
 
 /**
  * A max-plus automaton
  */
-class MaxPlusAutomaton : public ::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAEdgeLabel> {
+class MaxPlusAutomaton : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAEdgeLabel> {
 public:
     // Destructor.
     ~MaxPlusAutomaton() override = default;
@@ -214,20 +214,20 @@ inline MPString toString(const MPAREdgeLabel &l) {
 };
 
 // Types of states, edges, sets and cycle of an MPA with rewards.
-using MPARState = ::FSM::Labeled::State<MPAStateLabel, MPAREdgeLabel>;
-using MPARStateRef = ::FSM::Labeled::StateRef<MPAStateLabel, MPAREdgeLabel>;
-using MPAREdge = ::FSM::Labeled::Edge<MPAStateLabel, MPAREdgeLabel>;
-using MPAREdgeRef = ::FSM::Labeled::EdgeRef<MPAStateLabel, MPAREdgeLabel>;
-using MPARSetOfStates = ::FSM::Labeled::SetOfStates<MPAStateLabel, MPAREdgeLabel>;
-using MPARSetOfEdges = ::FSM::Abstract::SetOfEdges;
-using MPARCycle = std::list<const ::FSM::Abstract::Edge *>;
+using MPARState = ::MaxPlus::FSM::Labeled::State<MPAStateLabel, MPAREdgeLabel>;
+using MPARStateRef = ::MaxPlus::FSM::Labeled::StateRef<MPAStateLabel, MPAREdgeLabel>;
+using MPAREdge = ::MaxPlus::FSM::Labeled::Edge<MPAStateLabel, MPAREdgeLabel>;
+using MPAREdgeRef = ::MaxPlus::FSM::Labeled::EdgeRef<MPAStateLabel, MPAREdgeLabel>;
+using MPARSetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<MPAStateLabel, MPAREdgeLabel>;
+using MPARSetOfEdges = ::MaxPlus::FSM::Abstract::SetOfEdges;
+using MPARCycle = std::list<const ::MaxPlus::FSM::Abstract::Edge *>;
 
 /**
  * A max-plus automaton with rewards. In addition to the usual max-plus automaton,
  * its edges are labeled with rewards; a quantified amount of 'progress'.
  */
 class MaxPlusAutomatonWithRewards
-    : virtual public ::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAREdgeLabel> {
+    : virtual public ::MaxPlus::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAREdgeLabel> {
 public:
     // Destructor.
     ~MaxPlusAutomatonWithRewards() override = default;

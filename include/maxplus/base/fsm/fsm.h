@@ -698,11 +698,11 @@ public:
         return dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(*s);
     };
 
-    [[nodiscard]] const ::FSM::Abstract::SetOfStateRefs &getInitialStates() const override {
+    [[nodiscard]] const ::MaxPlus::FSM::Abstract::SetOfStateRefs &getInitialStates() const override {
         return this->initialStates;
     };
 
-    [[nodiscard]] const ::FSM::Abstract::SetOfStateRefs &getFinalStates() const override {
+    [[nodiscard]] const ::MaxPlus::FSM::Abstract::SetOfStateRefs &getFinalStates() const override {
         return this->finalStates;
     };
 
@@ -736,8 +736,8 @@ public:
         return this->states;
     };
 
-    [[nodiscard]] ::FSM::Abstract::SetOfStateRefs getStateRefs() const override {
-        ::FSM::Abstract::SetOfStateRefs result;
+    [[nodiscard]] ::MaxPlus::FSM::Abstract::SetOfStateRefs getStateRefs() const override {
+        ::MaxPlus::FSM::Abstract::SetOfStateRefs result;
         for (const auto &s : this->states) {
             result.insert(s.second->getReference());
         }
@@ -1070,7 +1070,7 @@ public:
     }
 
     [[nodiscard]] bool hasDirectedCycle() const {
-        ::FSM::Abstract::DetectCycle DC(*this);
+        ::MaxPlus::FSM::Abstract::DetectCycle DC(*this);
         return DC.checkForCycles(nullptr);
     }
 

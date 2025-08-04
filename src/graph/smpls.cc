@@ -8,14 +8,14 @@
 using namespace FSM;
 using namespace MaxPlus;
 
-using ELSEdge = ::FSM::Labeled::Edge<CId, MPString>;
-using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, MPString>;
-using ELSState = ::FSM::Labeled::State<CId, MPString>;
-using ELSStateRef = ::FSM::Labeled::StateRef<CId, MPString>;
-using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MPString>;
-using ELSSetOfEdges = ::FSM::Abstract::SetOfEdges;
-using ELSSetOfEdgeRefs = ::FSM::Abstract::SetOfEdgeRefs;
-using ELSSetOfStateRefs = ::FSM::Abstract::SetOfStateRefs;
+using ELSEdge = ::MaxPlus::FSM::Labeled::Edge<CId, MPString>;
+using ELSEdgeRef = ::MaxPlus::FSM::Labeled::EdgeRef<CId, MPString>;
+using ELSState = ::MaxPlus::FSM::Labeled::State<CId, MPString>;
+using ELSStateRef = ::MaxPlus::FSM::Labeled::StateRef<CId, MPString>;
+using ELSSetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<CId, MPString>;
+using ELSSetOfEdges = ::MaxPlus::FSM::Abstract::SetOfEdges;
+using ELSSetOfEdgeRefs = ::MaxPlus::FSM::Abstract::SetOfEdgeRefs;
+using ELSSetOfStateRefs = ::MaxPlus::FSM::Abstract::SetOfStateRefs;
 
 namespace MaxPlus::SMPLS {
 

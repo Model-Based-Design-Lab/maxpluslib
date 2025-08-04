@@ -54,7 +54,7 @@ namespace MaxPlus::SMPLS {
 
 using ModeMatrices = std::map<MPString, std::shared_ptr<MaxPlus::Matrix>>;
 
-class EdgeLabeledModeFSM : public ::FSM::Labeled::FiniteStateMachine<CId, MPString> {
+class EdgeLabeledModeFSM : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<CId, MPString> {
 public:
     // put the destructor deliberately into the cc sourc to ensure the class vtable is accessible
     // see: <https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable>
@@ -153,7 +153,7 @@ private:
      */
     void isConsistentUtil(const IOAState &s,
                           EventList &eventList,
-                          const ::FSM::Abstract::SetOfStateRefs &finalStates,
+                          const ::MaxPlus::FSM::Abstract::SetOfStateRefs &finalStates,
                           MPString &errMsg,
                           std::map<IOAStateRef, EventList> &visited);
 

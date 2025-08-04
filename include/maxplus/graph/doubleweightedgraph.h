@@ -54,7 +54,7 @@ using namespace ::MaxPlus::FSM::Labeled;
  * @tparam E edge label type
  */
 template <typename SL, typename EL>
-class DoubleWeightedGraph : virtual public ::FSM::Labeled::FiniteStateMachine<SL, EL> {
+class DoubleWeightedGraph : virtual public ::MaxPlus::FSM::Labeled::FiniteStateMachine<SL, EL> {
 public:
     virtual ~DoubleWeightedGraph() = default;
 

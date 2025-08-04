@@ -48,22 +48,22 @@
 
 namespace MaxPlus {
 
-using ELSState = ::FSM::Labeled::State<CId, MPString>;
-using ELSStateRef = ::FSM::Labeled::StateRef<CId, MPString>;
-using ELSEdge = ::FSM::Labeled::Edge<CId, MPString>;
-using ELSEdgeRef = ::FSM::Labeled::EdgeRef<CId, MPString>;
-using ELSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MPString>;
-using ELSSetOfEdges = ::FSM::Labeled::SetOfEdges<CId, MPString>;
+using ELSState = ::MaxPlus::FSM::Labeled::State<CId, MPString>;
+using ELSStateRef = ::MaxPlus::FSM::Labeled::StateRef<CId, MPString>;
+using ELSEdge = ::MaxPlus::FSM::Labeled::Edge<CId, MPString>;
+using ELSEdgeRef = ::MaxPlus::FSM::Labeled::EdgeRef<CId, MPString>;
+using ELSSetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<CId, MPString>;
+using ELSSetOfEdges = ::MaxPlus::FSM::Labeled::SetOfEdges<CId, MPString>;
 
 using MLSEdgeLabel = struct MLSEdgeLabel {
     Matrix *mat;
     CDouble rew;
 };
 
-using MLSState = ::FSM::Labeled::State<CId, MLSEdgeLabel>;
-using MLSEdge = ::FSM::Labeled::Edge<CId, MLSEdgeLabel>;
-using MLSSetOfStates = ::FSM::Labeled::SetOfStates<CId, MLSEdgeLabel>;
-using MLSSetOfEdges = ::FSM::Abstract::SetOfEdges;
+using MLSState = ::MaxPlus::FSM::Labeled::State<CId, MLSEdgeLabel>;
+using MLSEdge = ::MaxPlus::FSM::Labeled::Edge<CId, MLSEdgeLabel>;
+using MLSSetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<CId, MLSEdgeLabel>;
+using MLSSetOfEdges = ::MaxPlus::FSM::Abstract::SetOfEdges;
 
 } // namespace MaxPlus
 

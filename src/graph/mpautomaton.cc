@@ -13,7 +13,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCR() {
     MCMgraph g;
     CId nId = 0;
 
-    std::map<const ::FSM::Abstract::State *, MCMnode *> nodeMap;
+    std::map<const ::MaxPlus::FSM::Abstract::State *, MCMnode *> nodeMap;
 
     for (const auto &s : this->getStates()) {
         auto *n = g.addNode(nId++);
@@ -44,7 +44,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(
     MCMgraph g;
 
     CId nId = 0;
-    std::map<const ::FSM::Abstract::State *, MCMnode *> nodeMap;
+    std::map<const ::MaxPlus::FSM::Abstract::State *, MCMnode *> nodeMap;
 
     for (const auto &s : this->getStates()) {
         auto *n = g.addNode(nId++);
