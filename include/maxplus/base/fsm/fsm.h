@@ -264,17 +264,17 @@ public:
     virtual ~DepthFirstSearch() = default;
     using DFSStackCIter = DfsStack::const_iterator;
 
-    virtual void onEnterState(StateRef s){};
+    virtual void onEnterState(StateRef s) {};
 
-    virtual void onLeaveState(StateRef s){};
+    virtual void onLeaveState(StateRef s) {};
 
-    virtual void onTransition(const Edge &e){};
+    virtual void onTransition(const Edge &e) {};
 
-    virtual void onSimpleCycle(DfsStack &stack){};
+    virtual void onSimpleCycle(DfsStack &stack) {};
 
     const FiniteStateMachine &getFSM() { return this->fsm; }
 
-    explicit DepthFirstSearch(const FiniteStateMachine &targetFsm) : fsm(targetFsm){};
+    explicit DepthFirstSearch(const FiniteStateMachine &targetFsm) : fsm(targetFsm) {};
 
     // Execute the depth first search
     void DoDepthFirstSearch(const SetOfStateRefs &startingStates, bool fullDFS = false) {
@@ -400,7 +400,7 @@ public:
         _onLeaveStateLambda([](StateRef) {}),
         _onTransitionLambda([](const Edge &) {}),
         _onSimpleCycleLambda([](const DepthFirstSearch::DfsStack &) {}),
-        DepthFirstSearch(targetFsm){};
+        DepthFirstSearch(targetFsm) {};
 
     void setOnEnterLambda(TOnEnterLambda lambda) { this->_onEnterStateLambda = std::move(lambda); }
 
@@ -420,7 +420,7 @@ class DetectCycle : public DepthFirstSearch {
 public:
     bool hasCycle = false;
 
-    explicit DetectCycle(const FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){};
+    explicit DetectCycle(const FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm) {};
 
     ~DetectCycle() override = default;
 
@@ -459,7 +459,7 @@ class ReachableStates : public DepthFirstSearch {
 public:
     SetOfStateRefs result;
 
-    explicit ReachableStates(FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm){};
+    explicit ReachableStates(FiniteStateMachine &targetFsm) : DepthFirstSearch(targetFsm) {};
 
     ~ReachableStates() override = default;
 
@@ -606,7 +606,7 @@ private:
     };
 
 public:
-    FiniteStateMachine() : Abstract::FiniteStateMachine(){};
+    FiniteStateMachine() : Abstract::FiniteStateMachine() {};
 
     ~FiniteStateMachine() override = default;
 
@@ -698,7 +698,8 @@ public:
         return dynamic_cast<StateRef<StateLabelType, EdgeLabelType>>(*s);
     };
 
-    [[nodiscard]] const ::MaxPlus::FSM::Abstract::SetOfStateRefs &getInitialStates() const override {
+    [[nodiscard]] const ::MaxPlus::FSM::Abstract::SetOfStateRefs &
+    getInitialStates() const override {
         return this->initialStates;
     };
 

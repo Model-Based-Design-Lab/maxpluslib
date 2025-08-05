@@ -156,7 +156,7 @@ using MPASetOfEdgeRefs = ::MaxPlus::FSM::Labeled::SetOfEdgeRefs<MPAStateLabel, M
 /**
  * A max-plus automaton
  */
-class MaxPlusAutomaton : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAEdgeLabel> {
+class MaxPlusAutomaton: public ::MaxPlus::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAEdgeLabel> {
 public:
     // Destructor.
     ~MaxPlusAutomaton() override = default;
