@@ -25,6 +25,6 @@ format:
     tags:
         - Ubuntu2004-64bit
     script:
-        - clang-format --version
-        - clang-format --dry-run --Werror `find ./ -type f -name "*.h" -o -name "*.cc" -o -name "*.cpp"`
+        - clang-format-20 --version
+        - clang-format-20 --dry-run --Werror `find ./ -type f -name "*.h" -o -name "*.cc" -o -name "*.cpp"`
         
