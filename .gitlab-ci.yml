@@ -7,8 +7,6 @@ before_script:
     - chmod +x llvm.sh
     - ./llvm.sh 20
     - apt install clang-format-20
-    - clang-20 --version
-    - clang-format-20 --version
 
 build:
     tags:
@@ -28,6 +26,5 @@ format:
     tags:
         - Ubuntu2004-64bit
     script:
-        - clang-format-20 --version
         - clang-format-20 --dry-run --Werror `find ./ -type f -name "*.h" -o -name "*.cc" -o -name "*.cpp"`
         

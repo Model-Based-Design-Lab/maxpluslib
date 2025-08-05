@@ -12,8 +12,8 @@ class MatrixTest : public ::testing::Test {
 public:
     MatrixTest() {}
 
-    virtual void SetUp(){};
-    virtual void TearDown(){};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
     int test_SetMPTimeInMatrix();
     int test_PasteMatrix();
     int test_SubMatrix();

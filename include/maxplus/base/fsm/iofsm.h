@@ -23,7 +23,7 @@ namespace MaxPlus::FSM::Labeled {
 
 class IOAutomaton : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel> {
 public:
-    virtual ~IOAutomaton(){};
+    virtual ~IOAutomaton() {};
 };
 
 } // namespace MaxPlus::FSM::Labeled

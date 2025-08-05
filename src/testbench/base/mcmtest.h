@@ -10,8 +10,8 @@ class MCMTest : public ::testing::Test {
 public:
     MCMTest() {}
     virtual void Run();
-    virtual void SetUp(){};
-    virtual void TearDown(){};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
 
     void test_dg();
     void test_howard();

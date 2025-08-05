@@ -12,8 +12,8 @@ class ValueTest : public ::testing::Test {
 public:
     ValueTest() {}
     virtual void Run();
-    virtual void SetUp(){};
-    virtual void TearDown(){};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
 
     void test_mpTime();
     void test_Max();

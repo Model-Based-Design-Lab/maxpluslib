@@ -10,7 +10,7 @@ public:
     VectorTest() {}
 
     virtual void Run();
-    virtual void SetUp(){};
-    virtual void TearDown(){};
+    virtual void SetUp() {};
+    virtual void TearDown() {};
     void test_Infinity();
 };

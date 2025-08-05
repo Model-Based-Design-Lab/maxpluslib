@@ -10,8 +10,8 @@ class SparseMatrixTest : public ::testing::Test {
 public:
     SparseMatrixTest() = default;
 
-    void SetUp() override{};
-    void TearDown() override{};
+    void SetUp() override {};
+    void TearDown() override {};
     void Run() override;
 
     int test_Vectors();

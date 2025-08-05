@@ -18,9 +18,9 @@ void PolicyIterationTest::Run() {
     testInvalidInputGraphTest();
 };
 
-void PolicyIterationTest::SetUp(){};
+void PolicyIterationTest::SetUp() {};
 
-void PolicyIterationTest::TearDown(){};
+void PolicyIterationTest::TearDown() {};
 
 void PolicyIterationTest::testPlayer1CycleTest() {
 
