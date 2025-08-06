@@ -24,7 +24,7 @@ void PolicyIterationTest::TearDown() {};
 
 void PolicyIterationTest::testPlayer1CycleTest() {
 
-    std::cout << "Running test: Player1CycleTest" << std::endl;
+    std::cout << "Running test: Player1CycleTest\n";
 
     MaxPlusGameAutomatonWithRewards mpa;
 

@@ -18,3 +18,4 @@ CMakeSettings.json
 *.sln
 *.filters
 compile_commands.json
+.vscode

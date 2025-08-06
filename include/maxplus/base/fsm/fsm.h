@@ -564,8 +564,8 @@ public:
     }
 
     void addState(std::unique_ptr<State<StateLabelType, EdgeLabelType>> s) {
-        Abstract::SetOfStates::addState(std::move(s));
         this->addToStateIndex(s->getLabel(), s.get());
+        Abstract::SetOfStates::addState(std::move(s));
     }
 };
 
@@ -879,8 +879,10 @@ public:
         unprocessed.push_back(std::move(initialStateSet));
 
         while (!unprocessed.empty()) {
-            Abstract::SetOfStateRefs *Q = (unprocessed.begin())->get();
-            unprocessed.erase(unprocessed.begin());
+
+            auto it = unprocessed.begin();
+            std::unique_ptr<Abstract::SetOfStateRefs> Q = std::move(*it);
+            unprocessed.erase(it);
 
             // get all outgoing labels
             std::set<EdgeLabelType> labels;
