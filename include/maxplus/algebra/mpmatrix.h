@@ -44,7 +44,6 @@
 #include "maxplus/base/analysis/mcm/mcmgraph.h"
 #include "mptype.h"
 #include <memory>
-#include <unordered_set>
 #include <vector>
 
 namespace MaxPlus {
@@ -67,11 +66,11 @@ public:
     Vector(Vector &&) = default;
     Vector &operator=(Vector &&) = delete;
 
-    [[nodiscard]] inline unsigned int getSize() const {
+    [[nodiscard]] unsigned int getSize() const {
         return static_cast<unsigned int>(this->table.size());
     }
 
-    [[nodiscard]] inline MPTime get(unsigned int row) const { return this->table[row]; }
+    [[nodiscard]] MPTime get(unsigned int row) const { return this->table[row]; }
 
     void put(unsigned int row, MPTime value);
 
@@ -127,7 +126,7 @@ private:
     std::vector<MPTime> table;
 };
 
-enum class MatrixFill { MinusInfinity, Zero, Identity };
+enum class MatrixFill { MinusInfinity, Zero, Identity }; // NOLINT(*enum-size)
 
 class Matrix {
 public:
@@ -155,9 +154,9 @@ public:
 
     virtual ~Matrix();
 
-    [[nodiscard]] inline unsigned int getRows() const { return this->szRows; }
+    [[nodiscard]] unsigned int getRows() const { return this->szRows; }
 
-    [[nodiscard]] inline unsigned int getCols() const { return this->szCols; }
+    [[nodiscard]] unsigned int getCols() const { return this->szCols; }
 
     [[nodiscard]] unsigned int getSize() const;
 
@@ -170,30 +169,30 @@ public:
 
     void pasteRowVector(unsigned int top_row, unsigned int left_column, const Vector *pastedVector);
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix> createCopyPtr() const;
+    [[nodiscard]] virtual std::unique_ptr<Matrix> createCopyPtr() const;
     [[nodiscard]] virtual Matrix createCopy() const;
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix> getTransposedCopy() const;
+    [[nodiscard]] virtual std::unique_ptr<Matrix> getTransposedCopy() const;
 
     [[nodiscard]] Matrix transpose() const;
 
     [[nodiscard]] virtual Matrix getSubMatrix(const std::list<unsigned int> &rowIndices,
                                               const std::list<unsigned int> &colIndices) const;
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix>
+    [[nodiscard]] virtual std::unique_ptr<Matrix>
     getSubMatrixPtr(const std::list<unsigned int> &rowIndices,
                     const std::list<unsigned int> &colIndices) const;
 
     [[nodiscard]] Matrix getSubMatrix(const std::list<unsigned int> &indices) const;
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix>
+    [[nodiscard]] virtual std::unique_ptr<Matrix>
     getSubMatrixPtr(const std::list<unsigned int> &indices) const;
 
     [[nodiscard]] Matrix getSubMatrixNonSquare(const std::list<unsigned int> &indices) const;
 
     [[nodiscard]] Matrix getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndices) const;
 
-    [[nodiscard]] virtual std::shared_ptr<Matrix>
+    [[nodiscard]] virtual std::unique_ptr<Matrix>
     getSubMatrixNonSquareRowsPtr(const std::list<unsigned int> &rowIndices) const;
 
     /**
@@ -316,7 +315,7 @@ public:
     //  similar - differs by a constant within a threshold
 
 private:
-    const unsigned int oneVectorSize;
+    unsigned int oneVectorSize;
 };
 
 inline VectorList::VectorList(unsigned int oneVectorSizeInit) : oneVectorSize(oneVectorSizeInit) {
@@ -335,7 +334,7 @@ inline unsigned int VectorList::getSize() const { return static_cast<unsigned in
 
 inline void VectorList::grow() {
     auto last = static_cast<unsigned int>(this->size());
-    this->resize(static_cast<size_t>(last + 1));
+    this->resize(last + 1);
     this->insert(this->begin() + last, std::make_unique<Vector>(oneVectorSize, MP_MINUS_INFINITY));
 }
 

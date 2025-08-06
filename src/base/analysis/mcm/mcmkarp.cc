@@ -40,7 +40,9 @@
  */
 
 #include "base/analysis/mcm/mcmgraph.h"
+#include "base/analysis/mcm/mcmkarp.h"
 #include "base/math/cmath.h"
+#include <algorithm>
 #include <climits>
 #include <cstdint>
 
@@ -64,7 +66,6 @@ namespace MaxPlus::Graphs {
  * len    - number of elements of "cycle"
  */
 CDouble maximumCycleMeanKarp(MCMgraph &mcmGraph) {
-    std::shared_ptr<MCMnode> u;
 
     // Allocate memory d[n+1][n]
     unsigned int n = mcmGraph.nrVisibleNodes();
@@ -116,9 +117,7 @@ CDouble maximumCycleMeanKarpGeneral(MCMgraph &g) {
         MCMnode *sccCriticalNode = nullptr;
         ;
         CDouble cmcm = maximumCycleMeanKarp(*scc);
-        if (cmcm > mcm) {
-            mcm = cmcm;
-        }
+        mcm = (std::max)(cmcm, mcm);
     }
 
     return mcm;
@@ -135,7 +134,7 @@ CDouble maximumCycleMeanKarpGeneral(MCMgraph &g) {
  * A critical node is only returned if criticalNode is not nullptr.
  */
 
-CDouble maximumCycleMeanKarpDouble(MCMgraph &mcmGraph, const MCMnode **criticalNode = nullptr) {
+CDouble maximumCycleMeanKarpDouble(MCMgraph &mcmGraph, const MCMnode **criticalNode) {
 
     // Allocate memory d[n+1][n]
     unsigned int n = mcmGraph.nrVisibleNodes();
@@ -169,9 +168,7 @@ CDouble maximumCycleMeanKarpDouble(MCMgraph &mcmGraph, const MCMnode **criticalN
         CDouble ld = DBL_MAX;
         for (unsigned int k = 0; k < n; k++) {
             CDouble nld = (d[n][u.id] - d[k][u.id]) / static_cast<CDouble>(n - k);
-            if (nld < ld) {
-                ld = nld;
-            }
+            ld = (std::min)(nld, ld);
         }
         if (ld > l) {
             l = ld;
@@ -196,10 +193,9 @@ CDouble maximumCycleMeanKarpDoubleGeneral(MCMgraph &g, const MCMnode **criticalN
         std::map<CId, CId> nodeMap;
         scc->relabelNodeIds(&nodeMap);
         const MCMnode *sccCriticalNode = nullptr;
-        ;
-        CDouble cmcm = maximumCycleMeanKarpDouble(*scc, &sccCriticalNode);
-        if (cmcm > mcm) {
-            mcm = cmcm;
+        CDouble c_mcm = maximumCycleMeanKarpDouble(*scc, &sccCriticalNode);
+        if (c_mcm > mcm) {
+            mcm = c_mcm;
             if (criticalNode != nullptr) {
                 *criticalNode = g.getNode(nodeMap[sccCriticalNode->id]);
             }

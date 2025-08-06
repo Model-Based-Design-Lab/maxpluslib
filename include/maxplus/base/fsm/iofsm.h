@@ -10,20 +10,27 @@
 using InputAction = MaxPlus::MPString;
 using OutputAction = MaxPlus::MPString;
 using IOAEdgeLabel = std::pair<InputAction, OutputAction>;
-using IOAState = ::MaxPlus::FSM::Labeled::State<CId, IOAEdgeLabel>;
+using IOAState = ::MaxPlus::FSM::Labeled::State<MaxPlus::CId, IOAEdgeLabel>;
 using IOAStateRef = const IOAState *;
-using IOAEdge = ::MaxPlus::FSM::Labeled::Edge<CId, IOAEdgeLabel>;
-using IOAEdgeRef = ::MaxPlus::FSM::Labeled::EdgeRef<CId, IOAEdgeLabel>;
-using IOASetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<CId, IOAEdgeLabel>;
-using IOASetOfStateRefs = ::MaxPlus::FSM::Labeled::SetOfStateRefs<CId, IOAEdgeLabel>;
-using IOASetOfEdges = ::MaxPlus::FSM::Labeled::SetOfEdges<CId, IOAEdgeLabel>;
-using IOASetOfEdgeRefs = ::MaxPlus::FSM::Labeled::SetOfEdgeRefs<CId, IOAEdgeLabel>;
+using IOAEdge = ::MaxPlus::FSM::Labeled::Edge<MaxPlus::CId, IOAEdgeLabel>;
+using IOAEdgeRef = ::MaxPlus::FSM::Labeled::EdgeRef<MaxPlus::CId, IOAEdgeLabel>;
+using IOASetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<MaxPlus::CId, IOAEdgeLabel>;
+using IOASetOfStateRefs = ::MaxPlus::FSM::Labeled::SetOfStateRefs<MaxPlus::CId, IOAEdgeLabel>;
+using IOASetOfEdges = ::MaxPlus::FSM::Labeled::SetOfEdges<MaxPlus::CId, IOAEdgeLabel>;
+using IOASetOfEdgeRefs = ::MaxPlus::FSM::Labeled::SetOfEdgeRefs<MaxPlus::CId, IOAEdgeLabel>;
 
 namespace MaxPlus::FSM::Labeled {
 
 class IOAutomaton : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<CId, IOAEdgeLabel> {
 public:
-    virtual ~IOAutomaton() {};
+    IOAutomaton() = default;
+    ~IOAutomaton() override = default;
+
+    // Delete copy/move constructors and assignment operators
+    IOAutomaton(const IOAutomaton &) = delete;
+    IOAutomaton &operator=(const IOAutomaton &) = delete;
+    IOAutomaton(IOAutomaton &&) = delete;
+    IOAutomaton &operator=(IOAutomaton &&) = delete;
 };
 
 } // namespace MaxPlus::FSM::Labeled

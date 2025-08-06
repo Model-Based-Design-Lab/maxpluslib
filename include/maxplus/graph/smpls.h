@@ -52,13 +52,21 @@
 
 namespace MaxPlus::SMPLS {
 
-using ModeMatrices = std::map<MPString, std::shared_ptr<MaxPlus::Matrix>>;
+using ModeMatrices = std::map<MPString, std::unique_ptr<MaxPlus::Matrix>>;
 
 class EdgeLabeledModeFSM : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<CId, MPString> {
 public:
-    // put the destructor deliberately into the cc sourc to ensure the class vtable is accessible
+    EdgeLabeledModeFSM() = default;
+    // put the destructor deliberately into the cc source to ensure the class vtable is accessible
     // see: <https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable>
     ~EdgeLabeledModeFSM() override;
+
+    // Delete copy/move constructors and assignment operators
+    EdgeLabeledModeFSM(const EdgeLabeledModeFSM &) = delete;
+    EdgeLabeledModeFSM &operator=(const EdgeLabeledModeFSM &) = delete;
+    EdgeLabeledModeFSM(EdgeLabeledModeFSM &&) = delete;
+    EdgeLabeledModeFSM &operator=(EdgeLabeledModeFSM &&) = delete;
+
     virtual void removeDanglingStates();
 };
 
@@ -67,22 +75,35 @@ public:
     // the mode automaton
     EdgeLabeledModeFSM elsFSM;
 
-    // the mode matrices
-    ModeMatrices mm;
 
-    [[nodiscard]] std::shared_ptr<MaxPlusAutomaton> convertToMaxPlusAutomaton() const;
+    [[nodiscard]] std::unique_ptr<MaxPlusAutomaton> convertToMaxPlusAutomaton() const;
 
     // transposes all matrices of the SMPLS
     void transposeMatrices();
+    // returns the mode matrices
+    [[nodiscard]] const ModeMatrices &getModeMatrices() const { return this->mm; }
+    void addModeMatrix(const MPString &modeName, std::unique_ptr<MaxPlus::Matrix> m) {
+        this->mm.emplace(modeName, std::move(m));
+    }
+
+private:
+    // the mode matrices
+    ModeMatrices mm;
+
 };
 
-using ListOfMatrices = std::list<std::shared_ptr<Matrix>>;
+using ListOfMatrices = std::list<std::unique_ptr<Matrix>>;
 
 class DissectedModeMatrix {
 public:
+    DissectedModeMatrix() = default;
+    ModeMatrices& getCore() { return core; }
+    [[nodiscard]] const ModeMatrices& getCore() const { return core; }
+    ListOfMatrices& getEventRows() { return eventRows; }
+    [[nodiscard]] const ListOfMatrices& getEventRows() const { return eventRows; }
+private:
     ModeMatrices core;
     ListOfMatrices eventRows;
-    DissectedModeMatrix() = default;
 };
 
 using Mode = InputAction;
@@ -98,11 +119,11 @@ public:
     std::list<ModeEventPair> sigma;    // relation between mode and event
     std::list<EventOutcomePair> gamma; // relation between event and outcome
 
-    std::shared_ptr<IOAutomaton> ioa;
+    std::unique_ptr<IOAutomaton> ioa;
 
-    SMPLSwithEvents() { this->ioa = std::make_shared<IOAutomaton>(); }
+    SMPLSwithEvents() { this->ioa = std::make_unique<IOAutomaton>(); }
 
-    explicit SMPLSwithEvents(std::shared_ptr<IOAutomaton> ioa) : ioa(std::move(ioa)) {}
+    explicit SMPLSwithEvents(std::unique_ptr<IOAutomaton> ioa) : ioa(std::move(ioa)) {}
 
     /**
      * checks the consistency rules for SMPLS with events
@@ -114,7 +135,7 @@ public:
     /**
      * creates a max-plus automaton from SMPLS with events
      */
-    std::shared_ptr<MaxPlusAutomaton> convertToMaxPlusAutomaton();
+    std::unique_ptr<MaxPlusAutomaton> convertToMaxPlusAutomaton();
 
     /*
      * goes through the gamma relation and finds the event of the outcome
@@ -122,7 +143,7 @@ public:
     [[nodiscard]] Event findEventByOutcome(const EventOutcome &outcome) const;
 
 private:
-    std::list<std::shared_ptr<DissectedModeMatrix>> disMatrices;
+    std::list<std::unique_ptr<DissectedModeMatrix>> disMatrices;
     uint numberOfResources = 0;
     uint biggestMatrixSize = 0;
 
@@ -146,7 +167,7 @@ private:
                          std::multiset<Event> &eventList,
                          IOASetOfEdgeRefs &visitedEdges);
 
-    std::shared_ptr<DissectedModeMatrix> findDissectedModeMatrix(const MPString &sName);
+    DissectedModeMatrix* findDissectedModeMatrix(const MPString &sName);
 
     /**
      * recursive part of isConsistent

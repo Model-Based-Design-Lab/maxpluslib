@@ -50,7 +50,6 @@
 
 #include "maxplus/base/analysis/mcm/mcmgraph.h"
 #include <cstdint>
-#include <memory>
 #include <vector>
 
 namespace MaxPlus::Graphs {

@@ -12,6 +12,8 @@
 
 using namespace MaxPlus;
 
+// NOLINTBEGIN(*magic-numbers,*simplify-boolean-expr)
+
 MPAutomatonTest::MPAutomatonTest() = default;
 
 void MPAutomatonTest::SetUp() {}
@@ -26,9 +28,9 @@ void MPAutomatonTest::Run() {
     testDetectCycleFSM();
 }
 
-void MPAutomatonTest::testCreateFSM() {
+void MPAutomatonTest::testCreateFSM() { // NOLINT(*to-static)
 
-    std::cout << "Running test: CreateFSM" << std::endl;
+    std::cout << "Running test: CreateFSM\n";
 
     MaxPlusAutomatonWithRewards mpa;
 
@@ -43,17 +45,17 @@ void MPAutomatonTest::testCreateFSM() {
 
     auto es = dynamic_cast<const FSM::Abstract::SetOfEdgeRefs &>(s1->getOutgoingEdges());
     for (const auto &i : es) {
-        auto *e = dynamic_cast<EdgeRef<MPAStateLabel, MPAREdgeLabel>>(i);
+        const auto *e = dynamic_cast<EdgeRef<MPAStateLabel, MPAREdgeLabel>>(i);
 
         ASSERT_THROW(((e->getDestination())) == s2 || ((e->getDestination())) == s3);
     }
 
     mpa.setInitialState(*s1);
 
-    auto s = mpa.checkStateLabeled(makeMPAStateLabel(0, 1));
+    const auto *s = mpa.checkStateLabeled(makeMPAStateLabel(0, 1));
     ASSERT_THROW(s != nullptr);
 
-    auto e = mpa.findEdge(makeMPAStateLabel(0, 0),
+    const auto *e = mpa.findEdge(makeMPAStateLabel(0, 0),
                           makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0),
                           makeMPAStateLabel(0, 1));
     ASSERT_THROW(e != nullptr);
@@ -61,9 +63,9 @@ void MPAutomatonTest::testCreateFSM() {
     ASSERT_EQUAL_NOPRINT(s1, mpa.getInitialState());
 }
 
-void MPAutomatonTest::testDeterminizeFSM() {
+void MPAutomatonTest::testDeterminizeFSM() { // NOLINT(*to-static)
 
-    std::cout << "Running test: DeterminizeFSM" << std::endl;
+    std::cout << "Running test: DeterminizeFSM\n";
 
     MaxPlusAutomatonWithRewards mpa;
 
@@ -89,21 +91,21 @@ void MPAutomatonTest::testDeterminizeFSM() {
 
     mpa.setInitialState(*s1);
 
-    std::shared_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized =
-            std::dynamic_pointer_cast<MaxPlusAutomatonWithRewards>(mpa.determinizeEdgeLabels());
+    auto determinizedAutomaton = mpa.determinizeEdgeLabels();
+    std::unique_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized = std::unique_ptr<MaxPlusAutomatonWithRewards>(dynamic_cast<MaxPlusAutomatonWithRewards *>(determinizedAutomaton.release()));
 
     ASSERT_THROW(mpaDeterminized->getStates().size() == 2);
     ASSERT_THROW(mpaDeterminized->getEdges().size() == 3);
 
     CDouble mcr = mpa.calculateMCR();
-    std::shared_ptr<std::vector<const MPAREdge *>> cycle;
+    std::vector<const MPAREdge *> cycle;
     CDouble mcr1 = mpaDeterminized->calculateMCRAndCycle(&cycle);
 
     ASSERT_APPROX_EQUAL(mcr, mcr1, ASSERT_EPSILON);
-    ASSERT_EQUAL(cycle->size(), 2);
+    ASSERT_EQUAL(cycle.size(), 2);
 }
 
-void MPAutomatonTest::testMinimizeFSM() {
+void MPAutomatonTest::testMinimizeFSM() { // NOLINT(*to-static)
 
     std::cout << "Running test: MinimizeFSM\n";
 
@@ -119,17 +121,17 @@ void MPAutomatonTest::testMinimizeFSM() {
 
     fsa.setInitialState(*s0);
 
-    const auto fsaMin = std::dynamic_pointer_cast<FSM::Labeled::FiniteStateMachine<int, int>>(
+    const auto fsaMin = std::unique_ptr<FSM::Labeled::FiniteStateMachine<int, int>>(
             fsa.minimizeEdgeLabels());
 
-    std::cout << "Nr states: " << fsaMin->getStates().size() << std::endl;
-    std::cout << "Nr edges: " << fsaMin->getEdges().size() << std::endl;
+    std::cout << "Nr states: " << fsaMin->getStates().size() << "\n";
+    std::cout << "Nr edges: " << fsaMin->getEdges().size() << "\n";
 
     ASSERT_EQUAL(fsaMin->getStates().size(), 2);
     ASSERT_EQUAL(fsaMin->getEdges().size(), 2);
 }
 
-void MPAutomatonTest::testDFSFSM() {
+void MPAutomatonTest::testDFSFSM() { // NOLINT(*to-static)
 
     std::cout << "Running test: Depth-First Search FSM\n";
 
@@ -207,7 +209,7 @@ void MPAutomatonTest::testDFSFSM() {
     }
 }
 
-void MPAutomatonTest::testDetectCycleFSM() {
+void MPAutomatonTest::testDetectCycleFSM() { // NOLINT(*to-static)
 
     std::cout << "Running test: DetectCycles\n";
 
@@ -242,7 +244,7 @@ void MPAutomatonTest::testDetectCycleFSM() {
         fsa.addEdge(*s0, 2, *s1);
         fsa.addEdge(*s1, 2, *s2);
         fsa.addEdge(*s2, 2, *s3);
-        auto e = fsa.addEdge(*s3, 2, *s1);
+        const auto *e = fsa.addEdge(*s3, 2, *s1);
 
         fsa.setEdgeLabel(e, 5);
 
@@ -252,3 +254,5 @@ void MPAutomatonTest::testDetectCycleFSM() {
         ASSERT(hasCycle);
     }
 }
+
+// NOLINTEND(*magic-numbers,*simplify-boolean-expr)

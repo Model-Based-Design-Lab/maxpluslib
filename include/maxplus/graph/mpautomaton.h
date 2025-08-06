@@ -48,6 +48,7 @@
 
 namespace MaxPlus {
 
+using namespace MaxPlus;
 using namespace ::MaxPlus::FSM::Labeled;
 /**
  * MPA state is labeled with the FSM state ID, and the token number.
@@ -62,7 +63,7 @@ using MPAStateLabel = struct MPAStateLabel {
  * @param stateId FSM state id
  * @param tokenId token number
  */
-inline MPAStateLabel makeMPAStateLabel(CId stateId, unsigned int tokenId) {
+inline MPAStateLabel makeMPAStateLabel(CId stateId, int tokenId) {
     MPAStateLabel sl;
     sl.id = stateId;
     sl.tokenNr = tokenId;
@@ -159,8 +160,16 @@ using MPASetOfEdgeRefs = ::MaxPlus::FSM::Labeled::SetOfEdgeRefs<MPAStateLabel, M
 class MaxPlusAutomaton
     : public ::MaxPlus::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAEdgeLabel> {
 public:
+    MaxPlusAutomaton() = default;
     // Destructor.
     ~MaxPlusAutomaton() override = default;
+
+    // Delete copy/move constructors and assignment operators
+    MaxPlusAutomaton(const MaxPlusAutomaton &) = delete;
+    MaxPlusAutomaton &operator=(const MaxPlusAutomaton &) = delete;
+    MaxPlusAutomaton(MaxPlusAutomaton &&) = delete;
+    MaxPlusAutomaton &operator=(MaxPlusAutomaton &&) = delete;
+
 };
 
 /**
@@ -168,7 +177,7 @@ public:
  */
 using MPAREdgeLabel = struct MPAREdgeLabel {
     MPDelay delay;
-    const MPString mode;
+    MPString mode;
     CDouble reward{0.0};
 };
 
@@ -223,6 +232,7 @@ using MPARSetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<MPAStateLabel, MPAR
 using MPARSetOfEdges = ::MaxPlus::FSM::Abstract::SetOfEdges;
 using MPARCycle = std::list<const ::MaxPlus::FSM::Abstract::Edge *>;
 
+
 /**
  * A max-plus automaton with rewards. In addition to the usual max-plus automaton,
  * its edges are labeled with rewards; a quantified amount of 'progress'.
@@ -230,16 +240,24 @@ using MPARCycle = std::list<const ::MaxPlus::FSM::Abstract::Edge *>;
 class MaxPlusAutomatonWithRewards
     : virtual public ::MaxPlus::FSM::Labeled::FiniteStateMachine<MPAStateLabel, MPAREdgeLabel> {
 public:
+    MaxPlusAutomatonWithRewards() = default;
     // Destructor.
     ~MaxPlusAutomatonWithRewards() override = default;
-    std::shared_ptr<::FSM::Abstract::FiniteStateMachine> newInstance() override {
-        return std::make_shared<MaxPlusAutomatonWithRewards>();
+    std::unique_ptr<::MaxPlus::FSM::Abstract::FiniteStateMachine> newInstance() override {
+        return std::make_unique<MaxPlusAutomatonWithRewards>();
     }
+
+        // Delete copy/move constructors and assignment operators
+    MaxPlusAutomatonWithRewards(const MaxPlusAutomatonWithRewards &) = delete;
+    MaxPlusAutomatonWithRewards &operator=(const MaxPlusAutomatonWithRewards &) = delete;
+    MaxPlusAutomatonWithRewards(MaxPlusAutomatonWithRewards &&) = delete;
+    MaxPlusAutomatonWithRewards &operator=(MaxPlusAutomatonWithRewards &&) = delete;
+
 
     // compute the maximum cycle ratio of delay over progress
     CDouble calculateMCR();
     // compute the maximum cycle ratio of delay over progress and also return a critical cycle
-    CDouble calculateMCRAndCycle(std::shared_ptr<std::vector<MPAREdgeRef>> *cycle);
+    CDouble calculateMCRAndCycle(std::vector<MPAREdgeRef> *cycle);
 };
 
 } // namespace MaxPlus

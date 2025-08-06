@@ -47,7 +47,6 @@
 #include <algorithm> // std::max
 #include <cmath>     // -Infinity
 #include <stack>
-#include <utility> // std::pair
 
 namespace MaxPlus {
 
@@ -69,8 +68,16 @@ template <typename SL, typename EL> class PolicyIteration {
     const CDouble EPSILON = 10e-5;
 
 public:
+    PolicyIteration() = default;
     ~PolicyIteration() = default;
     ;
+
+    // Delete copy/move constructors and assignment operators
+    PolicyIteration(const PolicyIteration &) = delete;
+    PolicyIteration &operator=(const PolicyIteration &) = delete;
+    PolicyIteration(PolicyIteration &&) = delete;
+    PolicyIteration &operator=(PolicyIteration &&) = delete;
+
 
     struct PolicyIterationResult {
         std::map<const State<SL, EL> *, CDouble> values;
@@ -104,8 +111,8 @@ public:
                     "Input game graph is not valid. Some states have no successor.");
         }
         // Initialize arbitrary positional strategies.
-        std::shared_ptr<StrategyVector<SL, EL>> initialStrategy =
-                std::make_shared<StrategyVector<SL, EL>>();
+        std::unique_ptr<StrategyVector<SL, EL>> initialStrategy =
+                std::make_unique<StrategyVector<SL, EL>>();
         initialStrategy->initializeRandomStrategy(game);
 
         return policyIteration(game, initialStrategy, epsilon);
@@ -116,7 +123,7 @@ private:
      * Policy iteration algorithm to find the value of each state and the strategy.
      */
     PolicyIterationResult policyIteration(RatioGame<SL, EL> &game,
-                                          std::shared_ptr<StrategyVector<SL, EL>> initialStrategy,
+                                          std::unique_ptr<StrategyVector<SL, EL>> initialStrategy,
                                           CDouble epsilon) {
         const SetOfStates<SL, EL> &states = game.getStates();
 
@@ -171,10 +178,10 @@ private:
                     const auto &u = dynamic_cast<const StateRef<SL, EL>>(e->getDestination());
 
                     CDouble mw = ratioVector[u];
-                    CDouble w1 = static_cast<CDouble>(game.getWeight1(e));
-                    CDouble w2 = static_cast<CDouble>(game.getWeight2(e));
+                    auto w1 = static_cast<CDouble>(game.getWeight1(e));
+                    auto w2 = static_cast<CDouble>(game.getWeight2(e));
 
-                    CDouble reweighted = w1 - mw * w2;
+                    CDouble re_weighted = w1 - (mw * w2);
 
                     CDouble w2sum_v = dw2vector[v];
                     CDouble w2sum_u = dw2vector[u] + w2;
@@ -182,12 +189,12 @@ private:
                     CDouble delta = std::max(w2sum_v, w2sum_u) * epsilon;
 
                     CDouble dv = distVector[v];
-                    CDouble du = distVector[u] + reweighted;
+                    CDouble du = distVector[u] + re_weighted;
 
                     // Player 0 wants to maximize the ratio.
                     if (lessThan(ratioVector[v], ratioVector[u], epsilon)
                         || (equalTo(ratioVector[v], ratioVector[u], epsilon)
-                            && (lessThan(dv, du, 2.0 * delta)))) {
+                            && (lessThan(dv, du, 2.0 * delta)))) { // NOLINT(*magic-numbers)
                         currentStrategy.setSuccessor(v, u);
                         improvement = true;
                     }
@@ -236,8 +243,8 @@ private:
         std::map<const State<SL, EL> *, CDouble> d_i_t(d_prev);
         std::map<const State<SL, EL> *, CDouble> r_i_t(r_prev);
         std::map<const State<SL, EL> *, CDouble> dw2_i_t(dw2_prev);
-        std::shared_ptr<StrategyVector<SL, EL>> s_i_t =
-                std::make_shared<StrategyVector<SL, EL>>(currentStrategy);
+        std::unique_ptr<StrategyVector<SL, EL>> s_i_t =
+                std::make_unique<StrategyVector<SL, EL>>(currentStrategy);
 
         while (improvement) {
             improvement = false;
@@ -264,10 +271,10 @@ private:
                     auto u = dynamic_cast<const StateRef<SL, EL>>(e->getDestination());
 
                     CDouble cycleRatio = r_i_t[u];
-                    CDouble w1 = static_cast<CDouble>(game.getWeight1(e));
-                    CDouble w2 = static_cast<CDouble>(game.getWeight2(e));
+                    auto w1 = static_cast<CDouble>(game.getWeight1(e));
+                    auto w2 = static_cast<CDouble>(game.getWeight2(e));
 
-                    CDouble reweighted = w1 - cycleRatio * w2;
+                    CDouble re_weighted = w1 - (cycleRatio * w2);
 
                     CDouble w2sum_v = dw2_i_t[v];
                     CDouble w2sum_u = dw2_i_t[u] + w2;
@@ -275,11 +282,11 @@ private:
                     CDouble delta = std::max(w2sum_v, w2sum_u) * epsilon;
 
                     CDouble dv = d_i_t[v];
-                    CDouble du = d_i_t[u] + reweighted;
+                    CDouble du = d_i_t[u] + re_weighted;
 
                     if (greaterThan(r_i_t[v], r_i_t[u], epsilon)
                         || (equalTo(r_i_t[v], r_i_t[u], epsilon)
-                            && (greaterThan(dv, du, 2.0 * delta)))) {
+                            && (greaterThan(dv, du, 2.0 * delta)))) { // NOLINT(*magic-numbers)
 
                         // Improve strategy if either a smaller ratio
                         // can be obtained, or the distance becomes smaller.
@@ -318,7 +325,7 @@ private:
      * @return the new distance and ratio vectors
      */
     StrategyEvaluation evaluateStrategy(RatioGame<SL, EL> &game,
-                                        std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
+                                        StrategyVector<SL, EL>& currentStrategy,
                                         std::map<const State<SL, EL> *, CDouble> &distanceVector,
                                         std::map<const State<SL, EL> *, CDouble> &ratioVector,
                                         std::map<const State<SL, EL> *, CDouble> &dw2,
@@ -348,7 +355,7 @@ private:
     }
 
     struct CycleResult {
-        std::shared_ptr<FSM::Abstract::SetOfStateRefs> states;
+        std::unique_ptr<FSM::Abstract::SetOfStateRefs> states;
         std::map<const State<SL, EL> *, CDouble> valueMap;
     };
 
@@ -363,13 +370,13 @@ private:
      * @return
      */
     CycleResult findCyclesInRestrictedGraph(RatioGame<SL, EL> &game,
-                                            std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
+                                            StrategyVector<SL, EL> &currentStrategy,
                                             std::map<const State<SL, EL> *, CDouble> &stateIds) {
         const SetOfStates<SL, EL> &states = game.getStates();
         const State<SL, EL> *BOTTOM_VERTEX = nullptr;
 
-        std::shared_ptr<FSM::Abstract::SetOfStateRefs> selectedVertices =
-                std::make_shared<FSM::Abstract::SetOfStateRefs>();
+        std::unique_ptr<FSM::Abstract::SetOfStateRefs> selectedVertices =
+                std::make_unique<FSM::Abstract::SetOfStateRefs>();
 
         // Initially, all vertices are unvisited.
         std::map<const State<SL, EL> *, const State<SL, EL> *> visited =
@@ -383,11 +390,11 @@ private:
             auto v = dynamic_cast<const State<SL, EL> *>(&(si));
             if (visited[v] == BOTTOM_VERTEX) {
                 const State<SL, EL> *u = v;
-                while (visited[u] == BOTTOM_VERTEX) {
-                    visited[u] = v;
+                while (visited[u] == BOTTOM_VERTEX) { // NOLINT(*pointer-arithmetic)
+                    visited[u] = v; // NOLINT(*pointer-arithmetic)
                     u = currentStrategy->getSuccessor(u);
                 }
-                if (visited[u] == v) {
+                if (visited[u] == v) { // NOLINT(*pointer-arithmetic)
                     const State<SL, EL> *v_s = u;
                     const State<SL, EL> *x = currentStrategy->getSuccessor(u);
 
@@ -400,7 +407,7 @@ private:
                         // Find the vertex with the lowest id for unique
                         // ordering, to ensure always the same vertex is the
                         // "selected vertex" in the cycle.
-                        if (stateIds[x] < stateIds[v_s]) {
+                        if (stateIds[x] < stateIds[v_s]) { // NOLINT(*pointer-arithmetic)
                             v_s = x;
                         }
                         EdgeRef<SL, EL> x_succ =
@@ -413,7 +420,7 @@ private:
                         x = currentStrategy->getSuccessor(x);
                     }
                     // Store the cycle ratio for the cycle containing v_s.
-                    r_i_t[v_s] = w1sum / w2sum;
+                    r_i_t[v_s] = w1sum / w2sum; // NOLINT(*pointer-arithmetic)
                     selectedVertices->insert(v_s);
                 }
             }
@@ -447,8 +454,8 @@ private:
      */
     DistanceResult
     computeDistances(RatioGame<SL, EL> &game,
-                     std::shared_ptr<StrategyVector<SL, EL>> currentStrategy,
-                     const std::shared_ptr<FSM::Abstract::SetOfStateRefs> &selectedStates,
+                     StrategyVector<SL, EL> &currentStrategy,
+                     FSM::Abstract::SetOfStateRefs &selectedStates,
                      std::map<const State<SL, EL> *, CDouble> &r_i_t,
                      std::map<const State<SL, EL> *, CDouble> &d_prev,
                      std::map<const State<SL, EL> *, CDouble> &r_prev,
@@ -464,7 +471,7 @@ private:
         std::map<const State<SL, EL> *, CDouble> dw2;
 
         // For all selected states.
-        for (const auto &ssi : *selectedStates) {
+        for (const auto &ssi : selectedStates) {
             auto u = dynamic_cast<const State<SL, EL> *>(ssi);
             if (equalTo(r_i_t[u], r_prev[u], epsilon)) {
                 d_i_t[u] = d_prev[u];
@@ -482,8 +489,8 @@ private:
             auto state = dynamic_cast<const State<SL, EL> *>(&(si));
             if (!visited[state]) {
                 const State<SL, EL> *u = state;
-                while (!visited[u]) {
-                    visited[u] = true;
+                while (!visited[u]) { // NOLINT(*pointer-arithmetic)
+                    visited[u] = true; // NOLINT(*pointer-arithmetic)
                     stack.push(u);
                     u = currentStrategy->getSuccessor(u);
                 }
@@ -494,15 +501,15 @@ private:
                     auto w1 = static_cast<CDouble>(game.getWeight1(e));
                     auto w2 = static_cast<CDouble>(game.getWeight2(e));
 
-                    CDouble cycleRatio = r_i_t[u];
+                    CDouble cycleRatio = r_i_t[u]; // NOLINT(*pointer-arithmetic)
 
-                    CDouble reweighted = w1 - cycleRatio * w2;
+                    CDouble re_weighted = w1 - (cycleRatio * w2);
 
                     // Update cycle ratio.
-                    r_i_t[x] = cycleRatio;
+                    r_i_t[x] = cycleRatio; // NOLINT(*pointer-arithmetic)
                     // Update distance to cycle.
-                    d_i_t[x] = d_i_t[u] + reweighted;
-                    dw2[x] = dw2[u] + w2;
+                    d_i_t[x] = d_i_t[u] + re_weighted; // NOLINT(*pointer-arithmetic)
+                    dw2[x] = dw2[u] + w2; // NOLINT(*pointer-arithmetic)
                     u = x;
                 }
             }

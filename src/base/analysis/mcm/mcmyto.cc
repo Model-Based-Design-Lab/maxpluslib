@@ -48,24 +48,22 @@
 
 #include "base/analysis/mcm/mcmyto.h"
 #include "base/analysis/mcm/mcmgraph.h"
-#include "base/exception/exception.h"
-#include "base/math/cmath.h"
+#include <algorithm>
 #include <cassert>
 #include <cfloat>
 #include <cstdint>
-#include <memory>
 
 namespace MaxPlus::Graphs {
 
 class AlgYTO {
 public:
-    explicit AlgYTO(graph &g) : gr(g) {}
+    explicit AlgYTO(graph &g) : gr(&g) {}
 
 private:
     static constexpr node *NILN = nullptr;
     static constexpr arc *NILA = nullptr;
 
-    graph &gr;
+    graph *gr;
 
     std::int32_t update_level = 0;
     node *upd_nodes = nullptr;
@@ -99,15 +97,13 @@ private:
 
     d_heap h;
 
-#if 0
-        void printHeap()
-        {
-            cerr << "Heap: ";
-            for (std::int32_t i = 0; i < h.size; i++)
-                cerr << h.items[i]->key << ", ";
-            cerr << endl;
-        }
-#endif
+        // void printHeap()
+        // {
+        //     cerr << "Heap: ";
+        //     for (std::int32_t i = 0; i < h.size; i++)
+        //         cerr << h.items[i]->key << ", ";
+        //     cerr << endl;
+        // }
 
     [[nodiscard]] std::int32_t minChild(std::int32_t x) {
         std::int32_t k_min = -1;
@@ -120,7 +116,7 @@ private:
                 upb = dh * (x + 1);
             }
 
-            for (std::int32_t k = dh * x + 1; k <= upb; k++) {
+            for (std::int32_t k = (dh * x) + 1; k <= upb; k++) {
                 if (h.items[k]->key < min) {
                     min = h.items[k]->key;
                     k_min = k;
@@ -142,7 +138,7 @@ private:
                 upb = dh * (x + 1);
             }
 
-            for (std::int32_t k = dh * x + 1; k <= upb; k++) {
+            for (std::int32_t k = (dh * x) + 1; k <= upb; k++) {
                 if (min - h.items[k]->key > epsilon) {
                     min = h.items[k]->key;
                     k_min = k;
@@ -265,7 +261,7 @@ private:
      * contained in subtree updates node levels and costs of paths along sub-tree to
      * nodes contained in it.
      */
-    void update_subtree(node *root) {
+    void update_subtree(node *root) { // NOLINT(*no-recursion)
 
         root->level = update_level;
         root->link = upd_nodes;
@@ -275,7 +271,7 @@ private:
         if (root->first_child != NILN) {
             ++update_level;
             node *vptr = root->first_child;
-            do {
+            do { // NOLINT(*avoid-do-while)
                 vptr->cost_t = root->cost_t + vptr->parent_in->cost;
                 vptr->transit_time_t = root->transit_time_t + vptr->parent_in->transit_time;
                 update_subtree(vptr);
@@ -384,7 +380,7 @@ public:
      *
      * 9) goto (6);
      */
-    void mmcycle(graph &gr, CDouble *lambda, std::shared_ptr<std::vector<const arc *>> *cycle) {
+    void mmcycle(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle) { // NOLINT(*cognitive-complexity)
 
         // set up initial tree
         node *s_ptr = gr.vs;
@@ -429,9 +425,7 @@ public:
             total_cost_plus_one += fabs(a.cost);
             // keep min of transit times
             if (a.transit_time > 0.0L) {
-                if (a.transit_time < min_transit_time) {
-                    min_transit_time = a.transit_time;
-                }
+                min_transit_time = (std::min)(a.transit_time, min_transit_time);
             }
         }
         CDouble infty = total_cost_plus_one / min_transit_time;
@@ -567,9 +561,9 @@ public:
                         uptr = a_ptr->tail;
                         a_ptr->key =
                                 uptr->transit_time_t + a_ptr->transit_time > v_ptr->transit_time_t
-                                        ? static_cast<CDouble>(uptr->cost_t + a_ptr->cost
+                                        ? (uptr->cost_t + a_ptr->cost
                                                                - v_ptr->cost_t)
-                                                  / static_cast<CDouble>(uptr->transit_time_t
+                                                  / (uptr->transit_time_t
                                                                          + a_ptr->transit_time
                                                                          - v_ptr->transit_time_t)
                                         : infty;
@@ -601,9 +595,9 @@ public:
                         w_ptr = a_ptr->head;
                         CDouble a_key =
                                 v_ptr->transit_time_t + a_ptr->transit_time > w_ptr->transit_time_t
-                                        ? static_cast<CDouble>(v_ptr->cost_t + a_ptr->cost
+                                        ? (v_ptr->cost_t + a_ptr->cost
                                                                - w_ptr->cost_t)
-                                                  / static_cast<CDouble>(v_ptr->transit_time_t
+                                                  / (v_ptr->transit_time_t
                                                                          + a_ptr->transit_time
                                                                          - w_ptr->transit_time_t)
                                         : infty;
@@ -630,12 +624,12 @@ public:
         }
 
         if (cycle != nullptr) {
-            *cycle = std::make_shared<std::vector<const arc *>>();
+            // *cycle = std::make_shared<std::vector<const arc *>>();
             if (min_a_ptr != NILA) {
-                (*cycle)->push_back(min_a_ptr);
+                (*cycle).push_back(min_a_ptr);
                 a_ptr = min_a_ptr->tail->parent_in;
                 while (a_ptr->head != min_a_ptr->head) {
-                    (*cycle)->push_back(a_ptr);
+                    (*cycle).push_back(a_ptr);
                     a_ptr = a_ptr->tail->parent_in;
                 }
             }
@@ -660,7 +654,7 @@ public:
      * TODO: see if the algorithms can be unified to remove duplicate code
      **/
 
-    void mmcycle_robust(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle) {
+    void mmcycle_robust(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle) { // NOLINT(*cognitive-complexity)
         const CDouble MCR_EPSILON_RATIO = 1.0e-8L;
 
         // set up initial tree
@@ -707,15 +701,11 @@ public:
             total_cost_plus_one += fabs(a.cost);
             // keep min of transit times
             if (a.transit_time > 0.0L) {
-                if (a.transit_time < min_transit_time) {
-                    min_transit_time = a.transit_time;
-                }
+                min_transit_time = (std::min)(a.transit_time, min_transit_time);
             }
             // keep min of costs
             if (a.cost > 0.0L) {
-                if (a.cost < min_cost) {
-                    min_cost = a.cost;
-                }
+                min_cost = (std::min)(a.cost, min_cost);
             }
         }
         CDouble infty = total_cost_plus_one / min_transit_time;
@@ -1004,54 +994,57 @@ void convertMCMgraphToYTOgraph(MCMgraph &g,
         aidx++;
     }
 
-#if 0
-        // Print the MCM graph
-        cerr << "#nodes: " << g->nodes.size() << endl;
-        cerr << "#edges: " << g->edges.size() << endl;
-        cerr << "edge: (u, v, w, d)" << endl;
-        for (auto iter = g->edges.begin();
-             iter != g->edges.end(); iter++)
-        {
-            MCMedge *e = *iter;
+        // // Print the MCM graph
+        // cerr << "#nodes: " << g->nodes.size() << endl;
+        // cerr << "#edges: " << g->edges.size() << endl;
+        // cerr << "edge: (u, v, w, d)" << endl;
+        // for (auto iter = g->edges.begin();
+        //      iter != g->edges.end(); iter++)
+        // {
+        //     MCMedge *e = *iter;
 
-            if (!e->visible)
-                continue;
+        //     if (!e->visible)
+        //         continue;
 
-            cerr << "(" << e->src->id;
-            cerr << ", " << e->dst->id;
-            cerr << ", " << e->w;
-            cerr << ", " << e->d;
-            cerr << ")" << endl;
-        }
-        cerr << endl;
+        //     cerr << "(" << e->src->id;
+        //     cerr << ", " << e->dst->id;
+        //     cerr << ", " << e->w;
+        //     cerr << ", " << e->d;
+        //     cerr << ")" << endl;
+        // }
+        // cerr << endl;
 
-        // Print the graph used in the YTO algorithm
-        x = gr.nodes;
-        for (int i = 0; i <= gr.n_nodes; i++)
-        {
-            cerr << "vertex: " << x->id << endl;
+        // // Print the graph used in the YTO algorithm
+        // x = gr.nodes;
+        // for (int i = 0; i <= gr.n_nodes; i++)
+        // {
+        //     cerr << "vertex: " << x->id << endl;
 
-            for (arc *a = x->first_arc_in; a != nullptr; a = a->next_in)
-            {
-                cerr << "   edge from: " << a->tail->id;
-                cerr << " (weight: " << a->cost << ")" << endl;
-            }
-            for (arc *a = x->first_arc_out; a != nullptr; a = a->next_out)
-            {
-                cerr << "   edge to:   " << a->head->id;
-                cerr << " (weight: " << a->cost << ")" << endl;
-            }
+        //     for (arc *a = x->first_arc_in; a != nullptr; a = a->next_in)
+        //     {
+        //         cerr << "   edge from: " << a->tail->id;
+        //         cerr << " (weight: " << a->cost << ")" << endl;
+        //     }
+        //     for (arc *a = x->first_arc_out; a != nullptr; a = a->next_out)
+        //     {
+        //         cerr << "   edge to:   " << a->head->id;
+        //         cerr << " (weight: " << a->cost << ")" << endl;
+        //     }
 
-            x++;
-        }
-#endif
-}
+        //     x++;
+        // }
+
+    }
+
+namespace {
 
 /**
  * constOne ()
  * The function returns the unit cost associated with an edge.
  */
 CDouble constOne(const MCMedge & /*e*/) { return 1.0; }
+
+} // namespace
 
 /**
  * getWeight ()

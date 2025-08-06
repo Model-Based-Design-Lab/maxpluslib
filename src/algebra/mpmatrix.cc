@@ -41,13 +41,12 @@
 #include "algebra/mpmatrix.h"
 #include "algebra/mptype.h"
 #include "base/analysis/mcm/mcmgraph.h"
-#include "base/analysis/mcm/mcmyto.h"
 #include "base/exception/exception.h"
 #include <cmath>
 #include <cstdlib>
 #include <memory>
 
-using namespace Graphs;
+using namespace ::MaxPlus::Graphs;
 
 constexpr double DEFAULT_SCALE = 1.0e-06;
 
@@ -349,7 +348,7 @@ void Matrix::addRows(uint n) {
     this->szRows = this->szRows + n;
     unsigned int nr_els = this->getRows() * this->getCols();
     this->table.resize(nr_els);
-    for (unsigned int pos = nr_els - n * this->getCols(); pos < nr_els; pos++) {
+    for (unsigned int pos = nr_els - (n * this->getCols()); pos < nr_els; pos++) {
         this->table[pos] = MP_MINUS_INFINITY;
     }
 }
@@ -388,7 +387,7 @@ MPTime Matrix::get(unsigned int row, unsigned int column) const {
         throw MPException("Index out of bounds in"
                           "Matrix::get");
     }
-    return this->table[row * this->getCols() + column];
+    return this->table[(row * this->getCols()) + column];
 }
 
 /**
@@ -412,7 +411,7 @@ void Matrix::put(unsigned int row, unsigned int column, MPTime value) {
         throw MPException("Index out of bounds in"
                           "Matrix::put");
     }
-    this->table[row * this->getCols() + column] = value;
+    this->table[(row * this->getCols()) + column] = value;
 }
 
 /**
@@ -551,7 +550,7 @@ Matrix Matrix::mp_maximum(const Matrix &m) const {
  * mp_power()
  * Raise matrix to a positive integer power >= 1.
  */
-Matrix Matrix::mp_power(const unsigned int p) const {
+Matrix Matrix::mp_power(const unsigned int p) const { // NOLINT(*no-recursion)
 
     // base case p==1
     if (p == 1) {
@@ -571,8 +570,8 @@ Matrix Matrix::mp_power(const unsigned int p) const {
 /**
  * Matrix copy.
  */
-std::shared_ptr<Matrix> Matrix::createCopyPtr() const {
-    std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(this->getRows(), this->getCols());
+std::unique_ptr<Matrix> Matrix::createCopyPtr() const {
+    std::unique_ptr<Matrix> newMatrix = std::make_unique<Matrix>(this->getRows(), this->getCols());
     unsigned int nEls = this->getRows() * this->getCols();
     for (unsigned int pos = 0; pos < nEls; pos++) {
         newMatrix->table[pos] = this->table[pos];
@@ -594,10 +593,10 @@ Matrix Matrix::createCopy() const {
 /**
  * Matrix transposed copy.
  */
-std::shared_ptr<Matrix> Matrix::getTransposedCopy() const {
+std::unique_ptr<Matrix> Matrix::getTransposedCopy() const {
     unsigned int MR = this->getCols();
     unsigned int MC = this->getRows();
-    std::shared_ptr<Matrix> newMatrix = std::make_shared<Matrix>(MR, MC);
+    std::unique_ptr<Matrix> newMatrix = std::make_unique<Matrix>(MR, MC);
     for (unsigned int col = 0; col < MC; col++) {
         for (unsigned int row = 0; row < MR; row++) {
             newMatrix->put(
@@ -641,11 +640,11 @@ Matrix Matrix::getSubMatrix(const std::list<unsigned int> &rowIndices,
     return newMatrix;
 }
 
-std::shared_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &rowIndices,
+std::unique_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &rowIndices,
                                                 const std::list<unsigned int> &colIndices) const {
     auto NR = static_cast<unsigned int>(rowIndices.size());
     auto NC = static_cast<unsigned int>(colIndices.size());
-    auto newMatrix = std::make_shared<Matrix>(NR, NC);
+    auto newMatrix = std::make_unique<Matrix>(NR, NC);
 
     auto rit = rowIndices.begin();
     for (unsigned int r = 0; r < NR; r++, rit++) {
@@ -667,7 +666,7 @@ Matrix Matrix::getSubMatrix(const std::list<unsigned int> &indices) const {
     return this->getSubMatrix(indices, indices);
 }
 
-std::shared_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &indices) const {
+std::unique_ptr<Matrix> Matrix::getSubMatrixPtr(const std::list<unsigned int> &indices) const {
     assert(this->getRows() == this->getCols());
     return this->getSubMatrixPtr(indices, indices);
 }
@@ -704,10 +703,10 @@ Matrix Matrix::getSubMatrixNonSquareRows(const std::list<unsigned int> &rowIndic
     return newMatrix;
 }
 
-std::shared_ptr<Matrix>
+std::unique_ptr<Matrix>
 Matrix::getSubMatrixNonSquareRowsPtr(const std::list<unsigned int> &rowIndices) const {
     auto NR = static_cast<unsigned int>(rowIndices.size());
-    auto newMatrix = std::make_shared<Matrix>(NR, this->getCols());
+    auto newMatrix = std::make_unique<Matrix>(NR, this->getCols());
 
     auto cit = rowIndices.begin();
     for (unsigned int r = 0; r < NR; r++, cit++) {
@@ -938,7 +937,7 @@ Matrix Matrix::allPairLongestPathMatrix(MPTime posCycleThreshold, bool implyZero
         if (distMat.get(k, k) > posCycleThreshold) {
             MPString tmp;
             distMat.toString(tmp, DEFAULT_SCALE);
-            std::cout << tmp << std::endl;
+            std::cout << tmp << "\n";
             throw MPException("Positive cycle!");
         }
     }
@@ -1029,7 +1028,7 @@ CDouble Matrix::mp_eigenvalue() const {
     // convert matrix to mcm graph
 
     // Create a new MCM graph
-    std::shared_ptr<MCMgraph> mcmGraph = std::make_shared<MCMgraph>();
+    std::unique_ptr<MCMgraph> mcmGraph = std::make_unique<MCMgraph>();
 
     // store vector of nodes
     std::vector<MCMnode *> nodes(sz);
@@ -1064,7 +1063,7 @@ CDouble Matrix::mp_eigenvalue() const {
     }
 
     // prune the graph
-    std::shared_ptr<MCMgraph> pruned = mcmGraph->pruneEdges();
+    std::unique_ptr<MCMgraph> pruned = mcmGraph->pruneEdges();
 
     // compute MCM
     CDouble res = pruned->calculateMaximumCycleMeanKarpDouble();
@@ -1135,7 +1134,7 @@ MCMgraph Matrix::mpMatrixToPrecedenceGraph() const {
 }
 
 std::pair<Matrix::EigenvectorList, Matrix::GeneralizedEigenvectorList>
-Matrix::mp_generalized_eigenvectors() const {
+Matrix::mp_generalized_eigenvectors() const { // NOLINT(*cognitive-complexity)
     // check if matrix is square.
     if (this->getRows() != this->getCols()) {
         throw MPException("Matrix is not square in Matrix::mp_eigenvector().");
@@ -1168,18 +1167,18 @@ Matrix::mp_generalized_eigenvectors() const {
     // SCC counter k
     uint k = 0;
     // for each SCC
-    for (auto scc_i = scc_s.cbegin(); scc_i != scc_s.cend(); scc_i++, k++) {
-        const std::shared_ptr<MCMgraph> &scc = *scc_i;
-        sccMapInv[k] = scc.get();
+    for (auto scc_i = scc_s.begin(); scc_i != scc_s.end(); scc_i++, k++) {
+        MCMgraph& scc = *(*scc_i);
+        sccMapInv[k] = &scc;
 
         // MCM calculation requires node relabelling
         std::map<CId, CId> sccNodeIdMap;
-        scc->relabelNodeIds(&sccNodeIdMap);
+        scc.relabelNodeIds(&sccNodeIdMap);
 
-        if (scc->nrVisibleEdges() > 0) {
+        if (scc.nrVisibleEdges() > 0) {
             // compute MCM mu and critical node n of scc
             const MCMnode *n = nullptr;
-            auto mu = MPTime(scc->calculateMaximumCycleMeanKarpDouble(&n));
+            auto mu = MPTime(scc.calculateMaximumCycleMeanKarpDouble(&n));
             criticalNodes.push_back(precGraph.getNode(sccNodeIdMap[n->id]));
             cycleMeans.push_back(mu);
         } else {

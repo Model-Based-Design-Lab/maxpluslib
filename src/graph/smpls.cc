@@ -5,7 +5,7 @@
 #include "maxplus/graph/mpautomaton.h"
 #include <memory>
 
-using namespace FSM;
+using namespace ::MaxPlus::FSM;
 using namespace MaxPlus;
 
 using ELSEdge = ::MaxPlus::FSM::Labeled::Edge<CId, MPString>;
@@ -22,7 +22,7 @@ namespace MaxPlus::SMPLS {
 // destructor is put deliberately into the cc source to ensure the class vtable is accessible
 // see: <https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable>
 
-EdgeLabeledModeFSM::~EdgeLabeledModeFSM() {}
+EdgeLabeledModeFSM::~EdgeLabeledModeFSM() = default;
 
 /*removes states of the fsm with no outgoing edges.*/
 // TODO (Marc Geilen) carefully check and test and move to fsm
@@ -88,6 +88,8 @@ void EdgeLabeledModeFSM::removeDanglingStates() {
     }
 }
 
+namespace {
+
 /**
  * returns the largest finite element of a row up to and including colNumber
  */
@@ -104,6 +106,7 @@ MPTime getMaxOfRowUntilCol(Matrix &M, uint rowNumber, uint colNumber) {
     }
     return largestEl;
 }
+
 
 /**
  * returns the largest finite element of a row up to and including colNumber
@@ -122,8 +125,10 @@ MPTime getMaxOfColUntilRow(Matrix &M, uint colNumber, uint rowNumber) {
     return largestEl;
 }
 
-std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
-    auto mpa = std::make_shared<MaxPlusAutomaton>();
+} // namespace
+
+std::unique_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const { // NOLINT(*cognitive-complexity)
+    auto mpa = std::make_unique<MaxPlusAutomaton>();
     // transposeMatrices();
     //  create the FSM states for every pair of a states of the FSM
     //  and an initial token
@@ -166,7 +171,7 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
         }
 
         // create the states needed per transition matrix
-        for (unsigned int k = 0; k < nrTokens; k++) {
+        for (int k = 0; k < nrTokens; k++) {
             MPAStateRef s = mpa->addState(makeMPAStateLabel(qId, k));
             // std::cout << "DEBUG adding state to mpa id: " << (MPString)(s->getLabel().id) << ",
             // tkn: " <<  (s->getLabel().tokenNr)<< std::endl;
@@ -196,24 +201,24 @@ std::shared_ptr<MaxPlusAutomaton> SMPLS::convertToMaxPlusAutomaton() const {
             const auto *tr = dynamic_cast<ELSEdgeRef>(e);
             CId q2Id = dynamic_cast<ELSStateRef>(tr->getDestination())->getLabel();
             MPString sc = tr->getLabel();
-            std::shared_ptr<Matrix> Ms = this->mm.at(sc);
-            size_t r = Ms->getRows();
-            size_t c = Ms->getCols();
+            const Matrix& Ms = *(this->mm.at(sc));
+            size_t r = Ms.getRows();
+            size_t c = Ms.getCols();
 
             // for every entry in the mode matrix of that edge
             for (size_t row = 0; row < r; row++) {
                 MPAStateRef dst = mpa->getStateLabeled(
-                        makeMPAStateLabel(q2Id, static_cast<unsigned int>(row)));
+                        makeMPAStateLabel(q2Id, static_cast<int>(row)));
                 for (size_t col = 0; col < c; col++) {
                     const MPDelay d =
-                            Ms->get(static_cast<unsigned int>(row), static_cast<unsigned int>(col));
+                            Ms.get(static_cast<unsigned int>(row), static_cast<unsigned int>(col));
                     if (!MP_IS_MINUS_INFINITY(d)) {
                         MPAStateRef src = nullptr;
                         if (q1StateMap.find(col) != q1StateMap.end()) {
                             src = q1StateMap.at(col);
                         } else {
                             src = mpa->getStateLabeled(
-                                    makeMPAStateLabel(q1Id, static_cast<unsigned int>(col)));
+                                    makeMPAStateLabel(q1Id, static_cast<int>(col)));
                             q1StateMap[col] = src;
                         }
                         MPAEdgeLabel el = makeMPAEdgeLabel(d, sc);
@@ -285,8 +290,8 @@ bool SMPLSwithEvents::isConsistent() {
 
     if (!errMsg.empty()) {
         // TODO(mgeilen) no std:cout
-        std::cout << "IO Automaton is not consistent, error message: " << std::endl;
-        std::cout << errMsg << std::endl;
+        std::cout << "IO Automaton is not consistent, error message:\n";
+        std::cout << errMsg << "\n";
         return false;
     }
 
@@ -296,7 +301,7 @@ bool SMPLSwithEvents::isConsistent() {
 /**
  * creates a max-plus automaton from SMPLS with events
  */
-std::shared_ptr<MaxPlusAutomaton> SMPLSwithEvents::convertToMaxPlusAutomaton() {
+std::unique_ptr<MaxPlusAutomaton> SMPLSwithEvents::convertToMaxPlusAutomaton() {
     dissectModeMatrices();
     IOASetOfEdgeRefs visitedEdges;
     std::multiset<Event> eventList;
@@ -328,10 +333,10 @@ std::shared_ptr<MaxPlusAutomaton> SMPLSwithEvents::convertToMaxPlusAutomaton() {
  * all square (to the size of the biggest matrix) by adding rows and cols of -infty
  */
 void SMPLSwithEvents::makeMatricesSquare() {
-    for (const auto &it : this->mm) {
-        std::shared_ptr<Matrix> m = it.second;
-        m->addCols(biggestMatrixSize - m->getCols());
-        m->addRows(biggestMatrixSize - m->getRows());
+    for (const auto &it : this->getModeMatrices()) {
+        Matrix& m = *(it.second);
+        m.addCols(biggestMatrixSize - m.getCols());
+        m.addRows(biggestMatrixSize - m.getRows());
     }
 }
 
@@ -372,7 +377,7 @@ Event SMPLSwithEvents::findEventByMode(const Mode &mode) const {
  * this includes adding rows and columns of -inf and 0 based on the spec
  * allowing the system to analyze processing or conveying event timings
  */
-void SMPLSwithEvents::prepareMatrices(const IOAState &s,
+void SMPLSwithEvents::prepareMatrices(const IOAState &s, // NOLINT(*no-recursion,*cognitive-complexity)
                                       std::multiset<Event> &eventList,
                                       IOASetOfEdgeRefs &visitedEdges) {
     const auto &adj = s.getOutgoingEdges();
@@ -400,8 +405,9 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
         OutputAction output = e->getLabel().second;
         InputAction input = e->getLabel().first;
 
-        auto disSm = std::make_shared<DissectedModeMatrix>();
-        std::shared_ptr<Matrix> sMatrix; // matrix to be generated and assigned to this edge
+        auto disSmM = std::make_unique<DissectedModeMatrix>();
+        auto* disSm = disSmM.get();
+        std::unique_ptr<Matrix> sMatrix; // matrix to be generated and assigned to this edge
         MPString outputActionEventName = "";
         int emittingEventIndex = -1;
         int processingEventIndex = -1;
@@ -413,10 +419,10 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
                 throw MPException("mode " + output + " not found in dissected matrices!");
             }
 
-            sMatrix = disSm->core.begin()->second->createCopyPtr();
+            sMatrix = disSm->getCore().begin()->second->createCopyPtr();
 
             // look if it has any events to emit
-            if (!disSm->eventRows.empty()) {
+            if (!disSm->getEventRows().empty()) {
                 outputActionEventName = findEventByMode(output);
 
                 // ... and where it would sit in the sorted event std::multiset
@@ -433,7 +439,7 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
                 }
             }
         } else {
-            sMatrix = std::make_shared<Matrix>(
+            sMatrix = std::make_unique<Matrix>(
                     numberOfResources, numberOfResources, MatrixFill::Identity);
         }
         if (!input.empty()) // find the index of the event to be removed from the list
@@ -487,8 +493,8 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
                                                     // need to add the event at the bottom
                 {
                     sMatrix->addRows(1);
-                    std::shared_ptr<Matrix> eventRow =
-                            *disSm->eventRows.begin(); // for now we just assume max one event
+                    Matrix* eventRow =
+                            disSm->getEventRows().front().get(); // for now we just assume max one event
                                                        // emitted per mode
                     uint cols = eventRow->getCols();
                     uint x = 0;
@@ -513,9 +519,9 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
                 eventIndexCounter++;
             }
         } else if (!output.empty()) {
-            if (!disSm->eventRows.empty()) {
+            if (!disSm->getEventRows().empty()) {
                 sMatrix->addRows(1);
-                std::shared_ptr<Matrix> eventRow = *disSm->eventRows.begin();
+                Matrix* eventRow = disSm->getEventRows().front().get();
                 uint cols = eventRow->getCols(); // for now we just assume max one event emitted per
                                                  // mode
 
@@ -529,7 +535,7 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
             eList.insert(outputActionEventName);
         }
 
-        this->mm[modeName] = sMatrix;
+        this->addModeMatrix(modeName, std::move(sMatrix));
         visitedEdges.insert(e);
 
         // we need this later to make all matrices square
@@ -540,12 +546,12 @@ void SMPLSwithEvents::prepareMatrices(const IOAState &s,
     }
 }
 
-std::shared_ptr<DissectedModeMatrix>
+DissectedModeMatrix*
 SMPLSwithEvents::findDissectedModeMatrix(const MPString &sName) {
-    std::shared_ptr<DissectedModeMatrix> dis = nullptr;
+    DissectedModeMatrix* dis = nullptr;
     for (const auto &i : this->disMatrices) {
-        if (i->core.begin()->first == sName) {
-            dis = i;
+        if (i->getCore().begin()->first == sName) {
+            dis = i.get();
             break;
         }
     }
@@ -555,7 +561,7 @@ SMPLSwithEvents::findDissectedModeMatrix(const MPString &sName) {
 /**
  * recursive part of isConsistent
  */
-void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
+void SMPLSwithEvents::isConsistentUtil(const IOAState &s, // NOLINT(*no-recursion,*cognitive-complexity)
                                        EventList &eventList,
                                        const FSM::Abstract::SetOfStateRefs &finalStates,
                                        MPString &errMsg,
@@ -641,7 +647,7 @@ void SMPLSwithEvents::isConsistentUtil(const IOAState &s,
 /**
  * recursive part of determinize
  */
-void SMPLSwithEvents::determinizeUtil(const IOAState &s,
+void SMPLSwithEvents::determinizeUtil(const IOAState &s, // NOLINT(*no-recursion)
                                       IOASetOfStateRefs &visited,
                                       const FSM::Abstract::SetOfStateRefs &finalStates,
                                       MPString &errMsg,
@@ -743,12 +749,13 @@ bool SMPLSwithEvents::compareEventLists(EventList &l1, EventList &l2) {
 
 void SMPLSwithEvents::dissectModeMatrices() {
     ModeMatrices::iterator s;
-    for (const auto &s : this->mm) {
+    for (const auto &s : this->getModeMatrices()) {
         numberOfResources = 0;
-        std::shared_ptr<DissectedModeMatrix> dis = std::make_shared<DissectedModeMatrix>();
-        dis->core.insert(s);
+        std::unique_ptr<DissectedModeMatrix> dis = std::make_unique<DissectedModeMatrix>();
+        dis->getCore().emplace(s.first, std::move(s.second->createCopyPtr()));
+        //dis->core.insert(std::move(s));
 
-        std::shared_ptr<Matrix> m = s.second; //->getTransposedCopy();
+        Matrix* m = s.second.get(); //->getTransposedCopy();
         std::list<uint> mSubIndices;
         numberOfResources = std::min(m->getRows(), m->getCols());
         for (uint x = 0; x < numberOfResources; x++) {
@@ -756,18 +763,18 @@ void SMPLSwithEvents::dissectModeMatrices() {
             // numberOfResources++;
         }
 
-        dis->core.begin()->second = m->getSubMatrixNonSquareRowsPtr(mSubIndices);
+        dis->getCore().begin()->second = m->getSubMatrixNonSquareRowsPtr(mSubIndices);
         if (m->getRows() > numberOfResources) // if we have event rows
         {
             mSubIndices.clear();
             for (uint x = numberOfResources; x < std::max(m->getRows(), m->getCols()); x++) {
                 mSubIndices.push_back(x);
-                std::shared_ptr<Matrix> mEventRow = m->getSubMatrixNonSquareRowsPtr(mSubIndices);
-                dis->eventRows.push_back(mEventRow);
+                std::unique_ptr<Matrix> mEventRow = m->getSubMatrixNonSquareRowsPtr(mSubIndices);
+                dis->getEventRows().push_back(std::move(mEventRow));
                 mSubIndices.clear();
             }
         }
-        disMatrices.push_back(dis);
+        disMatrices.push_back(std::move(dis));
     }
 }
 

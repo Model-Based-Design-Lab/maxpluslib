@@ -1,6 +1,5 @@
 #include <algorithm>
 
-#include "algebra/mptype.h"
 #include "base/analysis/mcm/mcm.h"
 #include "base/analysis/mcm/mcmdg.h"
 #include "base/analysis/mcm/mcmgraph.h"
@@ -10,7 +9,6 @@
 #include <base/analysis/mcm/mcmhoward.h>
 #include <base/analysis/mcm/mcmyto.h>
 #include <random>
-#include <type_traits>
 
 using namespace MaxPlus;
 using namespace Graphs;
@@ -22,6 +20,10 @@ void MCMTest::Run() {
     this->test_yto();
     this->test_prune();
 };
+
+// NOLINTBEGIN(*magic-numbers,*simplify-boolean-expr)
+
+namespace {
 
 MCMgraph makeGraph1() {
     MCMgraph g;
@@ -41,6 +43,7 @@ MCMgraph makeGraph1() {
     return g;
 }
 
+
 // A corner case graph
 MCMgraph makeGraph2() {
     MCMgraph g;
@@ -52,6 +55,7 @@ MCMgraph makeGraph2() {
     return g;
 }
 
+
 MCMgraph
 makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned int seed) {
     MCMgraph g;
@@ -59,16 +63,15 @@ makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned
     std::mt19937 rng(seed);
     unsigned int actualNumberOfNodes = (numberOfNodes / 2) + (rng() % (numberOfNodes / 2));
 
-    std::vector<MCMnode *> nodes;
+    std::vector<MCMnode *> nodes(actualNumberOfNodes);
+
     for (unsigned int i = 0; i < actualNumberOfNodes; i++) {
-        nodes.push_back(g.addNode(i));
+        nodes[i] = g.addNode(i);
     }
 
     // cap the number of edges
     unsigned int actualNumberOfEdges = (numberOfEdges / 2) + (rng() % (numberOfEdges / 2));
-    if (actualNumberOfEdges > (actualNumberOfNodes - 1) * actualNumberOfNodes) {
-        actualNumberOfEdges = (actualNumberOfNodes - 1) * actualNumberOfNodes;
-    }
+    actualNumberOfEdges = (std::min)(actualNumberOfEdges, (actualNumberOfNodes - 1) * actualNumberOfNodes);
 
     // random edges
     std::set<std::pair<CId, CId>> existingEdges;
@@ -76,7 +79,7 @@ makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned
     for (; i < actualNumberOfEdges; i++) {
         CId src = 0;
         CId dst = 0;
-        do {
+        do { // NOLINT(*avoid-do-while)
             src = rng() % actualNumberOfNodes;
             dst = rng() % actualNumberOfNodes;
         } while (existingEdges.find(std::make_pair(src, dst)) != existingEdges.end());
@@ -99,9 +102,12 @@ makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned
     return g;
 }
 
+} // namespace
+
+
 // Test mcmdg.
-void MCMTest::test_dg() {
-    std::cout << "Running test: MCM-dg" << std::endl;
+void MCMTest::test_dg() { // NOLINT(*to-static)
+    std::cout << "Running test: MCM-dg\n";
 
     MCMgraph g1 = makeGraph1();
     CDouble result = mcmDG(g1);
@@ -113,15 +119,15 @@ void MCMTest::test_dg() {
 }
 
 /// Test MCM Howard.
-void MCMTest::test_howard() {
-    std::cout << "Running test: MCM-Howard" << std::endl;
+void MCMTest::test_howard() { // NOLINT(*to-static)
+    std::cout << "Running test: MCM-Howard\n";
     MCMgraph g1 = makeGraph1();
 
-    std::shared_ptr<std::vector<int>> ij = nullptr;
-    std::shared_ptr<std::vector<CDouble>> A = nullptr;
-    std::shared_ptr<std::vector<CDouble>> chi = nullptr;
-    std::shared_ptr<std::vector<CDouble>> v = nullptr;
-    std::shared_ptr<std::vector<int>> policy = nullptr;
+    std::unique_ptr<std::vector<int>> ij = nullptr;
+    std::unique_ptr<std::vector<CDouble>> A = nullptr;
+    std::unique_ptr<std::vector<CDouble>> chi = nullptr;
+    std::unique_ptr<std::vector<CDouble>> v = nullptr;
+    std::unique_ptr<std::vector<int>> policy = nullptr;
     int nr_iterations = 0;
     int nr_components = 0;
 
@@ -148,7 +154,7 @@ void MCMTest::test_howard() {
     ASSERT_EQUAL(0, policy->at(3));
     ASSERT_EQUAL(4, policy->at(4));
 
-    MCMnode *criticalNode;
+    MCMnode *criticalNode = nullptr;
     CDouble result = maximumCycleMeanHowardGeneral(g1, &criticalNode);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
     ASSERT_THROW(criticalNode->id == 0 || criticalNode->id == 1 || criticalNode->id == 2
@@ -160,15 +166,15 @@ void MCMTest::test_howard() {
 }
 
 /// Test MCM Karp.
-void MCMTest::test_karp() {
-    std::cout << "Running test: MCM-Karp" << std::endl;
+void MCMTest::test_karp() { // NOLINT(*to-static)
+    std::cout << "Running test: MCM-Karp\n";
 
     MCMgraph g1 = makeGraph1();
 
     CDouble result = maximumCycleMeanKarp(g1);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
 
-    const MCMnode *criticalNode;
+    const MCMnode *criticalNode = nullptr;
     result = maximumCycleMeanKarpDouble(g1, &criticalNode);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
     ASSERT_THROW(criticalNode->id == 0 || criticalNode->id == 1 || criticalNode->id == 2
@@ -181,8 +187,8 @@ void MCMTest::test_karp() {
 }
 
 /// Test MCM YTO.
-void MCMTest::test_yto() {
-    std::cout << "Running test: MCM-YTO" << std::endl;
+void MCMTest::test_yto() { // NOLINT(*to-static)
+    std::cout << "Running test: MCM-YTO\n";
 
     MCMgraph g1 = makeGraph1();
     CDouble result = maxCycleMeanYoungTarjanOrlin(g1);
@@ -192,7 +198,7 @@ void MCMTest::test_yto() {
     result = maxCycleMeanAndCriticalCycleYoungTarjanOrlin(g1, &cycle);
     ASSERT_APPROX_EQUAL(2.5, result, 1e-5);
     ASSERT_THROW(cycle.size() == 4);
-    int eid = cycle.at(0)->id;
+    uint eid = cycle.at(0)->id;
     ASSERT_THROW(eid == 0 || eid == 1 || eid == 2 || eid == 3);
 
     result = maxCycleRatioYoungTarjanOrlin(g1);
@@ -253,7 +259,7 @@ void MCMTest::test_yto() {
     for (int k = 0; k < 250; k++) {
         MCMgraph gr = makeRandomGraph(10, 10, k);
         result = minCycleRatioAndCriticalCycleYoungTarjanOrlin(gr, &cycle);
-        ASSERT_APPROX_EQUAL(expectedMinCycleRatios[k], result, 1e-4);
+        ASSERT_APPROX_EQUAL(expectedMinCycleRatios[k], result, 1e-4); // NOLINT(*array-index)
         // std::cout << "MCM: " << result << "cycle length: " << cycle->size() << std::endl;
     }
 
@@ -265,12 +271,12 @@ void MCMTest::test_yto() {
     for (int k = 0; k < expectedMaxCycleRatios.size(); k++) {
         MCMgraph gr = makeRandomGraph(1000, 100000, k);
         result = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(gr, &cycle);
-        ASSERT_APPROX_EQUAL(expectedMaxCycleRatios[k], result, 1e-2);
+        ASSERT_APPROX_EQUAL(expectedMaxCycleRatios[k], result, 1e-2); // NOLINT(*array-index)
         // std::cout << "MCM: " << result << "cycle length: " << cycle->size() << std::endl;
     }
 }
 
-void MCMTest::test_prune() {
+void MCMTest::test_prune() { // NOLINT(*to-static)
 
     MCMgraph mcmGraph;
     auto &n36 = *mcmGraph.addNode(36);
@@ -355,7 +361,7 @@ void MCMTest::test_prune() {
     mcmGraph.addEdge(73, n38, n40, 5.1029e+06, 1);
     mcmGraph.addEdge(74, n40, n40, 4.54732e+06, 1);
 
-    std::shared_ptr<MCMgraph> result = mcmGraph.pruneEdges();
+    std::unique_ptr<MCMgraph> result = mcmGraph.pruneEdges();
 
     CDouble mcr1 = maxCycleRatioAndCriticalCycleYoungTarjanOrlin(mcmGraph, nullptr);
     ASSERT_APPROX_EQUAL(mcr1, 5.83e+06, 1e3);
@@ -364,3 +370,5 @@ void MCMTest::test_prune() {
 
     ASSERT_APPROX_EQUAL(mcr1, mcr2, 1e3);
 }
+
+// NOLINTEND(*magic-numbers,*simplify-boolean-expr)

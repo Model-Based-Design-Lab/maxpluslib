@@ -61,8 +61,8 @@ namespace MaxPlus::Graphs {
  * to a sparse matrix input for Howard's algorithm.
  */
 void convertMCMgraphToMatrix(MCMgraph &g,
-                             std::shared_ptr<std::vector<int>> *ij,
-                             std::shared_ptr<std::vector<CDouble>> *A);
+                             std::unique_ptr<std::vector<int>> *ij,
+                             std::unique_ptr<std::vector<CDouble>> *A);
 
 /**
  * Howard ()
@@ -88,9 +88,9 @@ void Howard(const std::vector<int> &ij,
             const std::vector<CDouble> &A,
             int nr_nodes,
             int nr_arcs,
-            std::shared_ptr<std::vector<CDouble>> *chi,
-            std::shared_ptr<std::vector<CDouble>> *v,
-            std::shared_ptr<std::vector<int>>(*policy),
+            std::unique_ptr<std::vector<CDouble>> *chi,
+            std::unique_ptr<std::vector<CDouble>> *v,
+            std::unique_ptr<std::vector<int>> *policy,
             int *nr_iterations,
             int *nr_components);
 
@@ -98,7 +98,7 @@ void Howard(const std::vector<int> &ij,
  * maximumCycleMeanHoward ()
  * Howard Policy Iteration Algorithm for Max Plus Matrices.
  *
- * INPUT MCMgraph which must have outoing edges from every node
+ * INPUT MCMgraph which must have outgoing edges from every node
  *
  * OUTPUT:
  *      maximum cycle mean

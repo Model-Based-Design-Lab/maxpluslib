@@ -44,9 +44,7 @@
 
 #include "maxplus/base/basic_types.h"
 #include <memory>
-#include <utility>
 
-using namespace MaxPlus;
 
 namespace MaxPlus::Graphs {
 class MCMnode;
@@ -207,7 +205,7 @@ public:
     // of nodes and for some edge (w1, d1) there exists a different edge
     // (w2, d2) such that d2<=d1 and w2>=w1, then (w2, d2) is removed
     // Note this algorithm does currently not distinguish visible and invisible edges!
-    std::shared_ptr<MCMgraph> pruneEdges();
+    std::unique_ptr<MCMgraph> pruneEdges();
 
     [[nodiscard]] CDouble calculateMaximumCycleMeanKarp();
     [[nodiscard]] CDouble
@@ -216,8 +214,8 @@ public:
     [[nodiscard]] CDouble calculateMaximumCycleRatioAndCriticalCycleYoungTarjanOrlin(
             std::vector<const MCMedge *> *cycle = nullptr);
 
-    [[nodiscard]] std::shared_ptr<MCMgraph> normalize(CDouble mu) const;
-    [[nodiscard]] std::shared_ptr<MCMgraph> normalize(const std::map<CId, CDouble> &mu) const;
+    [[nodiscard]] std::unique_ptr<MCMgraph> normalize(CDouble mu) const;
+    [[nodiscard]] std::unique_ptr<MCMgraph> normalize(const std::map<CId, CDouble> &mu) const;
     [[nodiscard]] std::map<CId, CDouble> longestPaths(CId rootNodeId) const;
     [[nodiscard]] std::map<CId, CDouble> normalizedLongestPaths(CId rootNodeId, CDouble mu) const;
     [[nodiscard]] std::map<CId, CDouble>
@@ -231,7 +229,7 @@ private:
     MCMedges edges;
 };
 
-using MCMgraphs = std::list<std::shared_ptr<MCMgraph>>;
+using MCMgraphs = std::list<std::unique_ptr<MCMgraph>>;
 using MCMgraphsIter = MCMgraphs::iterator;
 
 /**

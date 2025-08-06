@@ -50,13 +50,11 @@
  */
 
 #include "base/analysis/mcm/mcmgraph.h"
+#include "base/analysis/mcm/mcmhoward.h"
 #include "base/exception/exception.h"
 
+#include <algorithm>
 #include <cmath>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
 #include <memory>
 
 using namespace MaxPlus;
@@ -77,13 +75,13 @@ public:
               const std::vector<CDouble> &A,
               int nr_nodes,
               int nr_arcs,
-              std::shared_ptr<std::vector<CDouble>> *chi,
-              std::shared_ptr<std::vector<CDouble>> *v,
-              std::shared_ptr<std::vector<int>> *policy,
+              std::unique_ptr<std::vector<CDouble>> *chi,
+              std::unique_ptr<std::vector<CDouble>> *v,
+              std::unique_ptr<std::vector<int>> *policy,
               int *nr_iterations,
               int *nr_components) :
-        ij(ij),
-        a(A),
+        ij(&ij),
+        a(&A),
         nr_nodes(nr_nodes),
         narcs(nr_arcs),
         chi(chi),
@@ -97,9 +95,9 @@ public:
         bool improved = false;
         *NIterations = 0;
 
-        *pi = std::make_shared<std::vector<int>>(nr_nodes);
-        *chi = std::make_shared<std::vector<CDouble>>(nr_nodes);
-        *v = std::make_shared<std::vector<CDouble>>(nr_nodes);
+        *pi = std::make_unique<std::vector<int>>(nr_nodes);
+        *chi = std::make_unique<std::vector<CDouble>>(nr_nodes);
+        *v = std::make_unique<std::vector<CDouble>>(nr_nodes);
 
         Safety_Check();
         Allocate_Memory();
@@ -107,7 +105,7 @@ public:
         Initial_Policy();
         New_Build_Inverse();
 
-        do {
+        do { // NOLINT(*avoid-do-while)
             Value();
             Improve(&improved);
             Update_Policy();
@@ -119,18 +117,18 @@ public:
     }
 
 private:
-    const std::vector<int> &ij;
-    const std::vector<CDouble> &a;
+    const std::vector<int> *ij;
+    const std::vector<CDouble> *a;
     int nr_nodes;
     int narcs;
-    std::shared_ptr<std::vector<CDouble>> *chi;
-    std::shared_ptr<std::vector<CDouble>> *v;
-    std::shared_ptr<std::vector<int>> *pi;
+    std::unique_ptr<std::vector<CDouble>> *chi;
+    std::unique_ptr<std::vector<CDouble>> *v;
+    std::unique_ptr<std::vector<int>> *pi;
     int *NIterations;
     int *NComponents;
 
-    std::shared_ptr<std::vector<int>> new_pi =
-            std::make_shared<std::vector<int>>(); /*  new policy */
+    std::unique_ptr<std::vector<int>> new_pi =
+            std::make_unique<std::vector<int>>(); /*  new policy */
     /* The inverse policy is coded by a linearly chained list.
      * pi_inv_idx[i]= pointer to the chain of inverses of node i.
      */
@@ -161,16 +159,12 @@ private:
      * heuristically by the following routine.
      */
     void Epsilon(CDouble *epsilon) {
-        CDouble MAX = a[0];
-        CDouble MIN = a[0];
+        CDouble MAX = (*a)[0];
+        CDouble MIN = (*a)[0];
 
         for (int i = 1; i < narcs; i++) {
-            if (a[i] > MAX) {
-                MAX = a[i];
-            }
-            if (a[i] < MIN) {
-                MIN = a[i];
-            }
+            MAX = (std::max)((*a)[i], MAX);
+            MIN = (std::min)((*a)[i], MIN);
         }
         *epsilon = (MAX - MIN) * EPSILON_FACTOR;
     }
@@ -190,11 +184,11 @@ private:
             v_aux[i] = EPSILON;
         }
 
-        for (int i = 0; i < narcs; i++) {
-            if (v_aux[ij[i * 2]] <= a[i]) {
-                (**pi)[ij[i * 2]] = ij[i * 2 + 1];
-                c[ij[i * 2]] = a[i];
-                v_aux[ij[i * 2]] = a[i];
+        for (size_t i = 0; i < narcs; i++) {
+            if (v_aux[(*ij)[i * 2]] <= (*a)[i]) {
+                (**pi)[(*ij)[i * 2]] = (*ij)[(i * 2) + 1];
+                c[(*ij)[i * 2]] = (*a)[i];
+                v_aux[(*ij)[i * 2]] = (*a)[i];
             }
         }
     }
@@ -239,7 +233,7 @@ private:
      * j of i, according to the spectral equation, v[j]+ lambda = A(arc from j to i)
      * v[i] the array visited is changed by side effect.
      */
-    void New_Depth_First_Label(int i) {
+    void New_Depth_First_Label(int i) { // NOLINT(*no-recursion)
         int a = pi_inv_idx[i];
         while (a != -1 && visited[pi_inv_elem[a]] == 0) {
             int next_i = pi_inv_elem[a];
@@ -269,7 +263,7 @@ private:
         CDouble weight = 0;
         int length = 0;
         int i = index;
-        do {
+        do { // NOLINT(*avoid-do-while)
             weight += c[i];
             length++;
             i = pir[i];
@@ -291,7 +285,7 @@ private:
         Init_Depth_First();
         int initial_point = 0;
 
-        do {
+        do { // NOLINT(*avoid-do-while)
             Visit_From(initial_point, color);
             while ((initial_point < nr_nodes) && (component[initial_point] != 0)) {
                 initial_point++;
@@ -312,12 +306,12 @@ private:
     }
 
     void First_Order_Improvement(bool *improved) {
-        for (int i = 0; i < narcs; i++) {
-            if ((**chi)[ij[i * 2 + 1]] > new_chi[ij[i * 2]]) {
+        for (size_t i = 0; i < narcs; i++) {
+            if ((**chi)[(*ij)[(i * 2) + 1]] > new_chi[(*ij)[i * 2]]) {
                 *improved = true;
-                (*new_pi)[ij[i * 2]] = ij[i * 2 + 1];
-                new_chi[ij[i * 2]] = (**chi)[ij[i * 2 + 1]];
-                new_c[ij[i * 2]] = a[i];
+                (*new_pi)[(*ij)[i * 2]] = (*ij)[(i * 2) + 1];
+                new_chi[(*ij)[i * 2]] = (**chi)[(*ij)[(i * 2) + 1]];
+                new_c[(*ij)[i * 2]] = (*a)[i];
             }
         }
     }
@@ -326,28 +320,28 @@ private:
         auto chir = **chi;
         auto vr = **v;
         if (*NComponents > 1) {
-            for (int i = 0; i < narcs; i++) {
+            for (size_t i = 0; i < narcs; i++) {
                 /* arc i is critical */
-                if (chir[ij[i * 2 + 1]] == new_chi[ij[i * 2]]) {
-                    CDouble w = a[i] + vr[ij[i * 2 + 1]] - chir[ij[i * 2 + 1]];
-                    if (w > v_aux[ij[i * 2]] + epsilon) {
+                if (chir[(*ij)[(i * 2) + 1]] == new_chi[(*ij)[i * 2]]) {
+                    CDouble w = (*a)[i] + vr[(*ij)[(i * 2) + 1]] - chir[(*ij)[(i * 2) + 1]];
+                    if (w > v_aux[(*ij)[i * 2]] + epsilon) {
                         *improved = true;
-                        v_aux[ij[i * 2]] = w;
-                        (*new_pi)[ij[i * 2]] = ij[i * 2 + 1];
-                        new_c[ij[i * 2]] = a[i];
+                        v_aux[(*ij)[i * 2]] = w;
+                        (*new_pi)[(*ij)[i * 2]] = (*ij)[(i * 2) + 1];
+                        new_c[(*ij)[i * 2]] = (*a)[i];
                     }
                 }
             }
         } else {
             /* we know that all the arcs realize the max in the
             first order improvement */
-            for (int i = 0; i < narcs; i++) {
-                CDouble w = a[i] + vr[ij[i * 2 + 1]] - chir[ij[i * 2 + 1]];
-                if (w > v_aux[ij[i * 2]] + epsilon) {
+            for (size_t i = 0; i < narcs; i++) {
+                CDouble w = (*a)[i] + vr[(*ij)[(i * 2) + 1]] - chir[(*ij)[(i * 2) + 1]];
+                if (w > v_aux[(*ij)[i * 2]] + epsilon) {
                     *improved = true;
-                    v_aux[ij[i * 2]] = w;
-                    (*new_pi)[ij[i * 2]] = ij[i * 2 + 1];
-                    new_c[ij[i * 2]] = a[i];
+                    v_aux[(*ij)[i * 2]] = w;
+                    (*new_pi)[(*ij)[i * 2]] = (*ij)[(i * 2) + 1];
+                    new_c[(*ij)[i * 2]] = (*a)[i];
                 }
             }
         }
@@ -385,9 +379,9 @@ private:
         // check if every node has outgoing edges.
         std::vector<int> u(nr_nodes);
 
-        for (int i = 0; i < narcs; i++) {
+        for (size_t i = 0; i < narcs; i++) {
             // ij[2*k] is the source node number of edge number k
-            u[ij[2 * i]] = 1;
+            u[(*ij)[2 * i]] = 1;
         }
 
         for (int i = 0; i < nr_nodes; i++) {
@@ -462,13 +456,15 @@ private:
  *               policy which is returned.
  */
 
+
+ 
 void Howard(const std::vector<int> &ij,
             const std::vector<CDouble> &A,
             int nr_nodes,
             int nr_arcs,
-            std::shared_ptr<std::vector<CDouble>> *chi,
-            std::shared_ptr<std::vector<CDouble>> *v,
-            std::shared_ptr<std::vector<int>>(*policy),
+            std::unique_ptr<std::vector<CDouble>> *chi,
+            std::unique_ptr<std::vector<CDouble>> *v,
+            std::unique_ptr<std::vector<int>>(*policy),
             int *nr_iterations,
             int *nr_components) {
 
@@ -485,8 +481,8 @@ void Howard(const std::vector<int> &ij,
  * to a sparse matrix input for Howard's algorithm.
  */
 void convertMCMgraphToMatrix(MCMgraph &g,
-                             std::shared_ptr<std::vector<int>> *ij,
-                             std::shared_ptr<std::vector<CDouble>> *A) {
+                             std::unique_ptr<std::vector<int>> *ij,
+                             std::unique_ptr<std::vector<CDouble>> *A) {
     uint i = 0;
     uint j = 0;
     v_uint mapId(g.getNodes().size());
@@ -500,18 +496,18 @@ void convertMCMgraphToMatrix(MCMgraph &g,
         i++;
     }
 
-    *ij = std::make_shared<std::vector<int>>(2 * g.getEdges().size());
+    *ij = std::make_unique<std::vector<int>>(2 * g.getEdges().size());
     auto &ijr = *(*ij);
-    *A = std::make_shared<std::vector<CDouble>>(g.getEdges().size());
+    *A = std::make_unique<std::vector<CDouble>>(g.getEdges().size());
     auto &Ar = *(*A);
 
     // Create an entry in the matrices for each edge
-    int k = 0;
+    size_t k = 0;
     for (const auto &e : g.getEdges()) {
         // Is the edge an existing edge in the graph?
         if (e.visible) {
-            ijr[2 * k] = mapId[e.src->id];
-            ijr[2 * k + 1] = mapId[e.dst->id];
+            ijr[2 * k] = static_cast<int>(mapId[e.src->id]);
+            ijr[(2 * k) + 1] = static_cast<int>(mapId[e.dst->id]);
             Ar[k] = e.w;
 
             // Next edge
@@ -526,14 +522,14 @@ CDouble maximumCycleMeanHoward(MCMgraph &g, MCMnode **criticalNode) {
         if (criticalNode != nullptr) {
             (*criticalNode) = nullptr;
         }
-        return -INFINITY;
+        return static_cast<CDouble>(-INFINITY);
     }
 
-    std::shared_ptr<std::vector<int>> ij = nullptr;
-    std::shared_ptr<std::vector<CDouble>> A = nullptr;
-    std::shared_ptr<std::vector<CDouble>> chi = nullptr;
-    std::shared_ptr<std::vector<CDouble>> v = nullptr;
-    std::shared_ptr<std::vector<int>> policy = nullptr;
+    std::unique_ptr<std::vector<int>> ij = nullptr;
+    std::unique_ptr<std::vector<CDouble>> A = nullptr;
+    std::unique_ptr<std::vector<CDouble>> chi = nullptr;
+    std::unique_ptr<std::vector<CDouble>> v = nullptr;
+    std::unique_ptr<std::vector<int>> policy = nullptr;
     int nr_iterations = 0;
     int nr_components = 0;
 
@@ -541,8 +537,8 @@ CDouble maximumCycleMeanHoward(MCMgraph &g, MCMnode **criticalNode) {
 
     Howard(*ij,
            *A,
-           g.numberOfNodes(),
-           g.numberOfEdges(),
+           static_cast<int>(g.numberOfNodes()),
+           static_cast<int>(g.numberOfEdges()),
            &chi,
            &v,
            &policy,
@@ -573,7 +569,7 @@ CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode) {
     MCMgraphs sccs;
     stronglyConnectedMCMgraph(g, sccs, false);
 
-    CDouble mcm = -INFINITY;
+    CDouble mcm = static_cast<CDouble>(-INFINITY);
     if (criticalNode != nullptr) {
         *criticalNode = nullptr;
     }
@@ -581,10 +577,10 @@ CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode) {
         std::map<CId, CId> nodeMap;
         scc->relabelNodeIds(&nodeMap);
         MCMnode *sccCriticalNode = nullptr;
-        ;
-        CDouble cmcm = maximumCycleMeanHoward(*scc, &sccCriticalNode);
-        if (cmcm > mcm) {
-            mcm = cmcm;
+        
+        CDouble c_mcm = maximumCycleMeanHoward(*scc, &sccCriticalNode);
+        if (c_mcm > mcm) {
+            mcm = c_mcm;
             if (criticalNode != nullptr) {
                 *criticalNode = g.getNode(nodeMap[sccCriticalNode->id]);
             }

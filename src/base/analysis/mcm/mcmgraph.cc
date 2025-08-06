@@ -100,13 +100,15 @@ MCMedge::MCMedge(CId eId, MCMnode &src, MCMnode &dst, CDouble w, CDouble d, bool
  */
 MCMnode::MCMnode(CId nId, bool nVisible) : id(nId), visible(nVisible) {}
 
+namespace {
+
 /**
  * splitMCMedgeToSequence ()
  * The function converts an MCM edge with more than one delay
  * into a sequence of edges with one delay (uses recursive call
  * to itself).
  */
-static void splitMCMedgeToSequence(MCMgraph &g, MCMedge &e) {
+void splitMCMedgeToSequence(MCMgraph &g, MCMedge &e) { // NOLINT(*no-recursion)
     // Create dummy node n;
     MCMnode *n = g.addNode(static_cast<CId>(g.getNodes().size()));
 
@@ -148,7 +150,7 @@ static void splitMCMedgeToSequence(MCMgraph &g, MCMedge &e) {
  * algorithm.
  * Note: algorithm assumes that edge weights are integer values !
  */
-static void addLongestDelayEdgeForNode(MCMgraph &g, MCMnode &n, MCMedge &e) {
+void addLongestDelayEdgeForNode(MCMgraph &g, MCMnode &n, MCMedge &e) { // NOLINT(*cognitive-complexity)
     std::vector<int> d(g.getNodes().size());
     std::vector<const MCMnode *> pi(g.getNodes().size());
     MCMnodeRefs S;
@@ -239,6 +241,8 @@ static void addLongestDelayEdgeForNode(MCMgraph &g, MCMnode &n, MCMedge &e) {
         }
     }
 }
+
+} // namespace
 
 /**
  * addLongestDelayEdgesToMCMgraph ()
@@ -340,7 +344,7 @@ const MCMnode *getNextNode(MCMnodes &nodes, v_int &order) {
  * dfsVisit ()
  * The visitor function of the DFS algorithm.
  */
-void dfsVisit(const MCMnode &u,
+void dfsVisit(const MCMnode &u, // NOLINT(*no-recursion)
               int &time,
               v_int &color,
               v_int &d,
@@ -371,8 +375,6 @@ void dfsVisit(const MCMnode &u,
     time++;
     f[u.id] = time;
 }
-
-} // namespace
 
 /**
  * dfsMCMgraph ()
@@ -422,7 +424,7 @@ void dfsMCMgraph(
  * also creates copies for all edges between this node and all nodes
  * already in the component.
  */
-static void addNodeToComponent(const MCMnode &n, MCMgraph &comp) {
+void addNodeToComponent(const MCMnode &n, MCMgraph &comp) {
 
     // Create a copy of n and add it to the component
     MCMnode *m = comp.addNode(n.id);
@@ -462,8 +464,7 @@ static void addNodeToComponent(const MCMnode &n, MCMgraph &comp) {
  * The function visits all children of the actor 'u'. The parent-child
  * relation is given via the vector 'pi'.
  */
-static bool
-treeVisitChildren(MCMgraph &g, std::vector<const MCMnode *> &pi, MCMnode *u, MCMgraph &comp) {
+bool treeVisitChildren(MCMgraph &g, std::vector<const MCMnode *> &pi, MCMnode *u, MCMgraph &comp) { // NOLINT(*no-recursion)
     bool children = false;
 
     for (uint i = 0; i < g.getNodes().size(); i++) {
@@ -498,11 +499,11 @@ treeVisitChildren(MCMgraph &g, std::vector<const MCMnode *> &pi, MCMnode *u, MCM
  * The function determines the strongly connected components in the graph. To do
  * this, it performs depth-first walk on the forest given by 'pi'.
  */
-static void findComponentsInMCMgraph(MCMgraph &g,
-                                     std::vector<const MCMnode *> &pi,
-                                     MCMgraphs &components,
-                                     bool includeComponentsWithoutEdges = false) {
-    std::shared_ptr<MCMgraph> comp;
+void findComponentsInMCMgraph(MCMgraph &g, // NOLINT(*cognitive-complexity)
+                              std::vector<const MCMnode *> &pi,
+                              MCMgraphs &components,
+                              bool includeComponentsWithoutEdges = false) {
+    std::unique_ptr<MCMgraph> comp;
 
     // Set all node as invisible
     for (auto &n : g.getNodes()) {
@@ -514,7 +515,7 @@ static void findComponentsInMCMgraph(MCMgraph &g,
 
         if (pi[n.id] == nullptr) {
             // Create a new graph for the component
-            comp = std::make_shared<MCMgraph>();
+            comp = std::make_unique<MCMgraph>();
 
             // Find all children of n in the tree
             if (treeVisitChildren(g, pi, &n, *comp)) {
@@ -541,7 +542,7 @@ static void findComponentsInMCMgraph(MCMgraph &g,
 
             // Found a strongly connected component (at least one edge)?
             if (includeComponentsWithoutEdges || comp->nrVisibleEdges() > 0) {
-                components.push_back(comp);
+                components.push_back(std::move(comp));
             }
         }
     }
@@ -555,6 +556,8 @@ static void findComponentsInMCMgraph(MCMgraph &g,
         }
     }
 }
+
+} // namespace
 
 /**
  * Extract the strongly connected components from the graph. These components
@@ -658,7 +661,7 @@ void relabelMCMgraph(MCMgraph &g) {
 // Of the weight and number of tokens pair pair of nodes
 // Generates a new graph
 // Note this algorithm does currently not distinguish visible and invisible edges!
-std::shared_ptr<MCMgraph> MCMgraph::pruneEdges() {
+std::unique_ptr<MCMgraph> MCMgraph::pruneEdges() {
 
     class _local {
     public:
@@ -697,7 +700,7 @@ std::shared_ptr<MCMgraph> MCMgraph::pruneEdges() {
     _local local;
 
     // create new graph
-    std::shared_ptr<MCMgraph> result = std::make_shared<MCMgraph>();
+    std::unique_ptr<MCMgraph> result = std::make_unique<MCMgraph>();
 
     // create all nodes.
     std::map<MCMnode *, MCMnode *> newNodeMap;
@@ -753,16 +756,16 @@ void MCMgraph::relabelNodeIds(std::map<CId, CId> *nodeIdMap) {
     }
 }
 
-std::shared_ptr<MCMgraph> MCMgraph::normalize(CDouble mu) const {
-    std::shared_ptr<MCMgraph> result = std::make_shared<MCMgraph>(*this);
+std::unique_ptr<MCMgraph> MCMgraph::normalize(CDouble mu) const {
+    std::unique_ptr<MCMgraph> result = std::make_unique<MCMgraph>(*this);
     for (auto &e : result->getEdges()) {
         e.w -= mu;
     }
     return result;
 }
 
-std::shared_ptr<MCMgraph> MCMgraph::normalize(const std::map<CId, CDouble> &mu) const {
-    std::shared_ptr<MCMgraph> result = std::make_shared<MCMgraph>(*this);
+std::unique_ptr<MCMgraph> MCMgraph::normalize(const std::map<CId, CDouble> &mu) const {
+    std::unique_ptr<MCMgraph> result = std::make_unique<MCMgraph>(*this);
     for (auto &e : result->getEdges()) {
         CDouble nc = mu.at(e.src->id);
         if (nc != -DBL_MAX) {
@@ -795,14 +798,14 @@ std::map<CId, CDouble> MCMgraph::longestPaths(const CId rootNodeId) const {
 
 std::map<CId, CDouble> MCMgraph::normalizedLongestPaths(const CId rootNodeId,
                                                         const CDouble mu) const {
-    std::shared_ptr<MCMgraph> normalizedGraph = this->normalize(mu);
+    std::unique_ptr<MCMgraph> normalizedGraph = this->normalize(mu);
     std::map<CId, CDouble> result = normalizedGraph->longestPaths(rootNodeId);
     return result;
 }
 
 std::map<CId, CDouble> MCMgraph::normalizedLongestPaths(const CId rootNodeId,
                                                         const std::map<CId, CDouble> &mu) const {
-    std::shared_ptr<MCMgraph> normalizedGraph = this->normalize(mu);
+    std::unique_ptr<MCMgraph> normalizedGraph = this->normalize(mu);
     std::map<CId, CDouble> result = normalizedGraph->longestPaths(rootNodeId);
     return result;
 }
