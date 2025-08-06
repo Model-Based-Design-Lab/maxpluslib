@@ -51,6 +51,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cfloat>
+#include <cmath>
 #include <cstdint>
 
 namespace MaxPlus::Graphs {

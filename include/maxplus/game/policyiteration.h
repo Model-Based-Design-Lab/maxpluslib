@@ -115,7 +115,7 @@ public:
                 std::make_unique<StrategyVector<SL, EL>>();
         initialStrategy->initializeRandomStrategy(game);
 
-        return policyIteration(game, initialStrategy, epsilon);
+        return policyIteration(game, std::move(initialStrategy), epsilon);
     }
 
 private:
@@ -250,7 +250,7 @@ private:
             improvement = false;
             // Evaluate the current strategies of both players.
             StrategyEvaluation evalResult =
-                    evaluateStrategy(game, s_i_t, d_prev, r_prev, dw2_prev, stateIds, epsilon);
+                    evaluateStrategy(game, *s_i_t, d_prev, r_prev, dw2_prev, stateIds, epsilon);
 
             // Update the current vectors.
             d_i_t = evalResult.d_i_t;
@@ -339,7 +339,7 @@ private:
         // and the ratio of each cycle.
         DistanceResult dr = computeDistances(game,
                                              currentStrategy,
-                                             cycleResult.states,
+                                             *(cycleResult.states),
                                              r_i_t,
                                              distanceVector,
                                              ratioVector,
@@ -392,14 +392,14 @@ private:
                 const State<SL, EL> *u = v;
                 while (visited[u] == BOTTOM_VERTEX) { // NOLINT(*pointer-arithmetic)
                     visited[u] = v; // NOLINT(*pointer-arithmetic)
-                    u = currentStrategy->getSuccessor(u);
+                    u = currentStrategy.getSuccessor(u);
                 }
                 if (visited[u] == v) { // NOLINT(*pointer-arithmetic)
                     const State<SL, EL> *v_s = u;
-                    const State<SL, EL> *x = currentStrategy->getSuccessor(u);
+                    const State<SL, EL> *x = currentStrategy.getSuccessor(u);
 
                     // Initialize both numerator and denominator.
-                    EdgeRef<SL, EL> e = game.getEdge(*u, *(currentStrategy->getSuccessor(u)));
+                    EdgeRef<SL, EL> e = game.getEdge(*u, *(currentStrategy.getSuccessor(u)));
                     auto w1sum = static_cast<CDouble>(game.getWeight1(e));
                     auto w2sum = static_cast<CDouble>(game.getWeight2(e));
 
@@ -411,13 +411,13 @@ private:
                             v_s = x;
                         }
                         EdgeRef<SL, EL> x_succ =
-                                game.getEdge(*x, *(currentStrategy->getSuccessor(x)));
+                                game.getEdge(*x, *(currentStrategy.getSuccessor(x)));
                         auto w1 = static_cast<CDouble>(game.getWeight1(x_succ));
                         auto w2 = static_cast<CDouble>(game.getWeight2(x_succ));
 
                         w1sum += w1;
                         w2sum += w2;
-                        x = currentStrategy->getSuccessor(x);
+                        x = currentStrategy.getSuccessor(x);
                     }
                     // Store the cycle ratio for the cycle containing v_s.
                     r_i_t[v_s] = w1sum / w2sum; // NOLINT(*pointer-arithmetic)
@@ -427,7 +427,7 @@ private:
         }
 
         CycleResult result;
-        result.states = selectedVertices;
+        result.states = std::move(selectedVertices);
         result.valueMap = r_i_t;
 
         return result;
@@ -492,7 +492,7 @@ private:
                 while (!visited[u]) { // NOLINT(*pointer-arithmetic)
                     visited[u] = true; // NOLINT(*pointer-arithmetic)
                     stack.push(u);
-                    u = currentStrategy->getSuccessor(u);
+                    u = currentStrategy.getSuccessor(u);
                 }
                 while (!stack.empty()) {
                     const State<SL, EL> *x = stack.top();

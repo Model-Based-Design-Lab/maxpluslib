@@ -122,7 +122,7 @@ void MPAutomatonTest::testMinimizeFSM() { // NOLINT(*to-static)
     fsa.setInitialState(*s0);
 
     const auto fsaMin = std::unique_ptr<FSM::Labeled::FiniteStateMachine<int, int>>(
-            fsa.minimizeEdgeLabels());
+            dynamic_cast<FSM::Labeled::FiniteStateMachine<int, int>*>(fsa.minimizeEdgeLabels().release()));
 
     std::cout << "Nr states: " << fsaMin->getStates().size() << "\n";
     std::cout << "Nr edges: " << fsaMin->getEdges().size() << "\n";

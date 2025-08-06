@@ -771,7 +771,7 @@ public:
 
     Abstract::SetOfStateRefs getStateRefs() {
         Abstract::SetOfStateRefs result;
-        for (auto i : this->states) {
+        for (const auto& i : this->states) {
             result.insert(&(*(i.second)));
         }
         return result;
@@ -801,8 +801,8 @@ public:
     };
 
     void setEdgeLabel(const EdgeRef<StateLabelType, EdgeLabelType> &e, const EdgeLabelType &l) {
-        auto ee = std::dynamic_pointer_cast<Edge<StateLabelType, EdgeLabelType>>(
-                (*this->edges.find(e->getId())).second);
+        auto ee = dynamic_cast<Edge<StateLabelType, EdgeLabelType>*>(
+                (*this->edges.find(e->getId())).second.get());
         ee->setLabel(l);
     }
 
@@ -829,7 +829,7 @@ public:
         // get all labels
         const SetOfStates<StateLabelType, EdgeLabelType> &allStates = this->getStates();
 
-        for (auto iter : allStates) {
+        for (const auto& iter : allStates) {
             auto s = dynamic_cast<State<StateLabelType, EdgeLabelType> &>(*(iter.second));
             if (s.stateLabel == src) {
                 const StateRef<StateLabelType, EdgeLabelType> srcState = this->getStateLabeled(src);
@@ -856,7 +856,7 @@ public:
     std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>> determinizeEdgeLabels() {
         std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>> result =
                 std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>>(
-                        this->newInstance());
+                        dynamic_cast<FiniteStateMachine<StateLabelType, EdgeLabelType>*>(this->newInstance().release()));
 
         // maintain map of sets of states to the corresponding new states.
         std::map<const Abstract::SetOfStateRefs, const State<StateLabelType, EdgeLabelType> *>
@@ -876,7 +876,7 @@ public:
         result->setInitialState(si);
 
         // add initial state to list of unprocessed state sets
-        unprocessed.push_back(initialStateSet);
+        unprocessed.push_back(std::move(initialStateSet));
 
         while (!unprocessed.empty()) {
             Abstract::SetOfStateRefs *Q = (unprocessed.begin())->get();
@@ -1003,8 +1003,7 @@ public:
                         changed = true;
                     }
                 }
-                auto tempEqClasses = eqClasses;
-                eqClasses = newEqClasses;
+                eqClasses = std::move(newEqClasses);
             } while (changed);
         }
 
@@ -1054,12 +1053,12 @@ public:
                     changed = true;
                 }
             }
-            auto tempEqClasses = eqClasses;
-            eqClasses = newEqClasses;
+            eqClasses = std::move(newEqClasses);
         } while (changed);
 
         std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>> result =
-                this->newInstance();
+                std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>>(
+                        dynamic_cast<FiniteStateMachine<StateLabelType, EdgeLabelType>*>(this->newInstance().release()));
 
         // make a state for every equivalence class
         std::map<Abstract::SetOfStateRefs *, StateRef<StateLabelType, EdgeLabelType>> newStateMap;
@@ -1069,7 +1068,7 @@ public:
             const State<StateLabelType, EdgeLabelType> *s =
                     dynamic_cast<const State<StateLabelType, EdgeLabelType> *>(*(cli->begin()));
             auto ns = result->addState(s->stateLabel);
-            newStateMap[cli] = ns;
+            newStateMap[cli.get()] = ns;
             sid++;
         }
 
@@ -1081,7 +1080,7 @@ public:
             // for every outgoing edge
             for (const auto *edi : es) {
                 auto ed = dynamic_cast<EdgeRef<StateLabelType, EdgeLabelType>>(edi);
-                result->addEdge(*(newStateMap[cli]),
+                result->addEdge(*(newStateMap[cli.get()]),
                                 ed->getLabel(),
                                 *(newStateMap[eqMap[ed->getDestination()]]));
             }
