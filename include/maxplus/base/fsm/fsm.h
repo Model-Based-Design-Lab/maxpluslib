@@ -266,7 +266,7 @@ public:
         };
 
         // access state
-        StateRef getState() { return this->state; }
+        StateRef getState() const { return this->state; }
 
         SetOfEdgeRefs::CIter getIter() { return this->iter; }
 
@@ -471,7 +471,7 @@ private:
     void onSimpleCycle(DfsStack &stack) override {
         if (!this->hasCycle) {
             if (this->cycle != nullptr) {
-                for (auto si : stack) {
+                for (const auto& si : stack) {
                     this->cycle->push_back(si.getState());
                 }
             }
@@ -801,8 +801,8 @@ public:
     };
 
     void setEdgeLabel(const EdgeRef<StateLabelType, EdgeLabelType> &e, const EdgeLabelType &l) {
-        auto ee = dynamic_cast<Edge<StateLabelType, EdgeLabelType>*>(
-                (*this->edges.find(e->getId())).second.get());
+        const auto& p = (*this->edges.find(e->getId())).second;
+        auto ee = dynamic_cast<Edge<StateLabelType, EdgeLabelType>*>(p.get());
         ee->setLabel(l);
     }
 
@@ -856,7 +856,7 @@ public:
     std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>> determinizeEdgeLabels() {
         std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>> result =
                 std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>>(
-                        dynamic_cast<FiniteStateMachine<StateLabelType, EdgeLabelType>*>(this->newInstance().release()));
+                        dynamic_cast<FiniteStateMachine<StateLabelType, EdgeLabelType> *>(this->newInstance().release()));
 
         // maintain map of sets of states to the corresponding new states.
         std::map<const Abstract::SetOfStateRefs, const State<StateLabelType, EdgeLabelType> *>
@@ -1058,9 +1058,10 @@ public:
             eqClasses = std::move(newEqClasses);
         } while (changed);
 
+        auto x = this->newInstance().release(); 
+        auto y = static_cast<FiniteStateMachine<StateLabelType, EdgeLabelType>*>(x);
         std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>> result =
-                std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>>(
-                        dynamic_cast<FiniteStateMachine<StateLabelType, EdgeLabelType>*>(this->newInstance().release()));
+                std::unique_ptr<FiniteStateMachine<StateLabelType, EdgeLabelType>>(y);
 
         // make a state for every equivalence class
         std::map<Abstract::SetOfStateRefs *, StateRef<StateLabelType, EdgeLabelType>> newStateMap;
