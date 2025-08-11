@@ -1168,7 +1168,7 @@ Matrix::mp_generalized_eigenvectors() const { // NOLINT(*cognitive-complexity)
     uint k = 0;
     // for each SCC
     for (auto scc_i = scc_s.begin(); scc_i != scc_s.end(); scc_i++, k++) {
-        MCMgraph& scc = *(*scc_i);
+        MCMgraph &scc = *(*scc_i);
         sccMapInv[k] = &scc;
 
         // MCM calculation requires node relabelling

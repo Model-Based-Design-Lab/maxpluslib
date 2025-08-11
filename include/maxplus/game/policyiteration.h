@@ -78,7 +78,6 @@ public:
     PolicyIteration(PolicyIteration &&) = delete;
     PolicyIteration &operator=(PolicyIteration &&) = delete;
 
-
     struct PolicyIterationResult {
         std::map<const State<SL, EL> *, CDouble> values;
         StrategyVector<SL, EL> strategy;
@@ -325,7 +324,7 @@ private:
      * @return the new distance and ratio vectors
      */
     StrategyEvaluation evaluateStrategy(RatioGame<SL, EL> &game,
-                                        StrategyVector<SL, EL>& currentStrategy,
+                                        StrategyVector<SL, EL> &currentStrategy,
                                         std::map<const State<SL, EL> *, CDouble> &distanceVector,
                                         std::map<const State<SL, EL> *, CDouble> &ratioVector,
                                         std::map<const State<SL, EL> *, CDouble> &dw2,
@@ -391,7 +390,7 @@ private:
             if (visited[v] == BOTTOM_VERTEX) {
                 const State<SL, EL> *u = v;
                 while (visited[u] == BOTTOM_VERTEX) { // NOLINT(*pointer-arithmetic)
-                    visited[u] = v; // NOLINT(*pointer-arithmetic)
+                    visited[u] = v;                   // NOLINT(*pointer-arithmetic)
                     u = currentStrategy.getSuccessor(u);
                 }
                 if (visited[u] == v) { // NOLINT(*pointer-arithmetic)
@@ -452,15 +451,14 @@ private:
      * @param epsilon         epsilon value for equality on real numbers
      * @return
      */
-    DistanceResult
-    computeDistances(RatioGame<SL, EL> &game,
-                     StrategyVector<SL, EL> &currentStrategy,
-                     FSM::Abstract::SetOfStateRefs &selectedStates,
-                     std::map<const State<SL, EL> *, CDouble> &r_i_t,
-                     std::map<const State<SL, EL> *, CDouble> &d_prev,
-                     std::map<const State<SL, EL> *, CDouble> &r_prev,
-                     std::map<const State<SL, EL> *, CDouble> &dw2_prev,
-                     CDouble epsilon) {
+    DistanceResult computeDistances(RatioGame<SL, EL> &game,
+                                    StrategyVector<SL, EL> &currentStrategy,
+                                    FSM::Abstract::SetOfStateRefs &selectedStates,
+                                    std::map<const State<SL, EL> *, CDouble> &r_i_t,
+                                    std::map<const State<SL, EL> *, CDouble> &d_prev,
+                                    std::map<const State<SL, EL> *, CDouble> &r_prev,
+                                    std::map<const State<SL, EL> *, CDouble> &dw2_prev,
+                                    CDouble epsilon) {
         const SetOfStates<SL, EL> &states = game.getStates();
 
         std::stack<const State<SL, EL> *> stack;
@@ -489,7 +487,7 @@ private:
             auto state = dynamic_cast<const State<SL, EL> *>(&(si));
             if (!visited[state]) {
                 const State<SL, EL> *u = state;
-                while (!visited[u]) { // NOLINT(*pointer-arithmetic)
+                while (!visited[u]) {  // NOLINT(*pointer-arithmetic)
                     visited[u] = true; // NOLINT(*pointer-arithmetic)
                     stack.push(u);
                     u = currentStrategy.getSuccessor(u);
@@ -509,7 +507,7 @@ private:
                     r_i_t[x] = cycleRatio; // NOLINT(*pointer-arithmetic)
                     // Update distance to cycle.
                     d_i_t[x] = d_i_t[u] + re_weighted; // NOLINT(*pointer-arithmetic)
-                    dw2[x] = dw2[u] + w2; // NOLINT(*pointer-arithmetic)
+                    dw2[x] = dw2[u] + w2;              // NOLINT(*pointer-arithmetic)
                     u = x;
                 }
             }

@@ -39,8 +39,8 @@
  *  SOFTWARE.
  */
 
-#include "base/analysis/mcm/mcmgraph.h"
 #include "base/analysis/mcm/mcmkarp.h"
+#include "base/analysis/mcm/mcmgraph.h"
 #include "base/math/cmath.h"
 #include <algorithm>
 #include <climits>

@@ -75,7 +75,6 @@ public:
     // the mode automaton
     EdgeLabeledModeFSM elsFSM;
 
-
     [[nodiscard]] std::unique_ptr<MaxPlusAutomaton> convertToMaxPlusAutomaton() const;
 
     // transposes all matrices of the SMPLS
@@ -89,7 +88,6 @@ public:
 private:
     // the mode matrices
     ModeMatrices mm;
-
 };
 
 using ListOfMatrices = std::list<std::unique_ptr<Matrix>>;
@@ -97,10 +95,11 @@ using ListOfMatrices = std::list<std::unique_ptr<Matrix>>;
 class DissectedModeMatrix {
 public:
     DissectedModeMatrix() = default;
-    ModeMatrices& getCore() { return core; }
-    [[nodiscard]] const ModeMatrices& getCore() const { return core; }
-    ListOfMatrices& getEventRows() { return eventRows; }
-    [[nodiscard]] const ListOfMatrices& getEventRows() const { return eventRows; }
+    ModeMatrices &getCore() { return core; }
+    [[nodiscard]] const ModeMatrices &getCore() const { return core; }
+    ListOfMatrices &getEventRows() { return eventRows; }
+    [[nodiscard]] const ListOfMatrices &getEventRows() const { return eventRows; }
+
 private:
     ModeMatrices core;
     ListOfMatrices eventRows;
@@ -167,7 +166,7 @@ private:
                          std::multiset<Event> &eventList,
                          IOASetOfEdgeRefs &visitedEdges);
 
-    DissectedModeMatrix* findDissectedModeMatrix(const MPString &sName);
+    DissectedModeMatrix *findDissectedModeMatrix(const MPString &sName);
 
     /**
      * recursive part of isConsistent

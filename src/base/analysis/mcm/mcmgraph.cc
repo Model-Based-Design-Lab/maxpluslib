@@ -150,7 +150,9 @@ void splitMCMedgeToSequence(MCMgraph &g, MCMedge &e) { // NOLINT(*no-recursion)
  * algorithm.
  * Note: algorithm assumes that edge weights are integer values !
  */
-void addLongestDelayEdgeForNode(MCMgraph &g, MCMnode &n, MCMedge &e) { // NOLINT(*cognitive-complexity)
+void addLongestDelayEdgeForNode(MCMgraph &g, // NOLINT(*cognitive-complexity)
+                                MCMnode &n,
+                                MCMedge &e) {
     std::vector<int> d(g.getNodes().size());
     std::vector<const MCMnode *> pi(g.getNodes().size());
     MCMnodeRefs S;
@@ -464,7 +466,10 @@ void addNodeToComponent(const MCMnode &n, MCMgraph &comp) {
  * The function visits all children of the actor 'u'. The parent-child
  * relation is given via the vector 'pi'.
  */
-bool treeVisitChildren(MCMgraph &g, std::vector<const MCMnode *> &pi, MCMnode *u, MCMgraph &comp) { // NOLINT(*no-recursion)
+bool treeVisitChildren(MCMgraph &g, // NOLINT(*no-recursion)
+                       std::vector<const MCMnode *> &pi,
+                       MCMnode *u,
+                       MCMgraph &comp) {
     bool children = false;
 
     for (uint i = 0; i < g.getNodes().size(); i++) {

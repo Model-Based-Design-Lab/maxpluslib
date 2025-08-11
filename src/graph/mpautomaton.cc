@@ -38,8 +38,7 @@ CDouble MaxPlusAutomatonWithRewards::calculateMCR() {
     return mcr;
 }
 
-CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(
-        std::vector<MPAREdgeRef> *cycle) {
+CDouble MaxPlusAutomatonWithRewards::calculateMCRAndCycle(std::vector<MPAREdgeRef> *cycle) {
 
     MCMgraph g;
 
