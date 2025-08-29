@@ -169,7 +169,6 @@ public:
     MaxPlusAutomaton &operator=(const MaxPlusAutomaton &) = delete;
     MaxPlusAutomaton(MaxPlusAutomaton &&) = delete;
     MaxPlusAutomaton &operator=(MaxPlusAutomaton &&) = delete;
-
 };
 
 /**
@@ -232,7 +231,6 @@ using MPARSetOfStates = ::MaxPlus::FSM::Labeled::SetOfStates<MPAStateLabel, MPAR
 using MPARSetOfEdges = ::MaxPlus::FSM::Abstract::SetOfEdges;
 using MPARCycle = std::list<const ::MaxPlus::FSM::Abstract::Edge *>;
 
-
 /**
  * A max-plus automaton with rewards. In addition to the usual max-plus automaton,
  * its edges are labeled with rewards; a quantified amount of 'progress'.
@@ -247,12 +245,11 @@ public:
         return std::make_unique<MaxPlusAutomatonWithRewards>();
     }
 
-        // Delete copy/move constructors and assignment operators
+    // Delete copy/move constructors and assignment operators
     MaxPlusAutomatonWithRewards(const MaxPlusAutomatonWithRewards &) = delete;
     MaxPlusAutomatonWithRewards &operator=(const MaxPlusAutomatonWithRewards &) = delete;
     MaxPlusAutomatonWithRewards(MaxPlusAutomatonWithRewards &&) = delete;
     MaxPlusAutomatonWithRewards &operator=(MaxPlusAutomatonWithRewards &&) = delete;
-
 
     // compute the maximum cycle ratio of delay over progress
     CDouble calculateMCR();

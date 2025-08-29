@@ -56,8 +56,8 @@ void MPAutomatonTest::testCreateFSM() { // NOLINT(*to-static)
     ASSERT_THROW(s != nullptr);
 
     const auto *e = mpa.findEdge(makeMPAStateLabel(0, 0),
-                          makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0),
-                          makeMPAStateLabel(0, 1));
+                                 makeRewardEdgeLabel(MPTime(3.0), MPString("A"), 1.0),
+                                 makeMPAStateLabel(0, 1));
     ASSERT_THROW(e != nullptr);
 
     ASSERT_EQUAL_NOPRINT(s1, mpa.getInitialState());
@@ -92,7 +92,9 @@ void MPAutomatonTest::testDeterminizeFSM() { // NOLINT(*to-static)
     mpa.setInitialState(*s1);
 
     auto determinizedAutomaton = mpa.determinizeEdgeLabels();
-    std::unique_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized = std::unique_ptr<MaxPlusAutomatonWithRewards>(dynamic_cast<MaxPlusAutomatonWithRewards *>(determinizedAutomaton.release()));
+    std::unique_ptr<MaxPlusAutomatonWithRewards> mpaDeterminized =
+            std::unique_ptr<MaxPlusAutomatonWithRewards>(
+                    dynamic_cast<MaxPlusAutomatonWithRewards *>(determinizedAutomaton.release()));
 
     ASSERT_THROW(mpaDeterminized->getStates().size() == 2);
     ASSERT_THROW(mpaDeterminized->getEdges().size() == 3);
@@ -122,7 +124,8 @@ void MPAutomatonTest::testMinimizeFSM() { // NOLINT(*to-static)
     fsa.setInitialState(*s0);
 
     const auto fsaMin = std::unique_ptr<FSM::Labeled::FiniteStateMachine<int, int>>(
-            dynamic_cast<FSM::Labeled::FiniteStateMachine<int, int>*>(fsa.minimizeEdgeLabels().release()));
+            dynamic_cast<FSM::Labeled::FiniteStateMachine<int, int> *>(
+                    fsa.minimizeEdgeLabels().release()));
 
     std::cout << "Nr states: " << fsaMin->getStates().size() << "\n";
     std::cout << "Nr edges: " << fsaMin->getEdges().size() << "\n";

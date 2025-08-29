@@ -43,7 +43,6 @@ MCMgraph makeGraph1() {
     return g;
 }
 
-
 // A corner case graph
 MCMgraph makeGraph2() {
     MCMgraph g;
@@ -54,7 +53,6 @@ MCMgraph makeGraph2() {
     // g.addEdge(1, n1, n1, 1.0, 1.0);
     return g;
 }
-
 
 MCMgraph
 makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned int seed) {
@@ -71,7 +69,8 @@ makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned
 
     // cap the number of edges
     unsigned int actualNumberOfEdges = (numberOfEdges / 2) + (rng() % (numberOfEdges / 2));
-    actualNumberOfEdges = (std::min)(actualNumberOfEdges, (actualNumberOfNodes - 1) * actualNumberOfNodes);
+    actualNumberOfEdges =
+            (std::min)(actualNumberOfEdges, (actualNumberOfNodes - 1) * actualNumberOfNodes);
 
     // random edges
     std::set<std::pair<CId, CId>> existingEdges;
@@ -103,7 +102,6 @@ makeRandomGraph(unsigned int numberOfNodes, unsigned int numberOfEdges, unsigned
 }
 
 } // namespace
-
 
 // Test mcmdg.
 void MCMTest::test_dg() { // NOLINT(*to-static)

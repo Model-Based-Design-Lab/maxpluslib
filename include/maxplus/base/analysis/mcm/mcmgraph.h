@@ -45,7 +45,6 @@
 #include "maxplus/base/basic_types.h"
 #include <memory>
 
-
 namespace MaxPlus::Graphs {
 class MCMnode;
 

@@ -98,13 +98,13 @@ private:
 
     d_heap h;
 
-        // void printHeap()
-        // {
-        //     cerr << "Heap: ";
-        //     for (std::int32_t i = 0; i < h.size; i++)
-        //         cerr << h.items[i]->key << ", ";
-        //     cerr << endl;
-        // }
+    // void printHeap()
+    // {
+    //     cerr << "Heap: ";
+    //     for (std::int32_t i = 0; i < h.size; i++)
+    //         cerr << h.items[i]->key << ", ";
+    //     cerr << endl;
+    // }
 
     [[nodiscard]] std::int32_t minChild(std::int32_t x) {
         std::int32_t k_min = -1;
@@ -381,7 +381,9 @@ public:
      *
      * 9) goto (6);
      */
-    void mmcycle(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle) { // NOLINT(*cognitive-complexity)
+    void mmcycle(graph &gr, // NOLINT(*cognitive-complexity)
+                 CDouble *lambda,
+                 std::vector<const arc *> *cycle) {
 
         // set up initial tree
         node *s_ptr = gr.vs;
@@ -562,11 +564,9 @@ public:
                         uptr = a_ptr->tail;
                         a_ptr->key =
                                 uptr->transit_time_t + a_ptr->transit_time > v_ptr->transit_time_t
-                                        ? (uptr->cost_t + a_ptr->cost
-                                                               - v_ptr->cost_t)
-                                                  / (uptr->transit_time_t
-                                                                         + a_ptr->transit_time
-                                                                         - v_ptr->transit_time_t)
+                                        ? (uptr->cost_t + a_ptr->cost - v_ptr->cost_t)
+                                                  / (uptr->transit_time_t + a_ptr->transit_time
+                                                     - v_ptr->transit_time_t)
                                         : infty;
 
                         if (a_ptr->key < min) {
@@ -596,11 +596,9 @@ public:
                         w_ptr = a_ptr->head;
                         CDouble a_key =
                                 v_ptr->transit_time_t + a_ptr->transit_time > w_ptr->transit_time_t
-                                        ? (v_ptr->cost_t + a_ptr->cost
-                                                               - w_ptr->cost_t)
-                                                  / (v_ptr->transit_time_t
-                                                                         + a_ptr->transit_time
-                                                                         - w_ptr->transit_time_t)
+                                        ? (v_ptr->cost_t + a_ptr->cost - w_ptr->cost_t)
+                                                  / (v_ptr->transit_time_t + a_ptr->transit_time
+                                                     - w_ptr->transit_time_t)
                                         : infty;
 
                         if (a_key < w_ptr->v_key->key) {
@@ -655,7 +653,9 @@ public:
      * TODO: see if the algorithms can be unified to remove duplicate code
      **/
 
-    void mmcycle_robust(graph &gr, CDouble *lambda, std::vector<const arc *> *cycle) { // NOLINT(*cognitive-complexity)
+    void mmcycle_robust(graph &gr, // NOLINT(*cognitive-complexity)
+                        CDouble *lambda,
+                        std::vector<const arc *> *cycle) {
         const CDouble MCR_EPSILON_RATIO = 1.0e-8L;
 
         // set up initial tree
@@ -995,47 +995,46 @@ void convertMCMgraphToYTOgraph(MCMgraph &g,
         aidx++;
     }
 
-        // // Print the MCM graph
-        // cerr << "#nodes: " << g->nodes.size() << endl;
-        // cerr << "#edges: " << g->edges.size() << endl;
-        // cerr << "edge: (u, v, w, d)" << endl;
-        // for (auto iter = g->edges.begin();
-        //      iter != g->edges.end(); iter++)
-        // {
-        //     MCMedge *e = *iter;
+    // // Print the MCM graph
+    // cerr << "#nodes: " << g->nodes.size() << endl;
+    // cerr << "#edges: " << g->edges.size() << endl;
+    // cerr << "edge: (u, v, w, d)" << endl;
+    // for (auto iter = g->edges.begin();
+    //      iter != g->edges.end(); iter++)
+    // {
+    //     MCMedge *e = *iter;
 
-        //     if (!e->visible)
-        //         continue;
+    //     if (!e->visible)
+    //         continue;
 
-        //     cerr << "(" << e->src->id;
-        //     cerr << ", " << e->dst->id;
-        //     cerr << ", " << e->w;
-        //     cerr << ", " << e->d;
-        //     cerr << ")" << endl;
-        // }
-        // cerr << endl;
+    //     cerr << "(" << e->src->id;
+    //     cerr << ", " << e->dst->id;
+    //     cerr << ", " << e->w;
+    //     cerr << ", " << e->d;
+    //     cerr << ")" << endl;
+    // }
+    // cerr << endl;
 
-        // // Print the graph used in the YTO algorithm
-        // x = gr.nodes;
-        // for (int i = 0; i <= gr.n_nodes; i++)
-        // {
-        //     cerr << "vertex: " << x->id << endl;
+    // // Print the graph used in the YTO algorithm
+    // x = gr.nodes;
+    // for (int i = 0; i <= gr.n_nodes; i++)
+    // {
+    //     cerr << "vertex: " << x->id << endl;
 
-        //     for (arc *a = x->first_arc_in; a != nullptr; a = a->next_in)
-        //     {
-        //         cerr << "   edge from: " << a->tail->id;
-        //         cerr << " (weight: " << a->cost << ")" << endl;
-        //     }
-        //     for (arc *a = x->first_arc_out; a != nullptr; a = a->next_out)
-        //     {
-        //         cerr << "   edge to:   " << a->head->id;
-        //         cerr << " (weight: " << a->cost << ")" << endl;
-        //     }
+    //     for (arc *a = x->first_arc_in; a != nullptr; a = a->next_in)
+    //     {
+    //         cerr << "   edge from: " << a->tail->id;
+    //         cerr << " (weight: " << a->cost << ")" << endl;
+    //     }
+    //     for (arc *a = x->first_arc_out; a != nullptr; a = a->next_out)
+    //     {
+    //         cerr << "   edge to:   " << a->head->id;
+    //         cerr << " (weight: " << a->cost << ")" << endl;
+    //     }
 
-        //     x++;
-        // }
-
-    }
+    //     x++;
+    // }
+}
 
 namespace {
 

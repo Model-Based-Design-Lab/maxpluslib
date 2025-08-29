@@ -58,8 +58,7 @@ void FiniteStateMachine::addEdgeLabeled(const MPString &src, const MPString &dst
 }
 
 std::unique_ptr<Abstract::SetOfStateRefs> FiniteStateMachine::reachableStates() {
-    return std::move(
-            Labeled::FiniteStateMachine<MPString, char>::reachableStates());
+    return std::move(Labeled::FiniteStateMachine<MPString, char>::reachableStates());
 }
 
 void FiniteStateMachine::setInitialStateLabeled(const MPString &sl) { this->setInitialState(sl); }
@@ -78,7 +77,7 @@ const Abstract::SetOfEdges &State::getOutgoingEdges() { // NOLINT(*no-recursion)
         while (i != oea.end()) {
             while (j != oeb.end()) {
                 if (this->fsm->matchEdges(*(*i), *(*j))) {
-                    Abstract::Edge* e = this->fsm->ensureEdge(*(*i), *(*j));
+                    Abstract::Edge *e = this->fsm->ensureEdge(*(*i), *(*j));
                     this->insertOutgoingEdge(*e);
                 }
                 j++;

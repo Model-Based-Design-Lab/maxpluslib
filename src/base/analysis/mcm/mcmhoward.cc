@@ -49,8 +49,8 @@
  *  SOFTWARE.
  */
 
-#include "base/analysis/mcm/mcmgraph.h"
 #include "base/analysis/mcm/mcmhoward.h"
+#include "base/analysis/mcm/mcmgraph.h"
 #include "base/exception/exception.h"
 
 #include <algorithm>
@@ -456,8 +456,6 @@ private:
  *               policy which is returned.
  */
 
-
- 
 void Howard(const std::vector<int> &ij,
             const std::vector<CDouble> &A,
             int nr_nodes,
@@ -577,7 +575,7 @@ CDouble maximumCycleMeanHowardGeneral(MCMgraph &g, MCMnode **criticalNode) {
         std::map<CId, CId> nodeMap;
         scc->relabelNodeIds(&nodeMap);
         MCMnode *sccCriticalNode = nullptr;
-        
+
         CDouble c_mcm = maximumCycleMeanHoward(*scc, &sccCriticalNode);
         if (c_mcm > mcm) {
             mcm = c_mcm;
