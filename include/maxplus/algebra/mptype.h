@@ -65,7 +65,7 @@ public:
 
     explicit operator CDouble() const { return myVal; }
     explicit operator MPString() const { return timeToString(*this); }
-    MPTime &operator-();
+    MPTime operator-();
     MPTime &operator+=(MPTime a);
     MPTime &operator-=(MPTime a);
     bool operator==(MPTime a) const;
@@ -153,10 +153,9 @@ inline MPTime operator-(MPTime a, CDouble b) { return MPTime(a) - MPTime(b); }
 
 inline MPTime operator-(CDouble a, MPTime b) { return MPTime(a) - MPTime(b); }
 
-inline MPTime &MPTime::operator-() {
+inline MPTime MPTime::operator-() {
     assert(!this->isMinusInfinity());
-    myVal = -myVal;
-    return *this;
+    return MPTime(-myVal);
 }
 
 inline MPTime operator*(MPTime a, MPTime b) {
